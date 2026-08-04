@@ -1,0 +1,362 @@
+/* 个股详情 · 页面专有样式（不改 FROZEN .ds-*） */
+
+.stk-crumb {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: var(--fg-4);
+  margin-bottom: 14px;
+}
+.stk-crumb a { color: var(--fg-3); text-decoration: none; }
+.stk-crumb a:hover { color: var(--fg); }
+.stk-crumb .here { color: var(--fg-2); }
+.stk-crumb .join {
+  margin-left: auto;
+  font: inherit;
+  font-size: 11px;
+  font-weight: 500;
+  padding: 4px 10px;
+  border-radius: var(--radius);
+  border: 1px solid var(--fg);
+  background: var(--fg);
+  color: var(--surface);
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.stk-crumb .join:hover { opacity: 0.92; }
+.stk-crumb .join.joined {
+  background: var(--surface);
+  color: var(--fg-2);
+  border-color: var(--border-strong);
+}
+
+/* 概览标题行 */
+.stk-ov-head {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+}
+.stk-ov-name {
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--fg);
+  line-height: 1.1;
+}
+.stk-ov-code {
+  font-family: var(--font-num);
+  font-size: 13px;
+  color: var(--fg-4);
+}
+.stk-ov-meta {
+  margin-left: auto;
+  font-size: 12px;
+  color: var(--fg-4);
+}
+.stk-ov-ai {
+  margin-left: 8px;
+  font: inherit;
+  font-size: 11px;
+  font-weight: 500;
+  color: hsl(var(--primary));
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+}
+.stk-ov-ai:hover { text-decoration: underline; }
+
+/* 左对齐指标格（覆盖 ds-tile 居中） */
+.stk-metrics {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+@media (max-width: 900px) {
+  .stk-metrics { grid-template-columns: repeat(2, 1fr); }
+}
+.stk-metric {
+  background: hsl(var(--muted) / 0.28);
+  border-radius: 12px;
+  padding: 12px;
+  text-align: left;
+}
+.stk-metric .k {
+  font-size: 12px;
+  color: var(--fg-4);
+  font-weight: 500;
+}
+.stk-metric .v {
+  font-family: var(--font-num);
+  font-size: 18px;
+  font-weight: 700;
+  margin-top: 4px;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+  color: var(--fg);
+  font-variant-numeric: tabular-nums;
+}
+.stk-metric .sub {
+  font-size: 11px;
+  color: var(--fg-4);
+  margin-top: 4px;
+}
+.stk-metric .sub.up { color: var(--up); }
+.stk-metric .sub.down { color: var(--down); }
+
+/* 卡内标题 */
+.stk-card-h {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--fg);
+  margin-bottom: 4px;
+}
+.stk-card-h .period {
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--fg-4);
+}
+.stk-card-h .ds-ico {
+  color: hsl(var(--primary));
+  opacity: 1;
+}
+.stk-card-hint {
+  font-size: 11px;
+  color: var(--fg-4);
+  margin: 0 0 12px;
+  line-height: 1.4;
+}
+.stk-card-foot {
+  font-size: 12px;
+  color: var(--fg-3);
+  margin: 12px 0 0;
+  line-height: 1.45;
+}
+.stk-card-foot .label { color: var(--fg-4); }
+
+/* 信号 pill */
+.stk-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 12px;
+}
+.stk-tag {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  border: 1px solid hsl(var(--primary) / 0.25);
+  background: hsl(var(--primary) / 0.1);
+  color: hsl(var(--primary));
+  font-size: 12px;
+  padding: 4px 10px;
+  line-height: 1.3;
+}
+.stk-tag.muted {
+  border-color: hsl(var(--border-raw) / 0.55);
+  background: hsl(var(--muted) / 0.35);
+  color: var(--fg-3);
+}
+.stk-tag.hot {
+  border-color: hsl(var(--primary) / 0.2);
+  background: hsl(var(--primary) / 0.12);
+  color: hsl(var(--primary));
+}
+
+/* 估值分位带 */
+.stk-valband { margin-bottom: 16px; }
+.stk-valband:last-child { margin-bottom: 0; }
+.stk-valband-h {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 4px 12px;
+  font-size: 13px;
+  margin-bottom: 8px;
+}
+.stk-valband-h .lab { font-weight: 500; color: var(--fg); }
+.stk-valband-h .n { font-size: 11px; color: var(--fg-4); font-weight: 400; }
+.stk-valband-h .sum { font-size: 12px; color: var(--fg-4); }
+.stk-valband-h .sum b {
+  font-family: var(--font-num);
+  font-weight: 600;
+  color: var(--fg);
+}
+.stk-valband-h .zone-low { color: var(--down); }
+.stk-valband-h .zone-fair { color: var(--fg-3); }
+.stk-valband-h .zone-high { color: var(--up); }
+.stk-valband-track {
+  position: relative;
+  height: 10px;
+  width: 100%;
+  border-radius: 999px;
+  overflow: hidden;
+}
+.stk-valband-track .seg {
+  position: absolute;
+  top: 0; bottom: 0;
+}
+.stk-valband-track .seg-low {
+  left: 0;
+  background: color-mix(in oklch, var(--down) 35%, transparent);
+}
+.stk-valband-track .seg-mid {
+  background: hsl(var(--muted) / 0.85);
+}
+.stk-valband-track .seg-high {
+  right: 0;
+  background: color-mix(in oklch, var(--up) 35%, transparent);
+}
+.stk-valband-pin {
+  position: absolute;
+  top: 50%;
+  width: 3px;
+  height: 16px;
+  border-radius: 2px;
+  background: var(--fg);
+  transform: translate(-50%, -50%);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+  z-index: 1;
+}
+.stk-valband-scale {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 6px;
+  font-family: var(--font-num);
+  font-size: 10px;
+  color: var(--fg-4);
+  font-variant-numeric: tabular-nums;
+}
+
+/* 列表行 */
+.stk-list { display: flex; flex-direction: column; gap: 0; }
+.stk-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid hsl(var(--border-raw) / 0.28);
+  font-size: 13px;
+  min-width: 0;
+}
+.stk-row:last-child { border-bottom: none; padding-bottom: 0; }
+.stk-row:first-child { padding-top: 0; }
+.stk-row .dt {
+  width: 88px;
+  flex-shrink: 0;
+  font-family: var(--font-num);
+  font-size: 12px;
+  color: var(--fg-4);
+  font-variant-numeric: tabular-nums;
+}
+.stk-row .dt-stack {
+  width: 72px;
+  flex-shrink: 0;
+  font-family: var(--font-num);
+  font-size: 11px;
+  color: var(--fg-4);
+  line-height: 1.35;
+  font-variant-numeric: tabular-nums;
+}
+.stk-row .org,
+.stk-row .type {
+  width: 96px;
+  flex-shrink: 0;
+  font-size: 12px;
+  color: var(--fg-4);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.stk-row .title {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--fg);
+}
+.stk-row a.title {
+  text-decoration: none;
+  color: var(--fg);
+}
+.stk-row a.title:hover { color: hsl(var(--primary)); }
+.stk-rating {
+  flex-shrink: 0;
+  font-size: 10px;
+  padding: 2px 7px;
+  border-radius: 6px;
+  background: hsl(var(--primary) / 0.12);
+  color: hsl(var(--primary));
+  white-space: nowrap;
+}
+
+/* 资金面 metric 已用 .stk-metric；大宗子列表 */
+.stk-block-h {
+  margin: 14px 0 8px;
+  padding-top: 12px;
+  border-top: 1px solid hsl(var(--border-raw) / 0.35);
+  font-size: 12px;
+  color: var(--fg-4);
+}
+.stk-block-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 12px;
+  padding: 5px 0;
+  min-width: 0;
+}
+.stk-block-row .dt {
+  width: 88px;
+  flex-shrink: 0;
+  font-family: var(--font-num);
+  color: var(--fg-4);
+}
+.stk-block-row .px { width: 64px; flex-shrink: 0; font-family: var(--font-num); }
+.stk-block-row .prem { width: 72px; flex-shrink: 0; font-family: var(--font-num); }
+.stk-block-row .prem.up { color: var(--up); }
+.stk-block-row .prem.down { color: var(--down); }
+.stk-block-row .parties {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--fg-4);
+}
+
+/* 概念标签云 */
+.stk-concepts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+.stk-concepts:last-child { margin-bottom: 0; }
+.stk-hot-label {
+  font-size: 12px;
+  color: var(--fg-4);
+  margin: 0 0 8px;
+}
+
+.stk-empty {
+  font-size: 12px;
+  color: var(--fg-4);
+  padding: 8px 0;
+}
+
+.stk-note {
+  margin-top: 12px;
+  font-size: 11px;
+  color: var(--fg-4);
+  line-height: 1.4;
+}

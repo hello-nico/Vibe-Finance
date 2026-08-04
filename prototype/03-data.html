@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>投研助手 · 数据</title>
+<link rel="stylesheet" href="shared.css?v=10">
+<script src="theme.js?v=3"></script>
+<style>
+.shell.data.agent-open .data-view { max-width: none; }
+
+.data-view { display: none; max-width: 980px; }
+.data-view.show { display: block; }
+.page-kicker { font: 10px var(--font-num); letter-spacing: .12em; color: var(--accent-ink); margin-bottom: 5px; }
+.page-title { font-size: 22px; font-weight: 700; line-height: 1.3; }
+.page-dek { font-size: 12.5px; color: var(--fg-2); line-height: 1.65; margin-top: 6px; max-width: 760px; }
+.page-meta { display: flex; flex-wrap: wrap; gap: 9px 16px; padding: 10px 0 12px; border-bottom: 1px solid var(--border); font-size: 10.5px; color: var(--fg-4); }
+.page-meta strong { color: var(--fg-3); font-weight: 500; font-family: var(--font-num); }
+
+.summary-line { display: grid; grid-template-columns: 1.4fr 1fr 1fr; gap: 14px; padding: 14px 0; border-bottom: 1px solid var(--border); }
+.summary-block .k { font-size: 9px; color: var(--fg-4); letter-spacing: .05em; }
+.summary-block .v { font-size: 13px; font-weight: 600; margin-top: 3px; }
+.summary-block .s { font-size: 10.5px; color: var(--fg-3); margin-top: 3px; line-height: 1.4; }
+
+.section { padding: 18px 0 4px; border-bottom: 1px solid var(--border); }
+.section:last-child { border-bottom: none; }
+.section-head { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; margin-bottom: 9px; }
+.section-title { font-size: 13px; font-weight: 600; }
+.section-note { font-size: 9.5px; color: var(--fg-4); }
+.analyze { color: var(--accent-ink); cursor: pointer; margin-left: 7px; }
+.analyze:hover { text-decoration: underline; }
+
+/* Wiki 关系 */
+.relation-flow { display: grid; grid-template-columns: 1fr 24px 1.15fr 24px 1fr; gap: 5px; align-items: stretch; }
+.rel-node { padding: 9px 10px; border: 1px solid var(--border); border-radius: var(--radius); cursor: pointer; background: var(--surface); min-height: 74px; }
+.rel-node:hover, .rel-node.on { border-color: var(--accent); background: color-mix(in oklch, var(--accent) 6%, var(--surface)); }
+.rel-node .r { font-size: 9px; color: var(--fg-4); }
+.rel-node .n { font-size: 11px; font-weight: 600; margin-top: 3px; }
+.rel-node .d { font-size: 9.5px; color: var(--fg-3); margin-top: 4px; line-height: 1.35; }
+.rel-arrow { display: grid; place-items: center; color: var(--fg-4); }
+
+.claim-table, .source-table { width: 100%; border-collapse: collapse; font-size: 11px; }
+.claim-table th, .source-table th { text-align: left; font-size: 9px; color: var(--fg-4); font-weight: 600; padding: 5px 7px; border-bottom: 1px solid var(--border); }
+.claim-table td, .source-table td { padding: 8px 7px; border-bottom: 1px solid var(--border); vertical-align: top; color: var(--fg-2); }
+.claim-table tr, .source-table tr { cursor: pointer; }
+.claim-table tr:hover td, .source-table tr:hover td { background: var(--hover); }
+.claim-table .claim { color: var(--fg); font-weight: 500; }
+.mono { font-family: var(--font-num); }
+.state { font-size: 9.5px; white-space: nowrap; }
+.state.ok { color: var(--ok); }
+.state.warn { color: var(--warn); }
+.state.gap { color: var(--err); }
+
+.coverage { display: grid; grid-template-columns: 125px 1fr 42px; gap: 9px; align-items: center; margin: 7px 0; font-size: 10.5px; }
+.coverage .bar { height: 7px; background: var(--sunken); overflow: hidden; border-radius: 2px; }
+.coverage .bar i { display: block; height: 100%; background: var(--accent); }
+.coverage .val { font: 10px var(--font-num); color: var(--fg-3); text-align: right; }
+
+.used-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.used-card { padding: 9px; border: 1px solid var(--border); border-radius: var(--radius); cursor: pointer; }
+.used-card:hover { border-color: var(--border-strong); background: var(--hover); }
+.used-card .t { font-size: 10.5px; font-weight: 600; }
+.used-card .p { font-size: 9.5px; color: var(--fg-4); margin-top: 3px; }
+
+/* Source 详情 */
+.source-origin { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+.origin-cell { padding: 8px 9px; border-left: 2px solid var(--border-strong); background: var(--sunken); }
+.origin-cell .k { font-size: 9px; color: var(--fg-4); }
+.origin-cell .v { font-size: 11px; font-weight: 500; margin-top: 3px; }
+.locator { font: 9.5px var(--font-num); color: var(--fg-3); }
+.quote { font-size: 10.5px; color: var(--fg-2); line-height: 1.45; }
+
+.lineage { display: flex; align-items: center; gap: 0; overflow-x: auto; padding: 4px 0 7px; }
+.lineage-node { min-width: 138px; padding: 8px 9px; border: 1px solid var(--border); border-radius: var(--radius); cursor: pointer; background: var(--surface); }
+.lineage-node:hover, .lineage-node.on { border-color: var(--accent); }
+.lineage-node + .lineage-node { margin-left: 24px; position: relative; }
+.lineage-node + .lineage-node::before { content: "→"; position: absolute; left: -17px; top: 36%; color: var(--fg-4); }
+.lineage-node .k { font-size: 9px; color: var(--fg-4); }
+.lineage-node .v { font-size: 10.5px; font-weight: 600; margin-top: 3px; }
+.lineage-node .s { font-size: 9.5px; color: var(--fg-3); margin-top: 3px; }
+
+.selection-readout { min-height: 27px; margin-top: 8px; padding: 6px 8px; border-left: 2px solid var(--accent); background: var(--sunken); font-size: 10px; color: var(--fg-3); }
+
+.agent-msg { margin-bottom: 12px; font-size: 11.5px; color: var(--fg-2); line-height: 1.55; }
+.agent-msg .who { font-size: 9px; color: var(--fg-4); margin-bottom: 2px; }
+.agent-suggest { display: grid; gap: 6px; }
+.agent-suggest button {
+  text-align: left; padding: 6px 8px; border: 1px solid var(--border);
+  border-radius: var(--radius); background: var(--surface);
+  font: inherit; font-size: 10.5px; color: var(--fg-2); cursor: pointer;
+}
+.agent-suggest button:hover { background: var(--hover); }
+
+@media (max-width: 1050px) {
+  .summary-line, .source-origin { grid-template-columns: 1fr 1fr; }
+  .used-grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+<div class="shell data" id="shell">
+  <div class="topbar">
+    <span class="topbar-brand">投研助手</span>
+    <div class="topbar-right"><span class="topbar-sync">↻ 2 分钟前 <span class="sync-abs">14:32</span></span><button type="button" class="topbar-agent" id="agent-open">助手</button></div>
+  </div>
+
+  <nav class="rail">
+    <a class="rail-btn" href="01-market.html"><svg class="rail-ico" viewBox="0 0 24 24"><path d="M3 18h18"/><path d="M5 14l4-5 3.5 3L17 6"/><path d="M14 6h3v3"/></svg><span>行情</span></a>
+    <a class="rail-btn" href="02-research.html"><svg class="rail-ico" viewBox="0 0 24 24"><path d="M7 4h8l4 4v12H7V4z"/><path d="M15 4v4h4M9 12h6M9 16h4"/></svg><span>研究</span></a>
+    <a class="rail-btn active" href="03-data.html"><svg class="rail-ico" viewBox="0 0 24 24"><path d="M5 5h14v14H5z"/><path d="M5 9h14M5 13h14M5 17h14M10 5v14M15 5v14"/></svg><span>数据</span></a>
+    <div class="rail-spacer"></div><div class="rail-avatar">陈</div>
+  </nav>
+
+  <aside class="data-nav">
+    <div class="mkt-tabs"><div class="mkt-tab on" data-mode="wiki">Wiki</div><div class="mkt-tab" data-mode="source">数据源</div></div>
+    <input class="sidebar-search sidebar-search--standalone" type="search" id="search" placeholder="搜索 Wiki、来源或变量…">
+
+    <div class="data-list sidebar-list show" id="list-wiki">
+      <div class="sidebar-section-label">行业与机制</div>
+      <div class="mkt-sub-item on" data-view="wiki-capacity"><span class="sidebar-list-status">今日</span><div class="n">煤电容量电价</div><div class="m">机制 · 政策 · 现金流</div></div>
+      <div class="mkt-sub-item"><span class="sidebar-list-status">3 天</span><div class="n">航运周期</div><div class="m">集运 / 干散 / 油运</div></div>
+      <div class="mkt-sub-item"><span class="sidebar-list-status">今日</span><div class="n">推理芯片约束迁移</div><div class="m">HBM · CoWoS · 电网</div></div>
+      <div class="sidebar-section-label">公司</div>
+      <div class="mkt-sub-item"><span class="sidebar-list-status">今日</span><div class="n">华能国际</div><div class="m">煤电底盘 · 新能源期权</div></div>
+      <div class="mkt-sub-item"><span class="sidebar-list-status">今日</span><div class="n">长江电力</div><div class="m">水电现金流 · 折旧</div></div>
+      <div class="mkt-sub-item"><span class="sidebar-list-status">7 天</span><div class="n">中远海控</div><div class="m">集运运营 · 运价暴露</div></div>
+      <div class="sidebar-section-label">方法</div>
+      <div class="mkt-sub-item"><div class="n">财报阅读核心逻辑</div><div class="m">业务模型 → 变量 → 财报验证</div></div>
+    </div>
+
+    <div class="data-list sidebar-list" id="list-source">
+      <div class="sidebar-section-label">官方与公司披露</div>
+      <div class="mkt-sub-item on" data-view="source-report"><span class="sidebar-list-status state ok">可用</span><div class="n">华能国际 2025 年报</div><div class="m">上交所 · PDF · 2026-03-25</div></div>
+      <div class="mkt-sub-item"><span class="sidebar-list-status state ok">可用</span><div class="n">发改价格〔2026〕114号</div><div class="m">国家发改委 · 政策原文</div></div>
+      <div class="mkt-sub-item"><span class="sidebar-list-status state warn">待更新</span><div class="n">SCFI 历史序列</div><div class="m">披露点 · 2009–2026</div></div>
+      <div class="sidebar-section-label">Provider</div>
+      <div class="mkt-sub-item"><span class="sidebar-list-status state ok">已配置</span><div class="n">Tushare Pro</div><div class="m">A股行情 · 财务三表</div></div>
+      <div class="mkt-sub-item"><span class="sidebar-list-status">未配置</span><div class="n">FactSet</div><div class="m">一致预期 · Transcript</div></div>
+      <div class="sidebar-section-label">用户文件</div>
+      <div class="mkt-sub-item"><span class="sidebar-list-status state ok">已解析</span><div class="n">航运订单簿.xlsx</div><div class="m">手工整理 · 8 个时点</div></div>
+      <div class="mkt-sub-item"><span class="sidebar-list-status state gap">缺口</span><div class="n">欧线现货—长协价差</div><div class="m">尚无连续公开序列</div></div>
+    </div>
+  </aside>
+
+  <main class="data-main">
+    <div class="content-with-agent">
+    <div class="page-body" id="data-body">
+    <div class="data-view show" id="view-wiki-capacity">
+      <div class="page-kicker">WIKI · 行业机制</div>
+      <h1 class="page-title">煤电容量电价</h1>
+      <p class="page-dek">为煤电提供固定成本回收，降低纯电量电价对利润的支配，但不消除煤价、电价与利用小时的周期影响。</p>
+      <div class="page-meta"><span>更新 <strong>2026-07-30</strong></span><span>数据截至 <strong>2026-06-30</strong></span><span>状态 <strong>部分验证</strong></span><span>引用 <strong>12 sources</strong></span></div>
+
+      <div class="summary-line">
+        <div class="summary-block"><div class="k">当前判断</div><div class="v">固定成本回收增强，利润仍取决于价差</div><div class="s">容量费提供底线，不应被解释成火电利润完全公用事业化。</div></div>
+        <div class="summary-block"><div class="k">核心变量</div><div class="v">回收比例 ≥50%</div><div class="s">各省执行细则与实际到账节奏。</div></div>
+        <div class="summary-block"><div class="k">主要缺口</div><div class="v state warn">省级执行数据</div><div class="s">公开口径分散，尚无统一季度序列。</div></div>
+      </div>
+
+      <section class="section">
+        <div class="section-head"><div class="section-title">关系与传导 <span class="analyze" data-agent="煤电容量电价关系图">继续分析</span></div><div class="section-note">点击节点查看它如何进入研究</div></div>
+        <div class="relation-flow" data-select-group>
+          <div class="rel-node" data-select="政策输入" data-note="114号文与各省执行细则决定固定成本回收比例。"><div class="r">政策输入</div><div class="n">容量电价</div><div class="d">固定成本回收比例</div></div>
+          <div class="rel-arrow">→</div>
+          <div class="rel-node on" data-select="行业机制" data-note="容量收入与电量电价共同决定煤电经营现金流。"><div class="r">行业机制</div><div class="n">煤电利润结构</div><div class="d">容量收入 + 电量价差</div></div>
+          <div class="rel-arrow">→</div>
+          <div class="rel-node" data-select="公司暴露" data-note="华能与国电受益程度取决于煤电占比和省份结构。"><div class="r">公司暴露</div><div class="n">华能 / 国电</div><div class="d">煤电占比 · 省份结构</div></div>
+        </div>
+        <div class="selection-readout">已选：行业机制 · 容量收入与电量价差共同决定煤电经营现金流。</div>
+      </section>
+
+      <section class="section">
+        <div class="section-head"><div class="section-title">知识结论</div><div class="section-note">结论必须对应来源与可验证状态</div></div>
+        <table class="claim-table">
+          <thead><tr><th>结论</th><th>当前证据</th><th>状态</th><th>更新</th></tr></thead>
+          <tbody>
+            <tr data-select="固定成本回收"><td class="claim">固定成本回收比例提高至不低于 50%</td><td>114号文原文</td><td class="state ok">已确认</td><td class="mono">2026-01</td></tr>
+            <tr data-select="利润传导"><td class="claim">容量收入改善火电利润下限</td><td>政策原文 + 公司披露</td><td class="state warn">部分验证</td><td class="mono">2026Q1</td></tr>
+            <tr data-select="省级执行"><td class="claim">各省实际回收进度达到政策目标</td><td>缺统一季度序列</td><td class="state gap">证据缺口</td><td class="mono">待补</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section class="section">
+        <div class="section-head"><div class="section-title">证据覆盖</div><div class="section-note">不是综合评分，而是覆盖范围</div></div>
+        <div class="coverage"><span>政策机制</span><div class="bar"><i style="width:100%"></i></div><span class="val">4/4</span></div>
+        <div class="coverage"><span>公司财报验证</span><div class="bar"><i style="width:72%"></i></div><span class="val">5/7</span></div>
+        <div class="coverage"><span>省级执行细则</span><div class="bar"><i style="width:38%"></i></div><span class="val">6/16</span></div>
+        <div class="coverage"><span>季度实际到账</span><div class="bar"><i style="width:20%"></i></div><span class="val">2/10</span></div>
+      </section>
+
+      <section class="section">
+        <div class="section-head"><div class="section-title">支撑来源 <span class="analyze" data-agent="Wiki 支撑来源">查看来源关系</span></div><div class="section-note">支持、反对和缺口并列</div></div>
+        <table class="source-table">
+          <thead><tr><th>来源</th><th>贡献</th><th>定位</th><th>关系</th></tr></thead>
+          <tbody>
+            <tr data-open-source><td>发改价格〔2026〕114号</td><td>定义固定成本回收比例</td><td class="locator">第 2 条</td><td class="state ok">支持</td></tr>
+            <tr data-open-source><td>华能国际 2025 年报</td><td>煤电利润与容量收益披露</td><td class="locator">经营讨论</td><td class="state warn">部分支持</td></tr>
+            <tr><td>省级容量电价执行汇总</td><td>验证实际执行比例</td><td class="locator">未形成</td><td class="state gap">缺口</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section class="section">
+        <div class="section-head"><div class="section-title">被研究使用</div><div class="section-note">Wiki 不是终点</div></div>
+        <div class="used-grid">
+          <div class="used-card"><div class="t">电力行业 · 利润池</div><div class="p">行业机制 → 火电固定成本</div></div>
+          <div class="used-card"><div class="t">华能国际 · 利润生成</div><div class="p">容量收入 → 一阶/二阶变量</div></div>
+          <div class="used-card"><div class="t">国电电力 · 估值情景</div><div class="p">执行比例 → 公用事业化假设</div></div>
+        </div>
+      </section>
+    </div>
+
+    <div class="data-view" id="view-source-report">
+      <div class="page-kicker">SOURCE · 公司披露</div>
+      <h1 class="page-title">华能国际 2025 年年度报告</h1>
+      <p class="page-dek">公司正式披露文件。用于验证装机、电量、煤价、利润结构、现金流、资本开支和容量收益等 Wiki 结论。</p>
+      <div class="page-meta"><span>发布 <strong>2026-03-25</strong></span><span>来源 <strong>上交所</strong></span><span>格式 <strong>PDF · 438页</strong></span><span>状态 <strong>已解析</strong></span></div>
+
+      <section class="section">
+        <div class="section-head"><div class="section-title">来源身份</div><div class="section-note">原文与解析结果分开记录</div></div>
+        <div class="source-origin">
+          <div class="origin-cell"><div class="k">级别</div><div class="v">L1 · 官方披露</div></div>
+          <div class="origin-cell"><div class="k">覆盖期间</div><div class="v">2025A</div></div>
+          <div class="origin-cell"><div class="k">解析</div><div class="v">PDF → 结构化文本</div></div>
+          <div class="origin-cell"><div class="k">完整性</div><div class="v state ok">438 / 438 页</div></div>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="section-head"><div class="section-title">数据血缘 <span class="analyze" data-agent="年报数据血缘">继续分析</span></div><div class="section-note">从原文到研究结论</div></div>
+        <div class="lineage" data-select-group>
+          <div class="lineage-node on" data-select="原始来源" data-note="上交所发布的公司正式 PDF。"><div class="k">SOURCE</div><div class="v">2025 年报 PDF</div><div class="s">上交所原文</div></div>
+          <div class="lineage-node" data-select="证据片段" data-note="定位到经营讨论、分部数据和现金流量表。"><div class="k">EVIDENCE</div><div class="v">段落 / 表格 / 数值</div><div class="s">页码与表格定位</div></div>
+          <div class="lineage-node" data-select="Wiki 结论" data-note="更新华能国际和煤电容量电价 Wiki。"><div class="k">WIKI</div><div class="v">公司与机制知识</div><div class="s">结论 + 关系</div></div>
+          <div class="lineage-node" data-select="研究使用" data-note="进入利润生成、现金留存与估值情景。"><div class="k">RESEARCH</div><div class="v">图表与判断</div><div class="s">可反向追溯</div></div>
+        </div>
+        <div class="selection-readout">已选：原始来源 · 上交所发布的公司正式 PDF。</div>
+      </section>
+
+      <section class="section">
+        <div class="section-head"><div class="section-title">已提取证据</div><div class="section-note">点击片段可定位原文</div></div>
+        <table class="source-table">
+          <thead><tr><th>证据片段</th><th>值/摘要</th><th>原文定位</th><th>状态</th></tr></thead>
+          <tbody>
+            <tr data-select="归母净利润"><td class="claim">2025 归母净利润</td><td class="mono">144.10 亿元</td><td class="locator">P18 · 主要会计数据</td><td class="state ok">已核对</td></tr>
+            <tr data-select="经营现金流"><td class="claim">经营活动现金流</td><td class="mono">公司披露值</td><td class="locator">P126 · 现金流量表</td><td class="state ok">已核对</td></tr>
+            <tr data-select="容量收益"><td class="claim">容量电价收益</td><td>未单独完整拆分</td><td class="locator">P42 · 经营讨论</td><td class="state warn">部分披露</td></tr>
+            <tr data-select="省级执行"><td class="claim">各省实际回收比例</td><td>年报未提供统一表</td><td class="locator">—</td><td class="state gap">缺口</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section class="section">
+        <div class="section-head"><div class="section-title">覆盖对象</div><div class="section-note">本来源可以更新什么</div></div>
+        <div class="used-grid">
+          <div class="used-card"><div class="t">华能国际 Wiki</div><div class="p">主营结构 · 利润变量 · 现金流</div></div>
+          <div class="used-card"><div class="t">煤电容量电价</div><div class="p">公司层实际验证</div></div>
+          <div class="used-card"><div class="t">电力行业研究</div><div class="p">利润池 · 关联公司 · 证伪</div></div>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="section-head"><div class="section-title">口径与限制</div><div class="section-note">不能从该来源推出的结论</div></div>
+        <table class="claim-table"><tbody>
+          <tr><td class="claim">容量收益</td><td>没有按省、按季度完整拆分，不能单独形成连续趋势。</td><td class="state warn">降级使用</td></tr>
+          <tr><td class="claim">煤价实时变化</td><td>年报为历史口径，需要外部煤价序列替换滞后值。</td><td class="state gap">需外部源</td></tr>
+        </tbody></table>
+      </section>
+    </div>
+    </div><!-- /.page-body -->
+
+    <aside class="agent-drawer" id="agent" aria-hidden="true">
+      <div class="agent-hd">
+        <div class="info">
+          <div class="t" id="agent-title">煤电容量电价</div>
+          <div class="s" id="agent-context">Wiki · 当前判断</div>
+        </div>
+        <button type="button" class="agent-close" id="agent-close" aria-label="关闭">×</button>
+      </div>
+      <div class="agent-body">
+        <div class="agent-msg"><div class="who">助手</div>当前会话继承所选 Wiki、来源、证据片段与数据血缘。</div>
+        <div class="agent-suggest">
+          <button type="button">哪些结论仍缺少省级执行数据？</button>
+          <button type="button">从年报中定位容量收益相关原文</button>
+          <button type="button">这个来源被哪些研究图表使用？</button>
+        </div>
+      </div>
+      <div class="agent-ft"><input placeholder="继续分析…"><button type="button">发送</button></div>
+    </aside>
+    </div><!-- /.content-with-agent -->
+  </main>
+</div>
+
+<script>
+(() => {
+  const shell = document.getElementById('shell');
+  const tabs = document.querySelectorAll('.mkt-tab');
+  const lists = { wiki: document.getElementById('list-wiki'), source: document.getElementById('list-source') };
+  const search = document.getElementById('search');
+  const views = { wiki: document.getElementById('view-wiki-capacity'), source: document.getElementById('view-source-report') };
+  const agent = document.getElementById('agent');
+  const btnAgent = document.getElementById('agent-open');
+  const title = document.getElementById('agent-title');
+  const context = document.getElementById('agent-context');
+  let mode = 'wiki';
+  let selected = '当前判断';
+
+  function openAgent() {
+    shell.classList.add('agent-open');
+    agent.setAttribute('aria-hidden', 'false');
+    btnAgent.classList.add('on');
+  }
+  function closeAgent() {
+    shell.classList.remove('agent-open');
+    agent.setAttribute('aria-hidden', 'true');
+    btnAgent.classList.remove('on');
+  }
+
+  function switchMode(next) {
+    mode = next;
+    tabs.forEach(t => t.classList.toggle('on', t.dataset.mode === next));
+    Object.entries(lists).forEach(([key, el]) => el.classList.toggle('show', key === next));
+    Object.entries(views).forEach(([key, el]) => el.classList.toggle('show', key === next));
+    document.querySelectorAll(`#list-${next} .mkt-sub-item`).forEach((item, i) => item.classList.toggle('on', i === 0));
+    applyListSearch();
+    selected = next === 'wiki' ? '当前判断' : '来源身份';
+    syncAgent();
+    document.getElementById('data-body').scrollTop = 0;
+  }
+
+  function applyListSearch() {
+    const query = search.value.trim().toLocaleLowerCase();
+    const activeList = lists[mode];
+    activeList.querySelectorAll('.mkt-sub-item').forEach(item => {
+      item.hidden = Boolean(query) && !item.textContent.toLocaleLowerCase().includes(query);
+    });
+    activeList.querySelectorAll('.sidebar-section-label').forEach(label => {
+      let next = label.nextElementSibling;
+      let hasVisibleItem = false;
+      while (next && !next.classList.contains('sidebar-section-label')) {
+        if (next.classList.contains('mkt-sub-item') && !next.hidden) {
+          hasVisibleItem = true;
+          break;
+        }
+        next = next.nextElementSibling;
+      }
+      label.hidden = !hasVisibleItem;
+    });
+  }
+
+  function syncAgent() {
+    title.textContent = mode === 'wiki' ? '煤电容量电价' : '华能国际 2025 年报';
+    context.textContent = `${mode === 'wiki' ? 'Wiki' : '数据源'} · ${selected}`;
+  }
+
+  tabs.forEach(tab => tab.addEventListener('click', () => switchMode(tab.dataset.mode)));
+  search.addEventListener('input', applyListSearch);
+  document.querySelectorAll('.mkt-sub-item').forEach(item => item.addEventListener('click', () => {
+    item.closest('.data-list').querySelectorAll('.mkt-sub-item').forEach(x => x.classList.remove('on'));
+    item.classList.add('on');
+  }));
+
+  document.addEventListener('click', event => {
+    const mark = event.target.closest('[data-select]');
+    if (!mark) return;
+    const group = mark.closest('[data-select-group]');
+    group?.querySelectorAll('[data-select].on').forEach(x => x.classList.remove('on'));
+    mark.classList.add('on');
+    selected = mark.dataset.select;
+    const readout = mark.closest('.section')?.querySelector('.selection-readout');
+    if (readout) readout.textContent = `已选：${selected} · ${mark.dataset.note || '可查看来源和下游使用。'}`;
+    syncAgent();
+  });
+
+  document.querySelectorAll('[data-open-source]').forEach(row => row.addEventListener('click', () => switchMode('source')));
+  document.querySelectorAll('[data-agent]').forEach(el => el.addEventListener('click', () => {
+    selected = el.dataset.agent;
+    syncAgent();
+    openAgent();
+  }));
+  btnAgent.addEventListener('click', () => {
+    if (shell.classList.contains('agent-open')) closeAgent();
+    else openAgent();
+  });
+  agent.addEventListener('click', () => {
+    if (!shell.classList.contains('agent-open')) openAgent();
+  });
+  document.getElementById('agent-close').addEventListener('click', e => {
+    e.stopPropagation();
+    closeAgent();
+  });
+})();
+</script>
+<script src="nav-collapse.js?v=10"></script>
+</body>
+</html>

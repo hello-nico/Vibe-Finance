@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>投研助手 · 行业</title>
+<link rel="stylesheet" href="shared.css?v=10">
+<script src="theme.js?v=3"></script>
+<style>
+/* 行业基本面 — 报价条 + 指标带（助手 dock 见 shared.css） */
+.ind-page { max-width: none; }
+
+.ind-crumb {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 11px; color: var(--fg-4); margin-bottom: 10px;
+}
+.ind-crumb a { color: var(--fg-3); text-decoration: none; }
+.ind-crumb a:hover { color: var(--fg); }
+.ind-crumb .here { color: var(--fg-2); }
+.ind-crumb .join {
+  margin-left: auto;
+  font: inherit; font-size: 11px; font-weight: 500;
+  padding: 4px 10px; border-radius: var(--radius);
+  border: 1px solid var(--fg); background: var(--fg);
+  color: var(--surface); text-decoration: none; white-space: nowrap; cursor: pointer;
+}
+.ind-crumb .join:hover { opacity: .92; }
+.ind-crumb .join.joined {
+  background: var(--surface); color: var(--fg-2); border-color: var(--border-strong);
+}
+
+.ind-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  margin-bottom: 14px;
+  overflow: hidden;
+  position: relative;
+}
+.ind-card::before {
+  content: "";
+  position: absolute; left: 0; top: 0; bottom: 0; width: 3px;
+  background: var(--fg-4);
+}
+.ind-card.is-up::before { background: var(--up); }
+.ind-card.is-down::before { background: var(--down); }
+
+.ind-quote { padding: 14px 16px; }
+
+.ind-title-row {
+  display: flex; align-items: center; flex-wrap: wrap;
+  gap: 10px 12px; margin-bottom: 4px;
+}
+.ind-name {
+  font-size: 22px; font-weight: 600; letter-spacing: -0.02em;
+  line-height: 1;
+}
+.ind-px-row {
+  display: inline-flex; align-items: center; gap: 8px;
+}
+.ind-px {
+  font-family: var(--font-num); font-size: 22px; font-weight: 600;
+  letter-spacing: -0.03em; line-height: 1; color: var(--fg);
+  font-variant-numeric: tabular-nums;
+}
+.ind-chg {
+  font-family: var(--font-num); font-size: 12px; font-weight: 500;
+  line-height: 1; padding: 4px 7px; border-radius: var(--radius);
+  border: 1px solid var(--border);
+  font-variant-numeric: tabular-nums;
+  position: relative; top: -1px;
+}
+.ind-chg.up {
+  color: var(--up);
+  background: color-mix(in oklch, var(--up) 10%, var(--surface));
+  border-color: color-mix(in oklch, var(--up) 28%, var(--border));
+}
+.ind-chg.down {
+  color: var(--down);
+  background: color-mix(in oklch, var(--down) 10%, var(--surface));
+  border-color: color-mix(in oklch, var(--down) 28%, var(--border));
+}
+.ind-sub {
+  font-size: 11px; color: var(--fg-4);
+  display: flex; flex-wrap: wrap; gap: 6px; align-items: center;
+}
+.ind-sub .dot { width: 2px; height: 2px; border-radius: 50%; background: var(--fg-4); }
+
+.ind-strip {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  border-top: 1px solid var(--border);
+  background: var(--sunken);
+}
+@media (max-width: 800px) {
+  .ind-strip { grid-template-columns: repeat(3, 1fr); }
+}
+.ind-metric {
+  padding: 10px 12px 11px;
+  border-right: 1px solid var(--border);
+  min-width: 0;
+}
+.ind-metric:last-child { border-right: none; }
+@media (max-width: 800px) {
+  .ind-metric:nth-child(3n) { border-right: none; }
+  .ind-metric:nth-child(n+4) { border-top: 1px solid var(--border); }
+}
+.ind-metric .k {
+  font-size: 10px; color: var(--fg-4);
+  margin-bottom: 3px; white-space: nowrap;
+}
+.ind-metric .v {
+  font-family: var(--font-num); font-size: 15px; font-weight: 500;
+  color: var(--fg); font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em; line-height: 1.2;
+}
+.ind-metric .v.up { color: var(--up); }
+.ind-metric .v.down { color: var(--down); }
+.ind-metric .v .u {
+  font-size: 10px; font-weight: 400; color: var(--fg-4);
+  margin-left: 3px; letter-spacing: 0;
+}
+
+.ind-tabs {
+  display: flex; gap: 2px; flex-wrap: wrap;
+  margin-bottom: 0; border-bottom: 1px solid var(--border);
+}
+.ind-tab {
+  font: inherit; font-size: 12px; color: var(--fg-3);
+  background: none; border: none; cursor: pointer;
+  padding: 9px 12px; border-bottom: 2px solid transparent; margin-bottom: -1px;
+}
+.ind-tab:hover { color: var(--fg); }
+.ind-tab.on { color: var(--fg); font-weight: 600; border-bottom-color: var(--fg); }
+
+.ind-panel { display: none; padding-top: 12px; }
+.ind-panel.on { display: block; }
+
+.ind-table-wrap {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius-lg); overflow: auto;
+}
+.ind-table { width: 100%; border-collapse: collapse; font-size: 12px; min-width: 720px; }
+.ind-table th {
+  text-align: left; font-size: 10px; font-weight: 600; letter-spacing: .04em;
+  color: var(--fg-4); padding: 8px 10px; border-bottom: 1px solid var(--border);
+  background: var(--sunken); white-space: nowrap; position: sticky; top: 0;
+}
+.ind-table th.r, .ind-table td.r { text-align: right; }
+.ind-table td {
+  padding: 8px 10px; border-bottom: 1px solid var(--border);
+  color: var(--fg-2); white-space: nowrap;
+}
+.ind-table tr:last-child td { border-bottom: none; }
+.ind-table tr:hover td { background: var(--hover); }
+.ind-table .code { font-family: var(--font-num); font-size: 11px; color: var(--fg-4); }
+.ind-table .nm { color: var(--fg); font-weight: 500; }
+.ind-table .nm a {
+  color: inherit; text-decoration: none; border-bottom: 1px solid transparent;
+}
+.ind-table .nm a:hover { color: var(--accent-ink); border-bottom-color: color-mix(in oklch, var(--accent-ink) 40%, transparent); }
+.ind-table .num { font-family: var(--font-num); font-variant-numeric: tabular-nums; }
+.ind-table tr[data-stock] { cursor: pointer; }
+
+.ind-empty {
+  padding: 28px 16px; text-align: center; color: var(--fg-4); font-size: 12px;
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg);
+}
+</style>
+</head>
+<body>
+<div class="shell ind-shell" id="shell">
+
+  <div class="topbar">
+    <span class="topbar-brand">投研助手</span>
+    <div class="topbar-right">
+      <span class="topbar-sync" title="2026-07-29 14:32">
+        <span class="sync-icon" aria-hidden="true">↻</span>
+        <span class="sync-rel">2 分钟前</span>
+        <span class="sync-abs">14:32</span>
+      </span>
+      <button type="button" class="topbar-agent" id="btn-agent">助手</button>
+    </div>
+  </div>
+
+  <nav class="rail">
+    <a class="rail-btn active" href="01-market.html">
+      <svg class="rail-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 18h18"/><path d="M5 14l4-5 3.5 3L17 6"/><path d="M14 6h3v3"/></svg>
+      <span>行情</span>
+    </a>
+    <a class="rail-btn" href="02-research.html">
+      <svg class="rail-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4h8l4 4v12H7V4z"/><path d="M15 4v4h4M9 12h6M9 16h4"/></svg>
+      <span>研究</span>
+    </a>
+    <a class="rail-btn" href="03-data.html">
+      <svg class="rail-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5h14v14H5z"/><path d="M5 9h14M5 13h14M5 17h14M10 5v14M15 5v14"/></svg>
+      <span>数据</span>
+    </a>
+    <div class="rail-spacer"></div>
+    <div class="rail-avatar">陈</div>
+  </nav>
+
+  <main class="main-area">
+    <div class="content-with-agent">
+      <div class="page-body">
+        <div class="ind-page">
+
+          <div class="ind-crumb">
+            <a href="01-market.html">行情</a>
+            <span>/</span>
+            <span>行业</span>
+            <span>/</span>
+            <span class="here" id="crumb-name">半导体</span>
+            <a class="join" href="02-research.html" id="ind-research">加入研究</a>
+          </div>
+
+          <section class="ind-card" id="ind-card">
+            <div class="ind-quote">
+              <div class="ind-title-row">
+                <span class="ind-name" id="ind-name">半导体</span>
+                <span class="ind-px-row">
+                  <span class="ind-px" id="ind-px">—</span>
+                  <span class="ind-chg" id="ind-chg">—</span>
+                </span>
+              </div>
+              <div class="ind-sub">
+                <span>东财二级行业</span>
+                <span class="dot" aria-hidden="true"></span>
+                <span>估值 <span class="mono" id="ind-asof">07-29</span></span>
+              </div>
+            </div>
+            <div class="ind-strip" id="ind-metrics"></div>
+          </section>
+
+          <div class="ind-tabs" id="ind-tabs">
+            <button type="button" class="ind-tab on" data-tab="members">成分股</button>
+            <button type="button" class="ind-tab" data-tab="reports">研报</button>
+            <button type="button" class="ind-tab" data-tab="pepb">PE、PB</button>
+            <button type="button" class="ind-tab" data-tab="div">股息</button>
+            <button type="button" class="ind-tab" data-tab="roe">ROE</button>
+            <button type="button" class="ind-tab" data-tab="np">净利润</button>
+            <button type="button" class="ind-tab" data-tab="mv">市值</button>
+          </div>
+
+          <div class="ind-panel on" id="panel-members">
+            <div class="ind-table-wrap">
+              <table class="ind-table">
+                <thead>
+                  <tr>
+                    <th style="width:36px">#</th>
+                    <th>代码</th>
+                    <th>名称</th>
+                    <th class="r">现价</th>
+                    <th class="r">涨跌幅</th>
+                    <th class="r">PE</th>
+                    <th class="r">PB</th>
+                    <th class="r">股息</th>
+                    <th class="r">ROE</th>
+                    <th class="r">总市值</th>
+                    <th class="r">今年来</th>
+                  </tr>
+                </thead>
+                <tbody id="member-body"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="ind-panel" id="panel-reports">
+            <div class="ind-empty">研报列表 · 原型占位（不展示受限数据）</div>
+          </div>
+          <div class="ind-panel" id="panel-pepb">
+            <div class="ind-empty">PE / PB 分布与历史分位 · 原型占位</div>
+          </div>
+          <div class="ind-panel" id="panel-div">
+            <div class="ind-empty">股息分布 · 原型占位</div>
+          </div>
+          <div class="ind-panel" id="panel-roe">
+            <div class="ind-empty">ROE 分布 · 原型占位</div>
+          </div>
+          <div class="ind-panel" id="panel-np">
+            <div class="ind-empty">净利润趋势 · 原型占位</div>
+          </div>
+          <div class="ind-panel" id="panel-mv">
+            <div class="ind-empty">市值结构 · 原型占位</div>
+          </div>
+
+        </div>
+      </div>
+
+      <aside class="agent-drawer" id="agent" aria-hidden="true">
+        <div class="agent-hd">
+          <div class="info">
+            <div class="t" id="agent-obj">半导体</div>
+            <div class="s" id="agent-ctx">行业基本面 · 成分股</div>
+          </div>
+          <button type="button" class="x" id="agent-close" aria-label="关闭">×</button>
+        </div>
+        <div class="agent-body" id="agent-body">
+          <div class="msg" id="agent-greeting">
+            <div class="who">助手</div>
+            当前在看<strong id="agent-greet-name">半导体</strong>行业基本面。可以直接问估值水位、成分股分化，或和相关主题的联动。
+          </div>
+          <div class="suggest" id="agent-suggest">
+            <button type="button" data-q="当前 PE / PB 处在什么水位？和历史区间比如何？">当前 PE / PB 处在什么水位？和历史区间比如何？</button>
+            <button type="button" data-q="成分股里涨跌分化主要来自哪些环节？">成分股里涨跌分化主要来自哪些环节？</button>
+            <button type="button" data-q="若要把这个行业加入研究，优先看哪几条主线？">若要把这个行业加入研究，优先看哪几条主线？</button>
+          </div>
+        </div>
+        <div class="agent-ft">
+          <input type="text" id="agent-input" placeholder="继续分析…" />
+          <button type="button" id="agent-send">发送</button>
+        </div>
+      </aside>
+    </div>
+  </main>
+</div>
+
+<script>
+const DATA = {
+  '半导体': {
+    name: '半导体',
+    asof: '07-29',
+    price: 2846.32,
+    chg: 7.29,
+    ytd: 18.42,
+    ann: 22.10,
+    count: 86,
+    peW: 48.6,
+    peE: 52.3,
+    pbW: 4.85,
+    members: [
+      ['688981', '中芯国际', 48.20, 3.40, 62.1, 2.8, 0.0, 4.2, 3860, 12.5],
+      ['002371', '北方华创', 312.5, 4.85, 38.2, 6.1, 0.2, 15.8, 1620, 28.4],
+      ['688012', '中微公司', 168.4, 6.21, 55.0, 8.2, 0.0, 12.1, 1040, 35.2],
+      ['603986', '兆易创新', 98.6, 2.15, 42.0, 3.9, 0.4, 9.5, 680, 8.6],
+      ['688008', '澜起科技', 72.3, 1.80, 48.5, 5.2, 0.3, 11.0, 820, 15.1],
+      ['002049', '紫光国微', 56.8, -0.92, 35.4, 4.1, 0.5, 10.2, 410, -3.2],
+      ['300661', '圣邦股份', 88.1, 2.40, 58.0, 7.5, 0.1, 14.0, 360, 21.0],
+      ['688396', '华润微', 42.5, 0.68, 28.6, 2.2, 0.8, 8.1, 520, 5.4],
+    ],
+  },
+  '银行': {
+    name: '银行',
+    asof: '07-29',
+    price: 4309.40,
+    chg: -0.91,
+    ytd: 3.76,
+    ann: 4.79,
+    count: 42,
+    peW: 7.16,
+    peE: 6.06,
+    pbW: 0.60,
+    members: [
+      ['600036', '招商银行', 38.20, -1.20, 6.8, 0.95, 4.8, 14.2, 9600, 2.1],
+      ['601398', '工商银行', 5.82, -0.68, 6.2, 0.55, 5.6, 9.8, 20800, 4.5],
+      ['601939', '建设银行', 7.45, -0.80, 5.9, 0.58, 5.4, 10.5, 18600, 3.8],
+      ['601288', '农业银行', 4.96, -0.40, 6.1, 0.52, 5.9, 9.2, 17400, 5.2],
+      ['601166', '兴业银行', 18.40, -1.50, 5.4, 0.48, 6.2, 11.0, 3800, 1.2],
+      ['000001', '平安银行', 11.25, -0.95, 5.1, 0.55, 5.0, 10.1, 2200, -2.4],
+    ],
+  },
+  '白酒': {
+    name: '白酒',
+    asof: '07-29',
+    price: 18920.5,
+    chg: -0.25,
+    ytd: -4.20,
+    ann: -2.10,
+    count: 19,
+    peW: 22.4,
+    peE: 24.8,
+    pbW: 5.6,
+    members: [
+      ['600519', '贵州茅台', 1842, 1.20, 24.5, 8.2, 1.8, 32.0, 23100, 2.4],
+      ['000858', '五粮液', 142.8, 0.92, 18.2, 4.1, 2.4, 22.5, 5540, -1.2],
+      ['000568', '泸州老窖', 168.0, 0.00, 16.8, 4.8, 2.6, 28.0, 2480, -5.6],
+    ],
+  },
+};
+
+function q(name) {
+  const p = new URLSearchParams(location.search);
+  return p.get('name') || name || '半导体';
+}
+
+function fmtChg(c) {
+  const sign = c > 0 ? '+' : c < 0 ? '−' : '';
+  return sign + Math.abs(c).toFixed(2) + '%';
+}
+
+function render(name) {
+  const d = DATA[name] || {
+    name,
+    asof: '07-29',
+    price: null,
+    chg: 0,
+    ytd: null,
+    ann: null,
+    count: '—',
+    peW: null,
+    peE: null,
+    pbW: null,
+    members: [],
+  };
+
+  document.title = `投研助手 · ${d.name}`;
+  document.getElementById('crumb-name').textContent = d.name;
+  document.getElementById('ind-name').textContent = d.name;
+  document.getElementById('ind-asof').textContent = d.asof;
+  document.getElementById('agent-obj').textContent = d.name;
+  document.getElementById('agent-greet-name').textContent = d.name;
+  document.getElementById('agent-ctx').textContent = '行业基本面 · 成分股';
+
+  const card = document.getElementById('ind-card');
+  card.classList.toggle('is-up', d.chg > 0);
+  card.classList.toggle('is-down', d.chg < 0);
+
+  const px = document.getElementById('ind-px');
+  const chg = document.getElementById('ind-chg');
+  px.textContent = d.price == null ? '—' : d.price.toLocaleString('zh-CN', { maximumFractionDigits: 2 });
+  chg.textContent = d.price == null ? '—' : fmtChg(d.chg);
+  chg.className = 'ind-chg' + (d.chg > 0 ? ' up' : d.chg < 0 ? ' down' : '');
+
+  const metrics = [
+    { k: '今年来', v: d.ytd == null ? '—' : fmtChg(d.ytd), cls: d.ytd > 0 ? 'up' : d.ytd < 0 ? 'down' : '' },
+    { k: '年化', v: d.ann == null ? '—' : fmtChg(d.ann), cls: d.ann > 0 ? 'up' : d.ann < 0 ? 'down' : '' },
+    { k: '成分股', v: String(d.count), u: typeof d.count === 'number' ? '支' : '' },
+    { k: 'PE 市值加权', v: d.peW == null ? '—' : d.peW.toFixed(2) },
+    { k: 'PE 等权', v: d.peE == null ? '—' : d.peE.toFixed(2) },
+    { k: 'PB 市值加权', v: d.pbW == null ? '—' : d.pbW.toFixed(2) },
+  ];
+  document.getElementById('ind-metrics').innerHTML = metrics.map(m => `
+    <div class="ind-metric">
+      <div class="k">${m.k}</div>
+      <div class="v ${m.cls || ''}">${m.v}${m.u ? `<span class="u">${m.u}</span>` : ''}</div>
+    </div>
+  `).join('');
+
+  const body = document.getElementById('member-body');
+  if (!d.members.length) {
+    body.innerHTML = `<tr><td colspan="11" style="text-align:center;color:var(--fg-4);padding:24px">暂无成分股示意数据</td></tr>`;
+    return;
+  }
+  body.innerHTML = d.members.map((r, i) => {
+    const chgCls = r[3] > 0 ? 'up' : r[3] < 0 ? 'down' : '';
+    const ytdCls = r[9] > 0 ? 'up' : r[9] < 0 ? 'down' : '';
+    const href = '05-stock.html?name=' + encodeURIComponent(r[1]);
+    return `<tr data-stock="${r[1]}">
+      <td class="num">${i + 1}</td>
+      <td class="code">${r[0]}</td>
+      <td class="nm"><a href="${href}">${r[1]}</a></td>
+      <td class="r num">${r[2].toLocaleString('zh-CN')}</td>
+      <td class="r num ${chgCls}">${fmtChg(r[3])}</td>
+      <td class="r num">${r[4].toFixed(1)}</td>
+      <td class="r num">${r[5].toFixed(2)}</td>
+      <td class="r num">${r[6].toFixed(1)}%</td>
+      <td class="r num">${r[7].toFixed(1)}%</td>
+      <td class="r num">${r[8].toLocaleString('zh-CN')}</td>
+      <td class="r num ${ytdCls}">${fmtChg(r[9])}</td>
+    </tr>`;
+  }).join('');
+  body.querySelectorAll('tr[data-stock]').forEach(tr => {
+    tr.addEventListener('click', e => {
+      if (e.target.closest('a')) return;
+      location.href = '05-stock.html?name=' + encodeURIComponent(tr.dataset.stock);
+    });
+  });
+}
+
+document.getElementById('ind-tabs').addEventListener('click', e => {
+  const btn = e.target.closest('.ind-tab');
+  if (!btn) return;
+  document.querySelectorAll('.ind-tab').forEach(t => t.classList.remove('on'));
+  btn.classList.add('on');
+  document.querySelectorAll('.ind-panel').forEach(p => p.classList.remove('on'));
+  document.getElementById('panel-' + btn.dataset.tab)?.classList.add('on');
+  const labels = {
+    members: '成分股', reports: '研报', pepb: 'PE、PB',
+    div: '股息', roe: 'ROE', np: '净利润', mv: '市值',
+  };
+  document.getElementById('agent-ctx').textContent =
+    '行业基本面 · ' + (labels[btn.dataset.tab] || btn.dataset.tab);
+});
+
+const shell = document.getElementById('shell');
+const agent = document.getElementById('agent');
+const btnAgent = document.getElementById('btn-agent');
+function openAgent() {
+  shell.classList.add('agent-open');
+  agent.setAttribute('aria-hidden', 'false');
+  btnAgent.classList.add('on');
+}
+function closeAgent() {
+  shell.classList.remove('agent-open');
+  agent.setAttribute('aria-hidden', 'true');
+  btnAgent.classList.remove('on');
+}
+btnAgent.addEventListener('click', () => {
+  if (shell.classList.contains('agent-open')) closeAgent();
+  else openAgent();
+});
+agent.addEventListener('click', () => {
+  if (!shell.classList.contains('agent-open')) openAgent();
+});
+document.getElementById('agent-close').addEventListener('click', e => {
+  e.stopPropagation();
+  closeAgent();
+});
+
+const joinBtn = document.getElementById('ind-research');
+joinBtn.addEventListener('click', e => {
+  e.preventDefault();
+  if (joinBtn.dataset.joined === '1') {
+    location.href = '02-research.html';
+    return;
+  }
+  joinBtn.dataset.joined = '1';
+  joinBtn.classList.add('joined');
+  joinBtn.textContent = '已加入 · 去研究';
+});
+
+function sendAgent(q) {
+  const body = document.getElementById('agent-body');
+  const name = document.getElementById('ind-name').textContent;
+  body.insertAdjacentHTML('beforeend',
+    `<div class="msg user"><div class="who">你</div>${q}</div>` +
+    `<div class="msg"><div class="who">助手</div>关于<strong>${name}</strong>：「${q}」——原型示意回复，正式环境会结合估值与成分股结构作答。</div>`);
+  body.scrollTop = body.scrollHeight;
+}
+document.getElementById('agent-suggest').addEventListener('click', e => {
+  const b = e.target.closest('button[data-q]');
+  if (!b) return;
+  openAgent();
+  sendAgent(b.dataset.q);
+});
+document.getElementById('agent-send').addEventListener('click', () => {
+  const input = document.getElementById('agent-input');
+  const q = input.value.trim();
+  if (!q) return;
+  input.value = '';
+  sendAgent(q);
+});
+document.getElementById('agent-input').addEventListener('keydown', e => {
+  if (e.key === 'Enter') document.getElementById('agent-send').click();
+});
+
+render(q('半导体'));
+</script>
+<script src="nav-collapse.js?v=10"></script>
+</body>
+</html>
