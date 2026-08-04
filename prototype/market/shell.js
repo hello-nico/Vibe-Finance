@@ -67,10 +67,9 @@
         '  <div class="mkt-sub-list sidebar-list sidebar-list--compact" id="sector-nav-list">' +
         shortcuts.map(function (item) {
           var active = item.key === focusKey;
-          var iconColor = active ? '%23F35D2B' : '%237B8BA0';
           return '<a class="mkt-sub-item mkt-sub-item--icon' + (active ? ' on' : '') + '" data-sector-shortcut data-sector-search="' + item.label + ' ' + item.tagline +
             '" href="' + mktBase + 'sector-detail.html?key=' + encodeURIComponent(item.key) + '"' + (active ? ' aria-current="page"' : '') + '>' +
-            '<img class="mkt-sub-ico" src="https://api.iconify.design/lucide:' + item.icon + '.svg?color=' + iconColor + '" alt="" aria-hidden="true" />' +
+            '<span class="mkt-sub-ico" style="--mkt-ico:url(https://api.iconify.design/lucide:' + item.icon + '.svg)" aria-hidden="true"></span>' +
             '<span class="n">' + item.label + '</span>' +
             '</a>';
         }).join('') +
@@ -212,7 +211,7 @@
       '  </div><button type="button" class="x" id="agent-close" aria-label="关闭">×</button></div>' +
       '  <div class="agent-body">' +
       '    <div class="msg"><div class="who">系统</div>' +
-      '      <span id="agent-body-text">将打包当前页的客观数据，判断由你的模型给出。</span></div>' +
+      '      <span id="agent-body-text">会带上当前页的客观数据，判断由你的模型给出。</span></div>' +
       '    <div class="suggest" id="agent-suggest">' +
       '      <button type="button">当前上下文下主线是什么？</button>' +
       '      <button type="button">列出 3 个可验证点</button>' +

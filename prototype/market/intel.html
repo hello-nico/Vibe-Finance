@@ -30,7 +30,7 @@
   </div>
 </main>
 
-<script src="shell.js?v=10"></script>
+<script src="shell.js?v=13"></script>
 <script src="agent.js"></script>
 <script src="../nav-collapse.js?v=10"></script>
 <script src="components.js?v=2"></script>
@@ -49,21 +49,21 @@
       window.MKT_AGENT_CTX = {
         title: '资讯 · ' + (t ? t.name : 'Investment News'),
         sub: '资讯雷达 · Investment News',
-        body: '将打包：' + (t ? t.name : '当前赛道') + ' 近 7 日公开源标题与摘要，输出「今日要点」条目。客观陈述，不推荐标的。',
+        body: '会带上 ' + (t ? t.name : '当前赛道') + ' 近 7 日公开源标题与摘要，输出「今日要点」条目。客观陈述，不推荐标的。',
         ph: '追问本赛道…',
       };
     } else if (tab === 'filings') {
       window.MKT_AGENT_CTX = {
         title: '资讯 · A股公告',
         sub: '资讯雷达 · A股公告',
-        body: '将打包关注列表近期公告标题，提炼可核对要点。公开披露，不构成建议。',
+        body: '会带上关注列表近期公告标题，提炼可核对要点。公开披露，不构成建议。',
         ph: '追问公告…',
       };
     } else if (tab === 'news') {
       window.MKT_AGENT_CTX = {
         title: '资讯 · 公开新闻',
         sub: '资讯雷达 · 公开新闻',
-        body: '将打包关注列表近期公开新闻标题，提炼今日要点。',
+        body: '会带上关注列表近期公开新闻标题，提炼今日要点。',
         ph: '追问新闻…',
       };
     }

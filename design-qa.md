@@ -1,3 +1,54 @@
+# Industry Detail Design QA
+
+## Verification target
+
+- Source: `/Users/apple/.codex/generated_images/019fc7c4-b2bb-7d51-99c3-a48308ce9713/exec-d7e7722c-6d7b-4717-807b-1d34040246aa.png`
+- Implementation: `/Users/apple/.codex/visualizations/2026/08/03/019fc7c4-b2bb-7d51-99c3-a48308ce9713/industry-redesign/implementation-v1.png`
+- URL: `http://127.0.0.1:39877/04-industry.html`
+- Viewport: `1440 × 1024`
+- State: warm-orange light theme, assistant closed, market-performance table view
+
+## Full-view comparison
+
+The reference and implementation screenshots were inspected together at the same viewport. The implementation preserves the selected direction's hierarchy: product shell, industry identity and market metrics, five-stage industry chain, three objective prosperity signals, and a constituent-company table with four metric views.
+
+Intentional differences from the generated reference:
+
+- Reuses the existing Vibe-Finance shell, tokens, glass surfaces, spacing and navigation instead of copying generated-image decoration.
+- Uses the current product definition from `docs/flow_design.md`: no composite score, recommendation, target price or buy/sell conclusion.
+- Keeps source and period visible on each prosperity signal and treats the figures as realistic prototype data.
+- Uses an interactive chain state instead of decorative stage arrows.
+
+## Focused checks
+
+| Region | Result | Notes |
+|---|---|---|
+| Industry identity | passed | Classification, stable identity, description, update time and source context are readable. |
+| Market metric strip | passed | Six metrics align with the existing market/stock density and use tabular numerals. |
+| Industry chain | passed | Five stages fit one row at desktop width; selection state and detail copy update correctly. |
+| Prosperity signals | passed | Three comparable data blocks show value, change, period and source without generating a score. |
+| Constituent table | passed | Market, valuation, profitability and scale tabs replace columns without layout shift. |
+| Responsive safety | passed | No horizontal page overflow at 1440px; table owns its narrow-screen overflow. |
+
+## Interaction and runtime checks
+
+- `设备` chain stage changes `aria-pressed` and the current-signal detail.
+- `估值指标` tab changes the table columns and selected state.
+- `实时行情` toggles its pressed state.
+- `加入研究` changes to `已加入 · 去研究` before routing.
+- `寒武纪` opens `05-stock.html?name=寒武纪` and browser back returns to the industry page.
+- Assistant drawer opens and closes.
+- Browser console warnings/errors: none.
+- JavaScript syntax checks: passed for `data.js`, `components.js`, and `page.js`.
+
+## Comparison history
+
+1. v1 — matched the selected hierarchy and existing product standard; no P0, P1 or P2 visual defects found.
+
+final result: passed
+
+---
+
 # Sidebar List 统一复用 · 本轮视觉与交互检查
 
 ## 验收结果

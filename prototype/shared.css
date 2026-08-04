@@ -550,11 +550,21 @@ body {
   align-items: center;
   gap: 9px;
   min-height: 36px;
+  /* 图标走 currentColor；未选中偏灰，选中跟 --nav-selected-fg（随主题 primary） */
+  color: var(--fg-4);
+}
+.mkt-sub-item--icon.on,
+.mkt-sub-item--icon[aria-current="page"] {
+  color: var(--nav-selected-fg);
 }
 .mkt-sub-ico {
   width: 18px;
   height: 18px;
   flex: 0 0 18px;
+  display: block;
+  background-color: currentColor;
+  -webkit-mask: var(--mkt-ico) center / contain no-repeat;
+  mask: var(--mkt-ico) center / contain no-repeat;
 }
 
 /* 侧栏搜索 / 状态徽标（非行样式） */
@@ -1388,16 +1398,22 @@ a.ov-cta-link {
   opacity: 0.55;
 }
 .sector-pending p {
+  margin: 0;
+  width: 100%;
   font-size: 13px;
   color: var(--fg-3);
   line-height: 1.55;
-  max-width: 28rem;
+  /* 空态两行短文案：桌面不折行，避免「左侧。」「链。」孤字居中 */
+  white-space: nowrap;
 }
 .sector-pending strong { color: var(--fg); font-weight: 600; }
 .sector-pending-sub {
   font-size: 12px !important;
   color: var(--fg-4) !important;
   opacity: 0.85;
+}
+@media (max-width: 720px) {
+  .sector-pending p { white-space: normal; }
 }
 .vf-disclaimer {
   display: flex;
