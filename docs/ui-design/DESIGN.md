@@ -1,7 +1,7 @@
 ---
 name: Vibe-Finance
 description: Calm Market Cockpit — 投研助手的视觉与交互设计系统。
-sourceOfTruth: prototype/shared.css
+visualImplementation: prototype/shared.css
 themeScript: prototype/theme.js
 marketModule: prototype/market/
 stockModule: prototype/stock/
@@ -25,11 +25,11 @@ shadow: { sm: "tight contact + light ambient", glass: "--glass-shadow", md: "dra
 
 # Design System: 投研助手（Vibe-Finance）
 
-> **Runtime source of truth:** [`prototype/shared.css`](../prototype/shared.css)  
-> **Theme switcher:** [`prototype/theme.js`](../prototype/theme.js)  
-> 本文是可解释的设计契约；色值/尺寸以 CSS 变量为准。文档与源码冲突时，**改文档或改源码，但以源码行为为真**。
+> **Visual implementation:** [`prototype/shared.css`](../../prototype/shared.css)  
+> **Theme switcher:** [`prototype/theme.js`](../../prototype/theme.js)  
+> 本文拥有预期的视觉与交互设计；CSS 是当前实现证据。两者冲突时视为待修复缺陷，原型代码不得创造产品规则。
 >
-> **行情总览页面规范：** [`market_overview_standard.md`](./market_overview_standard.md) 定义 Dashboard 边界、分组、刷新和文案纪律；本文件定义其视觉系统。
+> **行情总览页面规范：** [`market_overview_standard.md`](../market-design/market_overview_standard.md) 定义 Dashboard 边界、分组、刷新和文案纪律；本文件定义其视觉系统。
 
 本系统继承 Maka「Companion Command Center」的纪律（克制、可检视、中文优先），面向**行情驾驶舱 + 研究工作台**重写品牌与语义；并以 [killaislop.com](https://killaislop.com/) 的 slop 图鉴作为反面验收标准——产品要像**有人做过决定的投研工具**，不像生成默认页。
 
@@ -195,9 +195,9 @@ Wash（`--hover` 等）是**表面**，不是字色。
 - 阴影模拟**高度**：模糊有度；无彩色 glow；阴影不大于物体。
 - **Dark restraint：** 暗色 glass 用低不透明白填充 + 同配方 blur；禁止 neon 描边洪水。
 
-### 6.1b FROZEN v1 · Dashboard + Table（禁止私改）
+### 6.1b Frozen Dashboard + Table（禁止私改）
 
-行情总览已冻结共享组件（`shared.css` 中 `FROZEN v1` 段）。**后续所有页面/模块必须复用，不得在页面内联覆盖。**
+行情总览已冻结共享组件（`shared.css` 中 `FROZEN` 段）。**后续所有页面/模块必须复用，不得在页面内联覆盖。**
 
 | 类名 | 用途 |
 |---|---|
@@ -210,7 +210,7 @@ Wash（`--hover` 等）是**表面**，不是字色。
 
 兼容：旧 `.ov-*` 已挂同一规则。改视觉只改 `shared.css` 冻结段。
 
-### 6.1c 原型模块结构（v3 · 目录组件化）
+### 6.1c 原型模块结构（目录组件化）
 
 **核心纪律：动态数据 + 固定布局 + AI 辅助解释（助手复用）。**  
 薄 HTML 壳只挂载；数据 / 渲染 / 壳 / 助手分文件；样式真源仍是 `shared.css`（页专属样式可放模块 CSS，**不改** FROZEN `.ds-*`）。
@@ -219,21 +219,21 @@ Wash（`--hover` 等）是**表面**，不是字色。
 
 | 文件 | 角色 |
 |---|---|
-| [`prototype/shared.css`](../prototype/shared.css) | 主题 token（Research 字面量）+ glass + FROZEN + 行情/资讯样式 |
-| [`prototype/theme.js`](../prototype/theme.js) | 主题切换（amber / mint / dark） |
+| [`prototype/shared.css`](../../prototype/shared.css) | 主题 token（Research 字面量）+ glass + FROZEN + 行情/资讯样式 |
+| [`prototype/theme.js`](../../prototype/theme.js) | 主题切换（amber / mint / dark） |
 
 #### 行情 Mode · `prototype/market/`
 
 | 文件 | 角色 |
 |---|---|
-| [`01-market.html`](../prototype/01-market.html) | **总览**入口：检索 / 大盘指数 / 指数市盈率 / 热力 / 市场情绪 / 短线情绪 / 成交额 Top20 / 资金轮动 |
-| [`market/shell.js`](../prototype/market/shell.js) | 壳：topbar + rail + `mkt-nav`（顶层 Tab + 总览页内目录）+ agent dock |
-| [`market/data.js`](../prototype/market/data.js) | mock：sectors / tracks / newsDemo / filings / publicNews |
-| [`market/components.js`](../prototype/market/components.js) | 一函数一卡：资讯 Tab 体、Investment 面板、关注聚合列表、板块网格 / 详情、Dashboard 标题栏 / 刷新交互 |
-| [`market/agent.js`](../prototype/market/agent.js) | 助手 dock；页面设 `window.MKT_AGENT_CTX`（可选 `suggest`） |
-| [`market/sectors.html`](../prototype/market/sectors.html) | **板块中心**：完整赛道卡片网格；左栏另设热门板块快捷导航 |
-| [`market/sector-detail.html`](../prototype/market/sector-detail.html) | **板块详情**：`?key=`；返回板块中心 · 核心环节 pill ·「让 AI 拆这个板块」（对齐 Research SectorDetail）；与 `04-industry`（行业财务）分流 |
-| [`market/intel.html`](../prototype/market/intel.html) | **资讯雷达**：页内 Tab + 固定卡布局 |
+| [`01-market.html`](../../prototype/01-market.html) | **总览**入口：检索 / 大盘指数 / 指数市盈率 / 热力 / 市场情绪 / 短线情绪 / 成交额 Top20 / 资金轮动 |
+| [`market/shell.js`](../../prototype/market/shell.js) | 壳：topbar + rail + `mkt-nav`（顶层 Tab + 总览页内目录）+ agent dock |
+| [`market/data.js`](../../prototype/market/data.js) | mock：sectors / tracks / newsDemo / filings / publicNews |
+| [`market/components.js`](../../prototype/market/components.js) | 一函数一卡：资讯 Tab 体、Investment 面板、关注聚合列表、板块网格 / 详情、Dashboard 标题栏 / 刷新交互 |
+| [`market/agent.js`](../../prototype/market/agent.js) | 助手 dock；页面设 `window.MKT_AGENT_CTX`（可选 `suggest`） |
+| [`market/sectors.html`](../../prototype/market/sectors.html) | **板块中心**：完整赛道卡片网格；左栏另设热门板块快捷导航 |
+| [`market/sector-detail.html`](../../prototype/market/sector-detail.html) | **板块详情**：`?key=`；返回板块中心 · 核心环节 pill ·「让 AI 拆这个板块」（对齐 Research SectorDetail）；与 `04-industry`（行业财务）分流 |
+| [`market/intel.html`](../../prototype/market/intel.html) | **资讯雷达**：页内 Tab + 固定卡布局 |
 
 壳用法：页面写 `<div id="shell-root" data-view="overview\|sectors\|intel"></div>` + `<main class="main-area">`，脚本顺序：`data.js` → `shell.js` → `agent.js` →（可选）`components.js`。
 
@@ -241,11 +241,11 @@ Wash（`--hover` 等）是**表面**，不是字色。
 
 | 文件 | 角色 |
 |---|---|
-| [`05-stock.html`](../prototype/05-stock.html) | 壳：topbar / rail / crumb「加入研究」/ `#stk-root` / agent |
-| [`stock/data.js`](../prototype/stock/data.js) | mock（默认寒武纪；`?name=` 切换） |
-| [`stock/components.js`](../prototype/stock/components.js) | 一函数一卡：概览 / 财报速览 / 估值分位 / 财务 / 研报 / 公告 / 新闻 / 资金 / 解禁 / 概念 |
-| [`stock/page.js`](../prototype/stock/page.js) | 挂载 + 加入研究 + 助手接线 |
-| [`stock/stock.css`](../prototype/stock/stock.css) | 个股专有：估值带、列表行、pill（不改 FROZEN） |
+| [`05-stock.html`](../../prototype/05-stock.html) | 壳：topbar / rail / crumb「加入研究」/ `#stk-root` / agent |
+| [`stock/data.js`](../../prototype/stock/data.js) | mock（默认寒武纪；`?name=` 切换） |
+| [`stock/components.js`](../../prototype/stock/components.js) | 一函数一卡：概览 / 财报速览 / 估值分位 / 财务 / 研报 / 公告 / 新闻 / 资金 / 解禁 / 概念 |
+| [`stock/page.js`](../../prototype/stock/page.js) | 挂载 + 加入研究 + 助手接线 |
+| [`stock/stock.css`](../../prototype/stock/stock.css) | 个股专有：估值带、列表行、pill（不改 FROZEN） |
 
 结构对齐 Vibe-Research `StockData.tsx` 字段栈；**无**页内搜索框；AI 走助手抽屉，不另起渐变 AskAi 按钮。
 
@@ -253,11 +253,11 @@ Wash（`--hover` 等）是**表面**，不是字色。
 
 | 文件 | 角色 |
 |---|---|
-| `02-research.html` | 研究池（`obj-nav` 行业/个股列表） |
-| `03-data.html` | 数据 |
-| `04-industry.html` | 行业财务详情（`ind-shell` + 加入研究；与行情「板块详情」分流） |
+| [`02-research.html`](../../prototype/02-research.html) | 唯一正式研究原型：行业 / 个股列表、关注 / 跟踪 / 持有标签、最近更新、研究状态、当前报告、研究依据与结构化助手；业务以 [`research_design.md`](../research-design/research_design.md) 为准 |
+| [`03-data.html`](../../prototype/03-data.html) | 数据源 / 研究资料 / 配置；“研究资料”只展示用户历史上传，不展示内部 Wiki；配置中的“变更记录”承接全局恢复 |
+| [`04-industry.html`](../../prototype/04-industry.html) | 无 LLM 生成结论的行业数据详情（`ind-shell` + 加入研究；与行情「板块详情」分流） |
 
-### 6.2 Structured Glass（v6.5 · 贴边 glass）
+### 6.2 Structured Glass（贴边 glass）
 
 色值与玻璃配方 **字面抄** `Vibe-Research/frontend/src/index.css`（HSL + rgba）。
 
@@ -334,10 +334,10 @@ Wash（`--hover` 等）是**表面**，不是字色。
 | Shell class | 列 | 用途 |
 |---|---|---|
 | `.shell.market` | 56 + 220 + 1fr | 行情三页（总览 / 板块 / 资讯） |
-| `.shell.research` | 56 + 220 + 1fr | 研究池 |
+| `.shell.research` | 56 + 220 + 1fr | 研究 |
 | `.shell.data` | 56 + 220 + 1fr | 数据 |
 | `.shell.ind-shell` | 56 + 1fr | 个股 / 行业详情（无二级栏） |
-| `+ .nav-collapsed` | dock → 56px（仅 rail），二级栏宽 → 0 | 全站；[`nav-collapse.js`](../prototype/nav-collapse.js)；`localStorage vf-nav` |
+| `+ .nav-collapsed` | dock → 56px（仅 rail），二级栏宽 → 0 | 全站；[`nav-collapse.js`](../../prototype/nav-collapse.js)；`localStorage vf-nav` |
 
 **左栏开合（强制）：** rail 底三件套对齐 Research——**主题 · 用户 · `<<`/`>>`**（无文字头像）；收起后 **icon rail 常驻**，不是整栏消失；与右侧助手可同时开。  
 点击 **当前 Mode 的 rail** 始终切换二级栏开合；收起态为展开，展开态为收起。点击其他 Mode 则跳转并以展开态落地。`.nav-dock` 必须 `min-width: 0`，否则 grid 会把收起宽度撑回内容宽。
@@ -412,10 +412,12 @@ Wash（`--hover` 等）是**表面**，不是字色。
 
 | 模式 | 要求 |
 |---|---|
-| 入口 | 顶栏「助手」；场景 CTA 打开同一抽屉并带上 context（文案用「会带上」，不用「打包」） |
-| 上下文 | 行情：`MKT_AGENT_CTX`；个股：`page.js` 写 agent 文案 |
+| 入口 | 所有页面复用顶栏「助手」；场景 CTA 打开同一抽屉并显示已带上当前页面 context（文案用「会带上」，不用「打包」） |
+| 上下文反馈 | 抽屉可见当前页面或对象名称、筛选范围和数据时间，不在 UI 合同中重复定义装载逻辑 |
+| 结构化动作 | UI Tool 的输入、影响摘要和二次确认在抽屉内或关联浮层呈现，并与普通回答明显区分 |
+| 行为权威 | 会话、上下文装载、Memory 和确认语义统一引用 [`research_design.md`](../research-design/research_design.md) |
 | 场景 CTA | 「今日复盘」「解读板块」「一键提炼全部要点」「让 AI 提炼今日要点」「让助手读这些数据」 |
-| **禁止** | 每页自建第二套 AI 侧栏；✨ AI-POWERED 徽章；假进度光效 |
+| **禁止** | 每页自建第二套 AI 侧栏；把领域规则复制进视觉合同；✨ AI-POWERED 徽章；假进度光效 |
 
 **全局 dock（强制）：**
 
@@ -438,6 +440,8 @@ AI = 压缩与推理层，不是视觉主题。**动态数据进固定布局，�
 
 Investment News 内：赛道筛选只用 **chips**，禁止再在左栏复制一份赛道列表。
 
+关注股票的公告、新闻和已完成研究变化复用现有聚合面板；用户可以从消息进入对象或打开助手继续分析，不新增消息 Tab、通知中心或外部渠道设置。
+
 ### 8.8 板块中心卡片
 
 - `.sector-card.glass`：标题 + 可选「热门」+ tagline + 环节数  
@@ -448,6 +452,28 @@ Investment News 内：赛道筛选只用 **chips**，禁止再在左栏复制一
 
 - Badge 只表真状态（「热门」「集成」、数量、已加入）  
 - 图标继承字色 / primary；装饰 emoji 不进产品 UI  
+
+### 8.10 Destructive confirmation
+
+“删除研究档案”使用低频对象菜单和清晰的确认面板，不使用整屏红色警告或技术术语。
+
+确认面板固定分三组：
+
+1. **将删除：**研究状态、当前报告、研究依据、长期记录、对象关系和关注状态；
+2. **将保留：**用户上传的原始资料，并明确写出“你上传的原始资料不会删除”；
+3. **删除后：**停止持续更新，可从“数据 → 配置 → 变更记录”恢复。
+
+主按钮使用明确文案“删除研究档案”，取消按钮保持同级可见。禁止出现 Wiki、Git、commit、hash、文件路径或含糊的“清理数据”。
+
+### 8.11 One research surface, adaptive assistant
+
+研究对象页面向所有 A 股投资者使用同一信息架构。研究状态、实时指标、当前报告、研究依据和关系跳转继续遵循已确认顺序；实时指标和报告必须能承载当前价格、价值区间、收入成本与利润拆分、财务模型、行业先行指标及其日期和来源，不能退化成资料目录或通用财报摘要。
+
+助手根据用户当前问题和本轮对话调整术语、解释背景与分析深度；这种适配发生在回答中，不改变页面布局，也不降低 FCISU、来源和时间要求。
+
+“关注 / 跟踪 / 持有”是个股卡上的单个轻量标签，不使用三套列表或三套颜色，也不与绿 / 黄 / 红 / 灰研究状态混用。标签可在加入确认和对象菜单中修改。
+
+现有关注股票公告 / 新闻聚合继续作为消息入口；研究变化可以进入同一聚合，不新增通知中心或外部渠道配置。
 
 ---
 
@@ -529,7 +555,7 @@ font-serif on dashboard stats
 
 ## 12. Maintenance
 
-1. **改视觉先改 [`prototype/shared.css`](../prototype/shared.css)**，再视需要更新本文 frontmatter。FROZEN `.ds-*` 禁止页面私改。  
+1. **改视觉先改 [`prototype/shared.css`](../../prototype/shared.css)**，再视需要更新本文 frontmatter。FROZEN `.ds-*` 禁止页面私改。  
 2. **改行情业务**：数据进 `market/data.js`；渲染进 `market/components.js`；壳/助手不进页面内联大脚本。  
 3. **改个股详情**：数据 / 卡片 / 编排分属 `stock/{data,components,page}.js`；专有样式只进 `stock/stock.css`。  
 4. 新组件优先复用：`.ds-*` / `.glass` / `.ov-cta` / chip / agent drawer。  
@@ -549,8 +575,8 @@ font-serif on dashboard stats
 | 个股详情字段栈（估值 / 财报 / 研报…） | 无页内搜代码；「加入研究」+ 助手抽屉替代 AskAi 渐变钮 |
 | glass / primary 暖橙 token | 壳是 Finance rail + 分页，不是 Research 浮岛侧栏 |
 
-权威实现以 `prototype/` 为准；Research 为字段与模块对照，不是目录照搬。
+当前实现证据以 `prototype/` 为准；预期设计以本文和上级产品合同为准。Vibe-Research 只作字段与模块对照，不是目录照搬。
 
 ---
 
-*本文合订：Maka 工作台纪律 · shared.css v6.5 + market/stock 组件化 · [Kill AI Slop](https://killaislop.com/) · 对照 Vibe-Research DailyReview / Intel / StockData。*
+*本文合订：Maka 工作台纪律 · shared.css + market/stock 组件化 · [Kill AI Slop](https://killaislop.com/) · 对照 Vibe-Research DailyReview / Intel / StockData。*

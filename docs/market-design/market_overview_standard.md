@@ -1,12 +1,13 @@
 # 行情总览标准
 
 > **定位：** 行情总览是 Vibe-Finance 的 Dashboard 页面标准。它规定信息如何分层、一个 Dashboard 如何构成、数据如何决定内容形态；不是某一页的静态样式说明。  
-> **适用范围：** 行情总览，以及后续所有由多个市场数据模块构成的页面。视觉 token 和 CSS 真源仍以 [`DESIGN.md`](./DESIGN.md) 与 `prototype/shared.css` 为准。
+> **适用范围：** 行情总览，以及后续所有由多个市场数据模块构成的页面。视觉 token 和 CSS 真源仍以 [`../ui-design/DESIGN.md`](../ui-design/DESIGN.md) 与 `prototype/shared.css` 为准；行情模块的页面职责以 [`market_design.md`](market_design.md) 为准。
 
 ## 1. 核心原则
 
 **页面不是卡片的堆叠，而是按投资决策顺序组织的一组独立 Dashboard。**
 
+- 行情广度和可视化必须帮助尚无明确方向的用户看见市场结构、相对位置和变化，形成可继续研究的行业或个股候选，而不只服务已有自选监控。
 - 导航负责定位，不重复展示数据。
 - 分组负责阅读顺序，不承担 Dashboard 的数据和交互责任。
 - Dashboard 是唯一可复用的数据单元：拥有标题、内容、刷新与更新时间。
