@@ -1,0 +1,1107 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>架构实施说明 · Vibe-Finance</title>
+  <link rel="icon" href="data:,">
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #faf8f5;
+      --paper: #ffffff;
+      --ink: #1c2027;
+      --muted: #6a7280;
+      --faint: #9aa1ad;
+      --line: #e6e1da;
+      --line-soft: #efeae3;
+      --accent: #e8541f;
+      --accent-deep: #c44217;
+      --accent-soft: #fdeee4;
+      --green: #1e7a4c;
+      --green-soft: #e5f2ea;
+      --amber: #a86b12;
+      --amber-soft: #f9efd9;
+      --red: #b04434;
+      --red-soft: #f9e9e5;
+      --gray-soft: #eef0f2;
+      --shadow: 0 18px 50px rgba(40, 32, 24, 0.07);
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 6% 0%, rgba(232, 84, 31, 0.07), transparent 26rem),
+        radial-gradient(circle at 97% 12%, rgba(30, 122, 76, 0.06), transparent 24rem),
+        var(--bg);
+      font-family:
+        Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+        "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei",
+        sans-serif;
+      line-height: 1.7;
+    }
+
+    a { color: var(--accent-deep); text-underline-offset: 2px; }
+    a:hover { color: var(--accent); }
+
+    .page {
+      width: min(1160px, calc(100% - 40px));
+      margin: 0 auto;
+      padding: 26px 0 72px;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+      margin-bottom: 68px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--accent-deep);
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-decoration: none;
+    }
+
+    .brand-mark {
+      width: 26px; height: 26px;
+      border-radius: 7px;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.35), transparent 55%),
+        var(--accent);
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.3);
+      position: relative;
+    }
+
+    .brand-mark::after {
+      content: "";
+      position: absolute;
+      left: 6px; right: 6px; bottom: 6px;
+      height: 9px;
+      background:
+        linear-gradient(90deg, #fff 0 3px, transparent 3px 6px, #fff 6px 9px, transparent 9px 12px, #fff 12px 15px);
+      opacity: .85;
+      border-radius: 1px;
+    }
+
+    .topbar-meta { display: flex; gap: 16px; flex-wrap: wrap; }
+
+    .page-intro {
+      margin-bottom: 56px;
+      max-width: 40em;
+    }
+
+    .page-intro h1 {
+      margin: 0 0 12px;
+      font-size: clamp(24px, 2.8vw, 32px);
+      line-height: 1.28;
+      letter-spacing: -0.01em;
+    }
+
+    .intro-lead {
+      margin: 0;
+      color: var(--muted);
+      font-size: 15.5px;
+    }
+
+    section { margin-bottom: 92px; }
+
+    .section-heading {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(240px, 380px);
+      gap: 32px;
+      align-items: end;
+      margin-bottom: 34px;
+    }
+
+    .section-kicker {
+      margin: 0 0 10px;
+      color: var(--accent-deep);
+      font-size: 12.5px;
+      font-weight: 700;
+      letter-spacing: 0.16em;
+    }
+
+    h2 {
+      margin: 0;
+      font-size: clamp(23px, 2.6vw, 30px);
+      line-height: 1.3;
+      letter-spacing: -0.01em;
+    }
+
+    .section-intro {
+      margin: 0;
+      color: var(--muted);
+      font-size: 14.5px;
+    }
+
+    h3 { margin: 0 0 8px; font-size: 16px; }
+    p { margin: 0; }
+
+    /* ---------- diagram chrome ---------- */
+    .diagram {
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      margin-bottom: 18px;
+    }
+
+    .diagram-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 14px 22px;
+      border-bottom: 1px solid var(--line-soft);
+      background: #fcfbf9;
+      flex-wrap: wrap;
+    }
+
+    .diagram-head strong {
+      font-size: 13.5px;
+      letter-spacing: .02em;
+    }
+
+    .diagram-head .tag {
+      font-size: 11.5px;
+      color: var(--faint);
+      font-weight: 600;
+      letter-spacing: .08em;
+    }
+
+    .diagram-body { padding: 22px; }
+    .diagram-body.tight { padding: 16px; }
+    .diagram-foot {
+      padding: 12px 22px;
+      border-top: 1px solid var(--line-soft);
+      font-size: 12.5px;
+      color: var(--muted);
+      background: #fcfbf9;
+    }
+    .diagram-foot strong { color: var(--ink); }
+
+    .diagram svg { display: block; width: 100%; height: auto; }
+    .diagram svg text { font-family: inherit; }
+
+    .trust-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+    }
+
+    .trust {
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 20px;
+    }
+
+    .trust h3 { font-size: 14.5px; margin-bottom: 6px; }
+    .trust p { font-size: 12.5px; color: var(--muted); }
+
+    .trust-note {
+      margin-top: 14px;
+      padding: 12px 16px;
+      border: 1px dashed var(--line);
+      border-radius: 12px;
+      color: var(--muted);
+      font-size: 12.5px;
+    }
+
+    .trust-note strong { color: var(--ink); }
+
+    .rules { display: grid; gap: 10px; margin-top: 18px; }
+
+    .rule {
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 15px 18px;
+    }
+
+    .rule .sk-no {
+      flex: none;
+      width: 24px; height: 24px;
+      border-radius: 8px;
+      background: var(--gray-soft);
+      color: var(--muted);
+      display: grid; place-items: center;
+      font-size: 11.5px; font-weight: 800;
+    }
+
+    .rule strong { display: block; font-size: 14px; margin-bottom: 2px; }
+    .rule p { font-size: 12.5px; color: var(--muted); }
+
+    .path {
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 24px 24px 8px;
+      margin-bottom: 16px;
+      box-shadow: 0 6px 18px rgba(40, 32, 24, 0.04);
+    }
+
+    .path-head {
+      display: flex;
+      align-items: baseline;
+      gap: 14px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
+
+    .path-head .path-no {
+      flex: none;
+      padding: 4px 11px;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      color: var(--accent-deep);
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .path-head h3 { font-size: 17px; margin: 0; }
+    .path-head .goal { color: var(--muted); font-size: 13px; margin-left: auto; }
+
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .step {
+      border: 1px solid var(--line-soft);
+      border-radius: 12px;
+      padding: 13px 14px;
+      background: #fcfbf9;
+    }
+
+    .step .s-no {
+      font-size: 11px;
+      font-weight: 800;
+      color: var(--accent);
+      letter-spacing: .08em;
+      margin-bottom: 5px;
+    }
+
+    .step strong { display: block; font-size: 13.5px; margin-bottom: 3px; }
+    .step p { font-size: 12.5px; color: var(--muted); }
+    .step.key { border-color: rgba(232, 84, 31, .35); background: var(--accent-soft); }
+
+    .path-note {
+      border-top: 1px dashed var(--line);
+      padding: 12px 2px 14px;
+      font-size: 12.5px;
+      color: var(--muted);
+    }
+
+    .path-note strong { color: var(--ink); }
+
+    .split-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    .panel {
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 20px;
+    }
+
+    .panel .col-label {
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: .1em;
+      color: var(--faint);
+      margin-bottom: 12px;
+    }
+
+    .panel h3 { font-size: 15px; margin-bottom: 6px; }
+    .panel p { font-size: 13px; color: var(--muted); }
+
+    .guardrails {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .guardrail {
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 18px;
+    }
+
+    .guardrail .g-mark {
+      flex: none;
+      width: 28px; height: 28px;
+      border-radius: 9px;
+      background: var(--red-soft);
+      color: var(--red);
+      display: grid; place-items: center;
+      font-size: 14px; font-weight: 800;
+    }
+
+    .guardrail h3 { font-size: 14.5px; }
+    .guardrail p { font-size: 12.5px; color: var(--muted); }
+
+    .check-list {
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 8px 22px;
+      box-shadow: 0 6px 18px rgba(40, 32, 24, 0.04);
+    }
+
+    .check-item {
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      padding: 14px 0;
+      border-bottom: 1px dashed var(--line-soft);
+      font-size: 13.5px;
+    }
+
+    .check-item:last-child { border-bottom: 0; }
+
+    .check-item .box {
+      flex: none;
+      width: 16px; height: 16px;
+      margin-top: 3px;
+      border: 1.5px solid var(--accent);
+      border-radius: 4px;
+    }
+
+    .legend-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px 20px;
+      margin-top: 14px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .legend-row i {
+      display: inline-block;
+      width: 10px; height: 10px;
+      border-radius: 3px;
+      margin-right: 6px;
+      vertical-align: -1px;
+    }
+
+    .foot {
+      margin-top: 40px;
+      padding-top: 24px;
+      border-top: 1px solid var(--line);
+      color: var(--faint);
+      font-size: 12.5px;
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    @media (max-width: 900px) {
+      .section-heading,
+      .trust-grid,
+      .split-2,
+      .guardrails { grid-template-columns: 1fr; }
+      .topbar { margin-bottom: 40px; }
+      section { margin-bottom: 64px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header class="topbar">
+      <a class="brand" href="./index.html">
+        <span class="brand-mark" aria-hidden="true"></span>
+        <span>VIBE-FINANCE</span>
+      </a>
+      <div class="topbar-meta">
+        <span>架构实施说明</span>
+        <a href="./wiki.html" style="color:var(--muted);text-decoration:none">Wiki 说明</a>
+      </div>
+    </header>
+
+    <section class="page-intro" aria-label="概述">
+      <p class="section-kicker">架构实施说明</p>
+      <h1>系统如何划分职责、存储与写入路径</h1>
+      <p class="intro-lead">
+        研究状态、价值区间和估值位置都是判断。能按规则完成的事归执行器，判断归 Agent，会改范围或删东西的操作须用户确认；系统只在应用打开时运行。
+      </p>
+    </section>
+
+    <!-- ========== 系统总览图 ========== -->
+    <section aria-labelledby="sys-title">
+      <div class="section-heading">
+        <div>
+          <p class="section-kicker">系统总览</p>
+          <h2 id="sys-title">系统怎么拼在一起</h2>
+        </div>
+        <p class="section-intro">
+          前台调度触发任务；Agent 只提出要改什么；执行器是唯一真正写入的入口；数据工具只取数，不改知识档案。
+        </p>
+      </div>
+
+      <div class="diagram" aria-label="系统架构图">
+        <div class="diagram-head">
+          <strong>系统架构 · 组件与数据流</strong>
+          <span class="tag">运行结构</span>
+        </div>
+        <div class="diagram-body tight">
+          <svg viewBox="0 0 1080 520" role="img" aria-label="系统架构图：用户界面、前台调度、Agent、执行器、知识档案、列表数据库、数据工具">
+            <defs>
+              <marker id="arrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+                <path d="M0,0 L6,3 L0,6 Z" fill="#9aa1ad"/>
+              </marker>
+              <marker id="arrow-a" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+                <path d="M0,0 L6,3 L0,6 Z" fill="#e8541f"/>
+              </marker>
+              <marker id="arrow-g" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+                <path d="M0,0 L6,3 L0,6 Z" fill="#1e7a4c"/>
+              </marker>
+            </defs>
+
+            <!-- UI -->
+            <rect x="40" y="30" width="1000" height="70" rx="14" fill="#fcfbf9" stroke="#e6e1da"/>
+            <text x="60" y="58" font-size="12" font-weight="700" fill="#9aa1ad" letter-spacing="1.5">用户界面</text>
+            <text x="60" y="82" font-size="16" font-weight="700" fill="#1c2027">行情 / 研究 / 数据 · 公共助手</text>
+            <text x="760" y="82" font-size="12" fill="#6a7280">界面不出现内部实现细节</text>
+
+            <!-- Scheduler -->
+            <rect x="40" y="130" width="220" height="100" rx="14" fill="#fff" stroke="#e6e1da"/>
+            <text x="58" y="158" font-size="11" font-weight="700" fill="#e8541f" letter-spacing="1">调度</text>
+            <text x="58" y="184" font-size="15" font-weight="700" fill="#1c2027">前台调度</text>
+            <text x="58" y="208" font-size="12" fill="#6a7280">周节拍 · 披露窗口 · 重试</text>
+
+            <!-- Agent -->
+            <rect x="310" y="130" width="240" height="100" rx="14" fill="#fdeee4" stroke="rgba(232,84,31,.35)"/>
+            <text x="328" y="158" font-size="11" font-weight="700" fill="#c44217" letter-spacing="1">分析</text>
+            <text x="328" y="184" font-size="15" font-weight="700" fill="#1c2027">Agent</text>
+            <text x="328" y="208" font-size="12" fill="#6a7280">阅读 · 分析 · 提出变更方案</text>
+
+            <!-- 执行器 -->
+            <rect x="600" y="130" width="240" height="100" rx="14" fill="#e5f2ea" stroke="rgba(30,122,76,.35)"/>
+            <text x="618" y="158" font-size="11" font-weight="700" fill="#1e7a4c" letter-spacing="1">写入</text>
+            <text x="618" y="184" font-size="15" font-weight="700" fill="#1c2027">执行器</text>
+            <text x="618" y="208" font-size="12" fill="#6a7280">校验 · 写入 · 更新列表 · 记变更点</text>
+
+            <!-- Data tools -->
+            <rect x="880" y="130" width="160" height="100" rx="14" fill="#fff" stroke="#e6e1da"/>
+            <text x="898" y="158" font-size="11" font-weight="700" fill="#9aa1ad" letter-spacing="1">工具</text>
+            <text x="898" y="184" font-size="14" font-weight="700" fill="#1c2027">数据工具</text>
+            <text x="898" y="208" font-size="12" fill="#6a7280">行情 / 财务 / 公告</text>
+
+            <!-- arrows top -->
+            <line x1="150" y1="100" x2="150" y2="130" stroke="#9aa1ad" stroke-width="1.5" marker-end="url(#arrow)"/>
+            <line x1="430" y1="100" x2="430" y2="130" stroke="#9aa1ad" stroke-width="1.5" marker-end="url(#arrow)"/>
+            <path d="M260 180 H310" stroke="#e8541f" stroke-width="1.8" marker-end="url(#arrow-a)"/>
+            <text x="268" y="172" font-size="11" fill="#c44217" font-weight="700">触发</text>
+            <path d="M550 180 H600" stroke="#e8541f" stroke-width="1.8" marker-end="url(#arrow-a)"/>
+            <text x="552" y="172" font-size="11" fill="#c44217" font-weight="700">变更方案</text>
+            <path d="M840 160 H880" stroke="#9aa1ad" stroke-width="1.5" marker-end="url(#arrow)"/>
+            <text x="845" y="152" font-size="11" fill="#6a7280">读数</text>
+            <path d="M960 230 V280" stroke="#9aa1ad" stroke-width="1.5" stroke-dasharray="4 3" marker-end="url(#arrow)"/>
+            <text x="970" y="258" font-size="11" fill="#6a7280">不写仓库</text>
+
+            <!-- Storage zone -->
+            <rect x="40" y="280" width="1000" height="200" rx="16" fill="#fcfbf9" stroke="#e6e1da"/>
+            <text x="60" y="310" font-size="12" font-weight="700" fill="#9aa1ad" letter-spacing="1.5">知识档案 + 列表索引</text>
+
+            <!-- Knowledge repo -->
+            <rect x="60" y="330" width="620" height="120" rx="14" fill="#fff" stroke="#e6e1da"/>
+            <text x="80" y="358" font-size="11" font-weight="700" fill="#c44217" letter-spacing="1">知识档案 · 文件 + 本地版本记录</text>
+            <rect x="80" y="372" width="170" height="54" rx="10" fill="#f9efd9" stroke="rgba(168,107,18,.25)"/>
+            <text x="96" y="394" font-size="13" font-weight="700" fill="#1c2027">raw/</text>
+            <text x="96" y="412" font-size="11" fill="#6a7280">证据 · 只追加</text>
+            <rect x="270" y="372" width="170" height="54" rx="10" fill="#fff" stroke="#e6e1da"/>
+            <text x="286" y="394" font-size="13" font-weight="700" fill="#1c2027">wiki/</text>
+            <text x="286" y="412" font-size="11" fill="#6a7280">事实与关系</text>
+            <rect x="460" y="372" width="190" height="54" rx="10" fill="#fdeee4" stroke="rgba(232,84,31,.3)"/>
+            <text x="476" y="394" font-size="13" font-weight="700" fill="#1c2027">judgment/</text>
+            <text x="476" y="412" font-size="11" fill="#6a7280">状态 · 报告 · 长期假设</text>
+
+            <!-- 列表数据库 -->
+            <rect x="720" y="330" width="290" height="120" rx="14" fill="#fff" stroke="#e6e1da" stroke-dasharray="5 4"/>
+            <text x="740" y="358" font-size="11" font-weight="700" fill="#9aa1ad" letter-spacing="1">列表数据库 · 可重建</text>
+            <text x="740" y="388" font-size="15" font-weight="700" fill="#1c2027">列表索引</text>
+            <text x="740" y="414" font-size="12" fill="#6a7280">列表 · 事件 · 索引</text>
+            <text x="740" y="434" font-size="12" fill="#6a7280">删库后可从文件重建</text>
+
+            <!-- write arrows -->
+            <path d="M720 230 V280" stroke="#1e7a4c" stroke-width="1.8" marker-end="url(#arrow-g)"/>
+            <text x="728" y="258" font-size="11" fill="#1e7a4c" font-weight="700">写入并记变更点</text>
+            <path d="M780 280 V330" stroke="#1e7a4c" stroke-width="1.5" marker-end="url(#arrow-g)"/>
+            <path d="M370 230 V330" stroke="#1e7a4c" stroke-width="1.5" stroke-dasharray="4 3" marker-end="url(#arrow-g)"/>
+            <text x="250" y="290" font-size="11" fill="#1e7a4c">只读，供分析用</text>
+          </svg>
+        </div>
+        <div class="diagram-foot">
+          <strong>唯一通路：</strong>Agent → 变更方案 → 执行器 → 知识档案 / 列表索引。Agent 不直接改文件；数据工具不改知识档案。
+        </div>
+      </div>
+
+      <div class="trust-grid">
+        <article class="trust">
+          <h3>确定性 → 执行器</h3>
+          <p>写入文件、记日志、更新列表、保存变更点、重算估值：全部由执行器完成。</p>
+        </article>
+        <article class="trust">
+          <h3>判断 → Agent</h3>
+          <p>综合、取舍、页面维护、解释：Agent 可以做，但必须援引证据。</p>
+        </article>
+        <article class="trust">
+          <h3>确认 → 用户</h3>
+          <p>破坏性操作、改变研究范围、采用持续假设：用户确认后才生效。</p>
+        </article>
+      </div>
+    </section>
+
+    <!-- ========== 四层存储 ========== -->
+    <section aria-labelledby="layers-title">
+      <div class="section-heading">
+        <div>
+          <p class="section-kicker">分层存放</p>
+          <h2 id="layers-title">四层存放，每一层只认一个来源</h2>
+        </div>
+        <p class="section-intro">
+          分层依据是各自怎么变、怎么失效：证据会被替代，事实会被修正，判断会被推翻，列表索引随时可重建。
+        </p>
+      </div>
+
+      <div class="diagram" aria-label="四层存储架构图">
+        <div class="diagram-head">
+          <strong>存储分层 · 谁写入、以谁为准</strong>
+          <span class="tag">四层结构</span>
+        </div>
+        <div class="diagram-body tight">
+          <svg viewBox="0 0 1080 420" role="img">
+            <defs>
+              <marker id="a2" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+                <path d="M0,0 L6,3 L0,6 Z" fill="#e8541f"/>
+              </marker>
+              <marker id="a3" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+                <path d="M0,0 L6,3 L0,6 Z" fill="#9aa1ad"/>
+              </marker>
+            </defs>
+
+            <!-- left writers -->
+            <rect x="40" y="40" width="160" height="56" rx="12" fill="#fdeee4" stroke="rgba(232,84,31,.3)"/>
+            <text x="120" y="73" text-anchor="middle" font-size="13" font-weight="700">摄取 / 用户</text>
+            <rect x="40" y="130" width="160" height="56" rx="12" fill="#fdeee4" stroke="rgba(232,84,31,.3)"/>
+            <text x="120" y="163" text-anchor="middle" font-size="13" font-weight="700">Agent 维护</text>
+            <rect x="40" y="220" width="160" height="56" rx="12" fill="#fdeee4" stroke="rgba(232,84,31,.3)"/>
+            <text x="120" y="253" text-anchor="middle" font-size="13" font-weight="700">深复核写入</text>
+            <rect x="40" y="310" width="160" height="56" rx="12" fill="#e5f2ea" stroke="rgba(30,122,76,.3)"/>
+            <text x="120" y="343" text-anchor="middle" font-size="13" font-weight="700">执行器更新列表</text>
+
+            <!-- arrows -->
+            <path d="M200 68 H250" stroke="#e8541f" stroke-width="1.8" marker-end="url(#a2)"/>
+            <path d="M200 158 H250" stroke="#e8541f" stroke-width="1.8" marker-end="url(#a2)"/>
+            <path d="M200 248 H250" stroke="#e8541f" stroke-width="1.8" marker-end="url(#a2)"/>
+            <path d="M200 338 H250" stroke="#1e7a4c" stroke-width="1.8" marker-end="url(#a2)"/>
+
+            <!-- stack -->
+            <rect x="250" y="30" width="520" height="76" rx="14" fill="#f9efd9" stroke="rgba(168,107,18,.3)"/>
+            <text x="272" y="58" font-size="12" font-weight="700" fill="#a86b12">证据层</text>
+            <text x="272" y="82" font-size="18" font-weight="700">raw/sources/</text>
+            <text x="560" y="70" font-size="13" fill="#6a7280">只追加 · 原始资料只认这里</text>
+
+            <rect x="250" y="120" width="520" height="76" rx="14" fill="#fff" stroke="#e6e1da"/>
+            <text x="272" y="148" font-size="12" font-weight="700" fill="#6a7280">知识层</text>
+            <text x="272" y="172" font-size="18" font-weight="700">wiki/</text>
+            <text x="560" y="160" font-size="13" fill="#6a7280">可重写 · 事实与关系只认这里</text>
+
+            <rect x="250" y="210" width="520" height="76" rx="14" fill="#fdeee4" stroke="rgba(232,84,31,.35)"/>
+            <text x="272" y="238" font-size="12" font-weight="700" fill="#c44217">判断层</text>
+            <text x="272" y="262" font-size="18" font-weight="700">judgment/</text>
+            <text x="560" y="250" font-size="13" fill="#6a7280">会被推翻 · 状态与论证只认这里</text>
+
+            <rect x="250" y="300" width="520" height="76" rx="14" fill="#fff" stroke="#e6e1da" stroke-dasharray="5 4"/>
+            <text x="272" y="328" font-size="12" font-weight="700" fill="#9aa1ad">列表索引</text>
+            <text x="272" y="352" font-size="18" font-weight="700">列表数据库</text>
+            <text x="560" y="340" font-size="13" fill="#6a7280">删了也能重建 · 不当唯一来源</text>
+
+            <!-- right rules -->
+            <rect x="810" y="30" width="230" height="346" rx="16" fill="#fcfbf9" stroke="#e6e1da"/>
+            <text x="830" y="62" font-size="12" font-weight="700" fill="#9aa1ad" letter-spacing="1">边界规则</text>
+            <circle cx="842" cy="100" r="10" fill="#fdeee4"/>
+            <text x="842" y="104" text-anchor="middle" font-size="11" font-weight="800" fill="#c44217">1</text>
+            <text x="862" y="96" font-size="12.5" font-weight="700">Wiki ≠ 判断</text>
+            <text x="862" y="114" font-size="11.5" fill="#6a7280">禁止写状态/区间</text>
+
+            <circle cx="842" cy="170" r="10" fill="#fdeee4"/>
+            <text x="842" y="174" text-anchor="middle" font-size="11" font-weight="800" fill="#c44217">2</text>
+            <text x="862" y="166" font-size="12.5" font-weight="700">判断 → 脚注</text>
+            <text x="862" y="184" font-size="11.5" fill="#6a7280">复述事实必须指回</text>
+
+            <circle cx="842" cy="240" r="10" fill="#fdeee4"/>
+            <text x="842" y="244" text-anchor="middle" font-size="11" font-weight="800" fill="#c44217">3</text>
+            <text x="862" y="236" font-size="12.5" font-weight="700">列表不当来源</text>
+            <text x="862" y="254" font-size="11.5" fill="#6a7280">删库后仍可重建</text>
+
+            <path d="M925 280 V310" stroke="#9aa1ad" stroke-width="1.5" marker-end="url(#a3)"/>
+            <text x="830" y="340" font-size="12" fill="#6a7280">报告可滞后于 Wiki</text>
+            <text x="830" y="358" font-size="12" fill="#6a7280">用「待复核」表达</text>
+          </svg>
+        </div>
+      </div>
+
+      <div class="rules">
+        <div class="rule">
+          <span class="sk-no">1</span>
+          <div>
+            <strong>Wiki 不得写入研究状态、价值区间或估值结论</strong>
+            <p>判断只能出现在判断层。Wiki 可含明确标注为「推断」的推导，不得写价值区间或估值结论。</p>
+          </div>
+        </div>
+        <div class="rule">
+          <span class="sk-no">2</span>
+          <div>
+            <strong>判断层复述 Wiki 事实时必须带脚注锚点指回</strong>
+            <p>报告数字滞后于 Wiki 是允许的，用「待复核」表达；不允许两处各自声称正确。</p>
+          </div>
+        </div>
+        <div class="rule">
+          <span class="sk-no">3</span>
+          <div>
+            <strong>列表数据库不得成为任何事实或判断的唯一存放处</strong>
+            <p>删掉列表数据库后，重新扫描知识档案必须能完全重建。</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== 知识写入流程图 ========== -->
+    <section aria-labelledby="txn-title">
+      <div class="section-heading">
+        <div>
+          <p class="section-kicker">知识写入</p>
+          <h2 id="txn-title">先提出变更方案，再过校验，再一次性写入</h2>
+        </div>
+        <p class="section-intro">
+          Agent 不能直接改档案文件。校验不过或任一步失败，这次变更全部作废。
+        </p>
+      </div>
+
+      <div class="diagram" aria-label="知识写入流程图">
+        <div class="diagram-head">
+          <strong>知识写入 · 两阶段 + 校验</strong>
+          <span class="tag">写入流程</span>
+        </div>
+        <div class="diagram-body tight">
+          <svg viewBox="0 0 1080 480" role="img">
+            <defs>
+              <marker id="af" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+                <path d="M0,0 L6,3 L0,6 Z" fill="#9aa1ad"/>
+              </marker>
+              <marker id="af-a" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+                <path d="M0,0 L6,3 L0,6 Z" fill="#e8541f"/>
+              </marker>
+              <marker id="af-g" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+                <path d="M0,0 L6,3 L0,6 Z" fill="#1e7a4c"/>
+              </marker>
+              <marker id="af-r" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+                <path d="M0,0 L6,3 L0,6 Z" fill="#b04434"/>
+              </marker>
+            </defs>
+
+            <!-- Stage A band -->
+            <rect x="30" y="24" width="340" height="320" rx="18" fill="#fcfbf9" stroke="#e6e1da"/>
+            <text x="50" y="52" font-size="12" font-weight="700" fill="#c44217" letter-spacing="1.5">第一阶段 · Agent</text>
+            <text x="50" y="74" font-size="13" fill="#6a7280">慢 · 可失败 · 不改档案</text>
+
+            <rect x="60" y="100" width="280" height="48" rx="12" fill="#fff" stroke="#e6e1da"/>
+            <text x="200" y="130" text-anchor="middle" font-size="13.5" font-weight="700">读取页面 / 资料 / 假设</text>
+            <path d="M200 148 V168" stroke="#9aa1ad" stroke-width="1.5" marker-end="url(#af)"/>
+
+            <rect x="60" y="168" width="280" height="48" rx="12" fill="#fff" stroke="#e6e1da"/>
+            <text x="200" y="198" text-anchor="middle" font-size="13.5" font-weight="700">分析 · 取舍 · 组织叙述</text>
+            <path d="M200 216 V236" stroke="#9aa1ad" stroke-width="1.5" marker-end="url(#af)"/>
+
+            <rect x="60" y="236" width="280" height="70" rx="12" fill="#fdeee4" stroke="rgba(232,84,31,.35)"/>
+            <text x="200" y="266" text-anchor="middle" font-size="14" font-weight="700">提出变更方案</text>
+            <text x="200" y="288" text-anchor="middle" font-size="11.5" fill="#6a7280">要改哪些页 · 日志 · 状态标记</text>
+
+            <!-- arrow to gate -->
+            <path d="M370 271 H430" stroke="#e8541f" stroke-width="2" marker-end="url(#af-a)"/>
+            <text x="380" y="258" font-size="11" fill="#c44217" font-weight="700">变更方案</text>
+
+            <!-- Gate -->
+            <rect x="430" y="24" width="220" height="320" rx="18" fill="#fff" stroke="rgba(232,84,31,.35)"/>
+            <text x="540" y="52" text-anchor="middle" font-size="12" font-weight="700" fill="#c44217" letter-spacing="1.5">校验</text>
+            <text x="540" y="74" text-anchor="middle" font-size="13" fill="#6a7280">执行器校验</text>
+
+            <polygon points="540,110 610,180 540,250 470,180" fill="#fdeee4" stroke="rgba(232,84,31,.4)" stroke-width="1.5"/>
+            <text x="540" y="176" text-anchor="middle" font-size="13" font-weight="800">通过？</text>
+            <text x="540" y="196" text-anchor="middle" font-size="11" fill="#6a7280">固定规则</text>
+
+            <path d="M540 250 V290" stroke="#1e7a4c" stroke-width="1.8" marker-end="url(#af-g)"/>
+            <text x="550" y="278" font-size="11" fill="#1e7a4c" font-weight="700">是</text>
+
+            <path d="M470 180 H410 V400" stroke="#b04434" stroke-width="1.6" fill="none" marker-end="url(#af-r)"/>
+            <text x="420" y="170" font-size="11" fill="#b04434" font-weight="700">否</text>
+
+            <!-- Stage B -->
+            <rect x="690" y="24" width="360" height="320" rx="18" fill="#e5f2ea" stroke="rgba(30,122,76,.3)"/>
+            <text x="710" y="52" font-size="12" font-weight="700" fill="#1e7a4c" letter-spacing="1.5">第二阶段 · 执行器</text>
+            <text x="710" y="74" font-size="13" fill="#6a7280">快 · 按规则执行 · 不调用模型</text>
+
+            <rect x="720" y="100" width="300" height="40" rx="10" fill="#fff" stroke="rgba(30,122,76,.25)"/>
+            <text x="870" y="126" text-anchor="middle" font-size="13" font-weight="700">1 · 占用该对象</text>
+            <path d="M870 140 V152" stroke="#1e7a4c" stroke-width="1.5" marker-end="url(#af-g)"/>
+
+            <rect x="720" y="152" width="300" height="40" rx="10" fill="#fff" stroke="rgba(30,122,76,.25)"/>
+            <text x="870" y="178" text-anchor="middle" font-size="13" font-weight="700">2 · 写文件 / 追加日志</text>
+            <path d="M870 192 V204" stroke="#1e7a4c" stroke-width="1.5" marker-end="url(#af-g)"/>
+
+            <rect x="720" y="204" width="300" height="40" rx="10" fill="#fff" stroke="rgba(30,122,76,.25)"/>
+            <text x="870" y="230" text-anchor="middle" font-size="13" font-weight="700">3 · 更新列表索引</text>
+            <path d="M870 244 V256" stroke="#1e7a4c" stroke-width="1.5" marker-end="url(#af-g)"/>
+
+            <rect x="720" y="256" width="300" height="54" rx="10" fill="#fff" stroke="rgba(30,122,76,.4)"/>
+            <text x="870" y="280" text-anchor="middle" font-size="13" font-weight="700">4 · 记一次变更点</text>
+            <text x="870" y="298" text-anchor="middle" font-size="11" fill="#6a7280">放开对象 · 形成可恢复点</text>
+
+            <!-- pass bridge -->
+            <path d="M540 300 H690" stroke="#1e7a4c" stroke-width="1.8" marker-end="url(#af-g)" stroke-dasharray="0"/>
+            <!-- actually path from diamond bottom to stage B - already have vertical. Horizontal from mid? -->
+            <!-- connect from validate yes into stage B top-ish -->
+            <path d="M650 300 H690" stroke="#1e7a4c" stroke-width="1.8" marker-end="url(#af-g)"/>
+
+            <!-- failure sink -->
+            <rect x="30" y="380" width="1020" height="70" rx="14" fill="#f9e9e5" stroke="rgba(176,68,52,.3)"/>
+            <text x="60" y="410" font-size="13" font-weight="700" fill="#b04434">失败：整次作废 · 档案未改 · 回到上一可恢复点 · 记下原因可重试</text>
+            <text x="60" y="432" font-size="12" fill="#6a7280">写入失败、保存变更点失败、等待过久同样如此；不留下写到一半的内容。</text>
+          </svg>
+        </div>
+        <div class="diagram-foot">
+          <strong>结果保证：</strong>档案始终等于上一可恢复点。不会出现资料已改但 Wiki 未改，或报告只写了一半。
+        </div>
+      </div>
+
+      <div class="path">
+        <div class="path-head">
+          <span class="path-no">校验</span>
+          <h3>校验门至少拒绝这些</h3>
+          <span class="goal">固定规则拦住，不靠 Agent 自觉</span>
+        </div>
+        <div class="steps">
+          <div class="step">
+            <div class="s-no">01</div>
+            <strong>越层写入</strong>
+            <p>Wiki 出现研究状态或价值区间</p>
+          </div>
+          <div class="step">
+            <div class="s-no">02</div>
+            <strong>关键数字缺标注</strong>
+            <p>缺少脚注、来源分级或数据截至日</p>
+          </div>
+          <div class="step">
+            <div class="s-no">03</div>
+            <strong>冲突被单边删除</strong>
+            <p>抹掉对立来源而不留缺口</p>
+          </div>
+          <div class="step">
+            <div class="s-no">04</div>
+            <strong>Raw 原地改写</strong>
+            <p>覆盖已有资料内容</p>
+          </div>
+          <div class="step key">
+            <div class="s-no">05</div>
+            <strong>轻复核越权</strong>
+            <p>触及「待复核」与 Log 之外的任何内容</p>
+          </div>
+        </div>
+        <div class="path-note">
+          <strong>轻复核红线：</strong>只能写判断状态里的「待复核」，以及认知日志。
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== 同时写入 + 运行方式 ========== -->
+    <section aria-labelledby="runtime-title">
+      <div class="section-heading">
+        <div>
+          <p class="section-kicker">同时写入与运行方式</p>
+          <h2 id="runtime-title">同一对象排队写入；周节拍只在应用打开时工作</h2>
+        </div>
+        <p class="section-intro">
+          单用户桌面应用。不在后台偷偷跑，不开机自启，不用系统定时任务。
+        </p>
+      </div>
+
+      <div class="split-2">
+        <div class="diagram" aria-label="排队写入示意" style="margin:0">
+          <div class="diagram-head">
+            <strong>同时写入时怎么排队</strong>
+            <span class="tag">排队</span>
+          </div>
+          <div class="diagram-body tight">
+            <svg viewBox="0 0 500 280" role="img">
+              <rect x="20" y="20" width="210" height="180" rx="14" fill="#fcfbf9" stroke="#e6e1da"/>
+              <text x="36" y="48" font-size="12" font-weight="700" fill="#c44217">对象 A · 排队</text>
+              <rect x="40" y="66" width="170" height="36" rx="8" fill="#fdeee4" stroke="rgba(232,84,31,.3)"/>
+              <text x="125" y="89" text-anchor="middle" font-size="12" font-weight="700">正在写入</text>
+              <rect x="40" y="114" width="170" height="36" rx="8" fill="#fff" stroke="#e6e1da" stroke-dasharray="4 3"/>
+              <text x="125" y="137" text-anchor="middle" font-size="12" fill="#6a7280">下一次等待</text>
+              <text x="36" y="178" font-size="11" fill="#6a7280">同一对象不能同时写</text>
+
+              <rect x="270" y="20" width="210" height="180" rx="14" fill="#e5f2ea" stroke="rgba(30,122,76,.3)"/>
+              <text x="286" y="48" font-size="12" font-weight="700" fill="#1e7a4c">对象 B · 可同时</text>
+              <rect x="290" y="66" width="170" height="36" rx="8" fill="#fff" stroke="rgba(30,122,76,.25)"/>
+              <text x="375" y="89" text-anchor="middle" font-size="12" font-weight="700">正在写入</text>
+              <rect x="290" y="114" width="170" height="36" rx="8" fill="#fff" stroke="rgba(30,122,76,.25)"/>
+              <text x="375" y="137" text-anchor="middle" font-size="12" font-weight="700">可与 A 同时进行</text>
+              <text x="286" y="178" font-size="11" fill="#6a7280">不同对象互不影响</text>
+
+              <text x="250" y="240" text-anchor="middle" font-size="12.5" fill="#6a7280">整库只在记变更点时短暂排队</text>
+              <text x="250" y="262" text-anchor="middle" font-size="12" fill="#9aa1ad">不加额外复杂机制</text>
+            </svg>
+          </div>
+        </div>
+
+        <div class="diagram" aria-label="周节拍时间线" style="margin:0">
+          <div class="diagram-head">
+            <strong>周节拍时间线</strong>
+            <span class="tag">仅前台</span>
+          </div>
+          <div class="diagram-body tight">
+            <svg viewBox="0 0 500 280" role="img">
+              <!-- timeline -->
+              <line x1="40" y1="90" x2="460" y2="90" stroke="#e6e1da" stroke-width="3"/>
+              <circle cx="70" cy="90" r="8" fill="#e8541f"/>
+              <circle cx="200" cy="90" r="8" fill="#e8541f"/>
+              <circle cx="340" cy="90" r="7" fill="#d7dbe0"/>
+              <circle cx="430" cy="90" r="8" fill="#1e7a4c"/>
+
+              <text x="70" y="50" text-anchor="middle" font-size="12" font-weight="700">关闭</text>
+              <text x="70" y="68" text-anchor="middle" font-size="11" fill="#6a7280">不工作</text>
+
+              <text x="200" y="50" text-anchor="middle" font-size="12" font-weight="700">启动</text>
+              <text x="200" y="68" text-anchor="middle" font-size="11" fill="#6a7280">超期补一次</text>
+
+              <text x="340" y="50" text-anchor="middle" font-size="12" font-weight="700">运行中</text>
+              <text x="340" y="68" text-anchor="middle" font-size="11" fill="#6a7280">各自到期</text>
+
+              <text x="430" y="50" text-anchor="middle" font-size="12" font-weight="700">关闭</text>
+              <text x="430" y="68" text-anchor="middle" font-size="11" fill="#6a7280">停止</text>
+
+              <!-- closed band -->
+              <rect x="40" y="120" width="120" height="56" rx="10" fill="#f9e9e5" stroke="rgba(176,68,52,.25)"/>
+              <text x="100" y="144" text-anchor="middle" font-size="12" font-weight="700">关闭两周</text>
+              <text x="100" y="162" text-anchor="middle" font-size="11" fill="#6a7280">不回放历史节拍</text>
+
+              <rect x="180" y="120" width="150" height="56" rx="10" fill="#fdeee4" stroke="rgba(232,84,31,.3)"/>
+              <text x="255" y="144" text-anchor="middle" font-size="12" font-weight="700">启动补做</text>
+              <text x="255" y="162" text-anchor="middle" font-size="11" fill="#6a7280">每对象最多一次</text>
+
+              <rect x="350" y="120" width="110" height="56" rx="10" fill="#e5f2ea" stroke="rgba(30,122,76,.3)"/>
+              <text x="405" y="144" text-anchor="middle" font-size="12" font-weight="700">独立计时</text>
+              <text x="405" y="162" text-anchor="middle" font-size="11" fill="#6a7280">无全局时点</text>
+
+              <text x="250" y="220" text-anchor="middle" font-size="12.5" fill="#6a7280">「最近更新」显示真实上次检查时间</text>
+              <text x="250" y="244" text-anchor="middle" font-size="12" fill="#b04434" font-weight="600">不能宣称关闭期间仍在盯盘</text>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== 组件职责泳道 ========== -->
+    <section aria-labelledby="components-title">
+      <div class="section-heading">
+        <div>
+          <p class="section-kicker">组件职责</p>
+          <h2 id="components-title">Agent 与执行器之间只有变更方案一条路</h2>
+        </div>
+        <p class="section-intro">
+          Agent 不能绕过执行器直接改最终状态；执行器不能在没有变更方案时自己编内容。
+        </p>
+      </div>
+
+      <div class="diagram" aria-label="职责泳道图">
+        <div class="diagram-head">
+          <strong>职责分工 · 谁做什么 / 不做什么</strong>
+          <span class="tag">职责</span>
+        </div>
+        <div class="diagram-body tight">
+          <svg viewBox="0 0 1080 360" role="img">
+            <!-- headers -->
+            <rect x="20" y="20" width="160" height="40" rx="8" fill="#fcfbf9" stroke="#e6e1da"/>
+            <text x="100" y="46" text-anchor="middle" font-size="12" font-weight="700" fill="#9aa1ad">组件</text>
+            <rect x="190" y="20" width="430" height="40" rx="8" fill="#e5f2ea" stroke="rgba(30,122,76,.25)"/>
+            <text x="405" y="46" text-anchor="middle" font-size="12" font-weight="700" fill="#1e7a4c">负责</text>
+            <rect x="630" y="20" width="430" height="40" rx="8" fill="#f9e9e5" stroke="rgba(176,68,52,.25)"/>
+            <text x="845" y="46" text-anchor="middle" font-size="12" font-weight="700" fill="#b04434">不做</text>
+
+            <!-- rows -->
+            <g font-size="12.5">
+              <rect x="20" y="70" width="160" height="42" rx="8" fill="#fdeee4"/>
+              <text x="100" y="96" text-anchor="middle" font-weight="700">Agent</text>
+              <rect x="190" y="70" width="430" height="42" rx="8" fill="#fff" stroke="#e6e1da"/>
+              <text x="205" y="96" fill="#1c2027">阅读、分析、维护页面、解释、提出变更方案</text>
+              <rect x="630" y="70" width="430" height="42" rx="8" fill="#fff" stroke="#e6e1da"/>
+              <text x="645" y="96" fill="#6a7280">不直接写文件 · 不算估值 · 不更新列表</text>
+
+              <rect x="20" y="122" width="160" height="42" rx="8" fill="#e5f2ea"/>
+              <text x="100" y="148" text-anchor="middle" font-weight="700">执行器</text>
+              <rect x="190" y="122" width="430" height="42" rx="8" fill="#fff" stroke="#e6e1da"/>
+              <text x="205" y="148" fill="#1c2027">校验、写入、日志、更新列表、记变更点、恢复、计算</text>
+              <rect x="630" y="122" width="430" height="42" rx="8" fill="#fff" stroke="#e6e1da"/>
+              <text x="645" y="148" fill="#6a7280">不做判断 · 不生成叙述内容</text>
+
+              <rect x="20" y="174" width="160" height="42" rx="8" fill="#fcfbf9" stroke="#e6e1da"/>
+              <text x="100" y="200" text-anchor="middle" font-weight="700">知识仓库</text>
+              <rect x="190" y="174" width="430" height="42" rx="8" fill="#fff" stroke="#e6e1da"/>
+              <text x="205" y="200" fill="#1c2027">证据 / 知识 / 判断三层存放与恢复</text>
+              <rect x="630" y="174" width="430" height="42" rx="8" fill="#fff" stroke="#e6e1da"/>
+              <text x="645" y="200" fill="#6a7280">不存实时行情明细 · 临时缓存 · 聊天历史</text>
+
+              <rect x="20" y="226" width="160" height="42" rx="8" fill="#fcfbf9" stroke="#e6e1da"/>
+              <text x="100" y="252" text-anchor="middle" font-weight="700">列表数据库</text>
+              <rect x="190" y="226" width="430" height="42" rx="8" fill="#fff" stroke="#e6e1da"/>
+              <text x="205" y="252" fill="#1c2027">列表查询、事件、数据源与上传索引</text>
+              <rect x="630" y="226" width="430" height="42" rx="8" fill="#fff" stroke="#e6e1da"/>
+              <text x="645" y="252" fill="#6a7280">不当唯一来源 · 不保存判断原文</text>
+
+              <rect x="20" y="278" width="160" height="42" rx="8" fill="#fcfbf9" stroke="#e6e1da"/>
+              <text x="100" y="304" text-anchor="middle" font-weight="700">数据工具</text>
+              <rect x="190" y="278" width="430" height="42" rx="8" fill="#fff" stroke="#e6e1da"/>
+              <text x="205" y="304" fill="#1c2027">行情、财务、估值、公告、行业取数</text>
+              <rect x="630" y="278" width="430" height="42" rx="8" fill="#fff" stroke="#e6e1da"/>
+              <text x="645" y="304" fill="#6a7280">不写入知识仓库</text>
+            </g>
+          </svg>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== 失败语义 ========== -->
+    <section aria-labelledby="fail-title">
+      <div class="section-heading">
+        <div>
+          <p class="section-kicker">失败语义</p>
+          <h2 id="fail-title">失败默认回到上一可恢复点</h2>
+        </div>
+        <p class="section-intro">
+          列表索引失败不影响知识档案；知识写入失败不留下写到一半的内容。
+        </p>
+      </div>
+
+      <div class="diagram" aria-label="失败恢复流程图">
+        <div class="diagram-head">
+          <strong>失败路径 · 全部回到上一可恢复点</strong>
+          <span class="tag">失败</span>
+        </div>
+        <div class="diagram-body tight">
+          <svg viewBox="0 0 1080 260" role="img">
+            <defs>
+              <marker id="fr" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+                <path d="M0,0 L6,3 L0,6 Z" fill="#b04434"/>
+              </marker>
+            </defs>
+
+            <rect x="30" y="30" width="180" height="70" rx="12" fill="#fff" stroke="#e6e1da"/>
+            <text x="120" y="60" text-anchor="middle" font-size="13" font-weight="700">Agent 中断</text>
+            <text x="120" y="80" text-anchor="middle" font-size="11" fill="#6a7280">还没提出变更方案</text>
+
+            <rect x="240" y="30" width="180" height="70" rx="12" fill="#fff" stroke="#e6e1da"/>
+            <text x="330" y="60" text-anchor="middle" font-size="13" font-weight="700">校验拒绝</text>
+            <text x="330" y="80" text-anchor="middle" font-size="11" fill="#6a7280">记录原因可重试</text>
+
+            <rect x="450" y="30" width="180" height="70" rx="12" fill="#fff" stroke="#e6e1da"/>
+            <text x="540" y="60" text-anchor="middle" font-size="13" font-weight="700">写入并记变更点 失败</text>
+            <text x="540" y="80" text-anchor="middle" font-size="11" fill="#6a7280">整次作废</text>
+
+            <rect x="660" y="30" width="180" height="70" rx="12" fill="#fff" stroke="#e6e1da"/>
+            <text x="750" y="60" text-anchor="middle" font-size="13" font-weight="700">等待过久</text>
+            <text x="750" y="80" text-anchor="middle" font-size="11" fill="#6a7280">改期，不强行插入</text>
+
+            <rect x="870" y="30" width="180" height="70" rx="12" fill="#fff" stroke="#e6e1da"/>
+            <text x="960" y="60" text-anchor="middle" font-size="13" font-weight="700">列表重建失败</text>
+            <text x="960" y="80" text-anchor="middle" font-size="11" fill="#6a7280">列表暂时不可用</text>
+
+            <path d="M120 100 V150" stroke="#b04434" stroke-width="1.5" marker-end="url(#fr)"/>
+            <path d="M330 100 V150" stroke="#b04434" stroke-width="1.5" marker-end="url(#fr)"/>
+            <path d="M540 100 V150" stroke="#b04434" stroke-width="1.5" marker-end="url(#fr)"/>
+            <path d="M750 100 V150" stroke="#b04434" stroke-width="1.5" marker-end="url(#fr)"/>
+            <path d="M960 100 V130 H540 V150" stroke="#b04434" stroke-width="1.5" fill="none" marker-end="url(#fr)"/>
+
+            <rect x="200" y="150" width="680" height="70" rx="14" fill="#f9e9e5" stroke="rgba(176,68,52,.35)"/>
+            <text x="540" y="180" text-anchor="middle" font-size="15" font-weight="700" fill="#b04434">保留上一可恢复点 · 不留下写到一半的内容</text>
+            <text x="540" y="202" text-anchor="middle" font-size="12" fill="#6a7280">列表失败时知识档案仍完整；其余失败都不改档案正文</text>
+          </svg>
+        </div>
+      </div>
+
+      <div class="guardrails">
+        <article class="guardrail">
+          <div class="g-mark">×</div>
+          <div>
+            <h3>启动补做部分失败</h3>
+            <p>失败对象保留原状态，可单独重试；其余对象正常完成。</p>
+          </div>
+        </article>
+        <article class="guardrail">
+          <div class="g-mark">×</div>
+          <div>
+            <h3>界面保持业务语言</h3>
+            <p>用户只看到变更记录与恢复，看不到排队、版本号或文件路径。</p>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- ========== 验收 ========== -->
+    <section aria-labelledby="accept-title">
+      <div class="section-heading">
+        <div>
+          <p class="section-kicker">验收</p>
+          <h2 id="accept-title">完成后用这些条件检查</h2>
+        </div>
+        <p class="section-intro">
+          对象目录的文件内容见 Wiki 实施说明；这里验收系统骨架。
+        </p>
+      </div>
+
+      <div class="check-list">
+        <div class="check-item"><span class="box" aria-hidden="true"></span><span>删除列表数据库后重新扫描知识档案，关注列表、状态灯和更新时间可以完全重建</span></div>
+        <div class="check-item"><span class="box" aria-hidden="true"></span><span>Wiki 页面中不出现研究状态、价值区间或估值结论</span></div>
+        <div class="check-item"><span class="box" aria-hidden="true"></span><span>判断层中的每个关键数字都能通过脚注锚点回到 Wiki 或 Raw</span></div>
+        <div class="check-item"><span class="box" aria-hidden="true"></span><span>任何一次失败的知识写入都不留下写到一半的内容，档案始终等于上一可恢复点</span></div>
+        <div class="check-item"><span class="box" aria-hidden="true"></span><span>轻复核提出的变更无法通过校验去改写报告或研究状态</span></div>
+        <div class="check-item"><span class="box" aria-hidden="true"></span><span>多个对象可以同时复核，同一对象的两次写入不会互相覆盖</span></div>
+        <div class="check-item"><span class="box" aria-hidden="true"></span><span>应用关闭两周后重新打开，每个超期对象只补做一次轻复核，「最近更新」显示真实的上次检查时间</span></div>
+        <div class="check-item"><span class="box" aria-hidden="true"></span><span>普通用户界面不出现变更方案、排队、版本号或文件路径等内部细节</span></div>
+      </div>
+    </section>
+
+    <footer class="foot">
+      <span><a href="./wiki.html">Wiki 实施说明</a></span>
+    </footer>
+  </div>
+</body>
+</html>

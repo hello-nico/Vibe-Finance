@@ -833,13 +833,29 @@
 
     footer {
       margin-top: 44px;
+      padding-top: 24px;
+      border-top: 1px solid var(--line);
       color: var(--faint);
       font-size: 12.5px;
       display: flex;
       justify-content: space-between;
+      align-items: baseline;
       gap: 20px;
       flex-wrap: wrap;
     }
+
+    footer .more-links {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    footer .more-links a {
+      color: var(--accent-deep);
+      text-underline-offset: 2px;
+    }
+
+    footer .more-links a:hover { color: var(--accent); }
 
     /* ---------- responsive ---------- */
     @media (max-width: 1100px) {
@@ -1353,6 +1369,10 @@
 
     <footer>
       <span>Vibe-Finance · 产品方案</span>
+      <span class="more-links">
+        <a href="./architecture.html">架构实施说明</a>
+        <a href="./wiki.html">Wiki 实施说明</a>
+      </span>
     </footer>
     <!-- 内部说明（不对外展示）：本页面为产品方案的对外阅读稿，非权威文档；内容从 human-checklist.md 的对外锚定表述与已确认决策派生，如有差异以 human-checklist.md 与 docs/flow_design.md 为准。 -->
   </main>

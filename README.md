@@ -33,6 +33,8 @@
 | Document | Role |
 |---|---|
 | [`docs/product-plan/index.html`](docs/product-plan/index.html) | 产品方案的对外说明稿（面向客户）；非权威，内容以 `human-checklist.md` 和 `docs/flow_design.md` 为准 |
+| [`docs/product-plan/architecture.html`](docs/product-plan/architecture.html) | 架构实施说明的阅读稿；非权威，内容以 `docs/architecture/architecture.md` 为准 |
+| [`docs/product-plan/wiki.html`](docs/product-plan/wiki.html) | Wiki 实施说明的阅读稿；非权威，内容以 `docs/knowledge-design/wiki.md` 为准 |
 | [`docs/product-plan/shipping-viz/`](docs/product-plan/shipping-viz/) | 航运案例的交互可视化，验证周期型行业的分析方法 |
 | [`docs/product-plan/inference-silicon-cn/`](docs/product-plan/inference-silicon-cn/) | 推理芯片案例的交互可视化，验证成长产业链型行业的分析方法 |
 
