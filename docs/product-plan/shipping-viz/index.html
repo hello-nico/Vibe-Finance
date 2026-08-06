@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>船运不是一个周期 · 三条船型曲线，三种供给位置</title>
+<link rel="icon" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><rect width="16" height="16" fill="%23F7F2E7"/><rect x="1" y="9" width="14" height="3" fill="%2314263B"/><rect x="3" y="6" width="2" height="3" fill="%230E67B5"/><rect x="6" y="6" width="2" height="3" fill="%23C25E28"/><rect x="9" y="6" width="2" height="3" fill="%231F8A70"/><rect x="12" y="4" width="1" height="5" fill="%2314263B"/></svg>'>
+<link rel="stylesheet" href="css/main.css">
+</head>
+<body>
+
+<!-- 0. 封面 -->
+<header id="cover">
+  <div class="cover-inner">
+    <p class="cover-kicker">一份可以点开每个数字的周期研究 · 数据截至 <span id="cover-asof"></span></p>
+    <h1>船运不是<span class="red">一个</span>周期</h1>
+    <p class="cover-sub">同一场地缘冲击推高三条运价曲线，但集装箱船、干散货船、油轮各自握着一张完全不同的订单簿——把它们当一个周期看，你会拿到 2007 年的剧本。</p>
+    <div class="cover-stats" id="cover-stats"></div>
+    <p class="cover-hint" id="cover-hint">向下滚动 ↓</p>
+  </div>
+  <div class="sea" id="sea" aria-hidden="true"></div>
+</header>
+
+<main>
+
+<!-- 1. 三套时钟 -->
+<section id="clocks" class="band-paper">
+  <div class="wrap-narrow">
+    <h2>三个子行业，三套时钟</h2>
+    <div id="clocks-intro"></div>
+  </div>
+  <div class="wrap-wide">
+    <div id="clocks-dials" class="clocks-grid"></div>
+  </div>
+</section>
+
+<!-- 2. 中远海控股价 scrolly -->
+<section id="stockline" class="band-deep">
+  <div class="wrap-narrow">
+    <h2>一条股价，一部周期史</h2>
+    <p class="lede">中远海控（601919.SH）的十九年月线，就是集运周期的活体年表：一次顶点上市、一次死里逃生、两次事件红利。</p>
+  </div>
+  <div class="scrolly" id="scrolly-stock">
+    <figure class="sticky-fig"><div id="chart-stock"></div></figure>
+    <div class="steps steps-360" id="steps-stock"></div>
+  </div>
+  <div class="wrap-wide"><div id="src-stock" class="src-slot"></div></div>
+</section>
+
+<!-- 3. 三条曲线三十八年 scrolly -->
+<section id="curves" class="band-paper">
+  <div class="wrap-narrow">
+    <h2>三条曲线，三十八年</h2>
+    <p class="lede">集运（SCFI/CCFI）、干散（BDI）、油运（BDTI）必须分图分口径：它们偶尔同向，从不合流。</p>
+  </div>
+  <div class="scrolly" id="scrolly-curves">
+    <figure class="sticky-fig"><div id="chart-curves"></div></figure>
+    <div class="steps steps-340" id="steps-curves"></div>
+  </div>
+  <div class="wrap-wide"><div id="src-curves" class="src-slot"></div></div>
+</section>
+
+<!-- 4. 旧牌桌 scrolly -->
+<section id="cohort" class="band-deep">
+  <div class="wrap-narrow">
+    <h2>先认识旧牌桌</h2>
+    <p class="lede">读旧周期之前，先认清谁后来没了。2008 年牌桌上的玩家，是被破产、重整、并购一张张筛掉的。点击任何一张船牌，看它的结局与出处。</p>
+  </div>
+  <div class="scrolly" id="scrolly-cohort">
+    <figure class="sticky-fig"><div id="chart-cohort"></div></figure>
+    <div class="steps steps-340" id="steps-cohort"></div>
+  </div>
+  <div class="wrap-wide"><div id="src-cohort" class="src-slot"></div></div>
+</section>
+
+<!-- 5. 季度利润 -->
+<section id="quarterly" class="band-paper">
+  <div class="wrap-narrow">
+    <h2>亏损是按季度落进报表的</h2>
+    <p class="lede">年报里的“两年巨亏”，拆到季度是六年负利率常态。点击任何一根柱，调出那个季度的原始三项数字。</p>
+    <div class="btn-group" id="q-btns"></div>
+    <p class="chart-note" id="q-note"></p>
+  </div>
+  <div class="wrap-wide">
+    <div id="chart-quarterly"></div>
+    <div id="src-quarterly" class="src-slot"></div>
+  </div>
+</section>
+
+<!-- 6. 订单簿 2.5D -->
+<section id="orderbook" class="band-deep">
+  <div class="wrap-narrow">
+    <h2>订单簿：借来的繁荣回来了一半</h2>
+    <p class="lede" id="ob-lede">订单簿 ÷ 在役船队，是供给纪律的测谎仪。2007–2008 年它写着 56–68%；今天，三种船型给出三个完全不同的读数。点击货堆看精确数字与机构出处。</p>
+  </div>
+  <div class="wrap-wide">
+    <div id="chart-orderbook"></div>
+    <div id="src-orderbook" class="src-slot"></div>
+  </div>
+</section>
+
+<!-- 7. 运价领先利润 -->
+<section id="leadlag" class="band-paper">
+  <div class="wrap-narrow">
+    <h2>读运价的人，比读报表的人早到</h2>
+    <p class="lede">运价领先盈利一到四个季度：集运隔着长协缓冲，油运几乎现货直通。按下播放，看运价曲线“变成”利润率。</p>
+  </div>
+  <div class="wrap-wide">
+    <div id="chart-leadlag"></div>
+    <div id="src-leadlag" class="src-slot"></div>
+  </div>
+</section>
+
+<!-- 8. 五窗口打分卡 -->
+<section id="scorecard" class="band-deep">
+  <div class="wrap-narrow">
+    <h2>哪段历史最像今天？</h2>
+    <p class="lede">五个历史窗口的打分卡。点击任何一格展开机制、峰谷、订单簿与公司结局。</p>
+  </div>
+  <div class="wrap-wide">
+    <div id="scorecard-rows"></div>
+    <div id="rejected-block"></div>
+    <div id="src-scorecard" class="src-slot"></div>
+  </div>
+</section>
+
+<!-- 9. 传导桥 -->
+<section id="bridge" class="band-paper">
+  <div class="wrap-narrow">
+    <h2>子行业之间：什么能传导，什么不能</h2>
+    <p class="lede">能传导的是钱和情绪，不能传导的是需求与口径。读错这张图的人，会拿着 BDI 去预测集装箱运价。</p>
+  </div>
+  <div class="wrap-wide">
+    <div id="chart-bridge"></div>
+    <div id="src-bridge" class="src-slot"></div>
+  </div>
+</section>
+
+<!-- 10. 三行业现在时 -->
+<section id="current" class="band-deep">
+  <div class="wrap-narrow">
+    <h2>那么，现在到哪一幕了？</h2>
+    <p class="lede">三条航道，三个位置。船停在哪，是由订单簿投票的。</p>
+  </div>
+  <div class="wrap-wide">
+    <div id="current-lanes"></div>
+    <div id="src-current" class="src-slot"></div>
+  </div>
+</section>
+
+<!-- 11. 监控仪表盘 -->
+<section id="signals" class="band-paper">
+  <div class="wrap-narrow">
+    <h2>接下来盯什么</h2>
+    <p class="lede">每个信号都配了阈值、来源和证伪点——船运不是一个周期，监控也不能共用一个仪表盘。</p>
+  </div>
+  <div class="wrap-wide">
+    <div id="signals-grid"></div>
+    <div id="src-signals" class="src-slot"></div>
+  </div>
+</section>
+
+<!-- 12. 口径、缺口与出处 -->
+<footer id="gaps" class="band-deep">
+  <div class="wrap-narrow">
+    <h2>口径、缺口与出处</h2>
+    <p class="lede">所有已知缺口都摆在明处。这一节是这份报告的“不能回答什么”。</p>
+  </div>
+  <div class="wrap-wide">
+    <div id="gap-table"></div>
+    <div id="limitations-block"></div>
+    <div id="footer-meta"></div>
+  </div>
+</footer>
+
+</main>
+
+<div id="tooltip" role="tooltip"></div>
+<div id="modal-overlay" hidden>
+  <div id="modal-card" role="dialog" aria-modal="true">
+    <button id="modal-close" aria-label="关闭">×</button>
+    <div id="modal-body"></div>
+  </div>
+</div>
+
+<script src="vendor/d3.min.js"></script>
+<script src="vendor/scrollama.min.js"></script>
+<script src="data/data.js"></script>
+<script src="js/pixel.js"></script>
+<script src="js/charts.js"></script>
+<script src="js/sections.js"></script>
+<script src="js/scrolly.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>

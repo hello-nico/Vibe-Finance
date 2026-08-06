@@ -1,0 +1,29 @@
+/* ==========================================================================
+   fonts.css — et-book 本地嵌入（ET Book WOFF，仅拉丁/数字；中文走宋体系 fallback）
+   字体文件位于 ../fonts/（路径相对于本 css/ 目录）
+   ========================================================================== */
+
+@font-face {
+  font-family: "et-book";
+  src: url("../fonts/et-book-roman-line-figures.woff") format("woff");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "et-book";
+  src: url("../fonts/et-book-bold-line-figures.woff") format("woff");
+  font-weight: bold;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* italic 变体映射到 old-style figures（et-book 无独立斜体字形文件） */
+@font-face {
+  font-family: "et-book";
+  src: url("../fonts/et-book-roman-old-style-figures.woff") format("woff");
+  font-weight: normal;
+  font-style: italic;
+  font-display: swap;
+}

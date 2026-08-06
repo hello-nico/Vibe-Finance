@@ -1,0 +1,1360 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Vibe-Finance 产品方案</title>
+  <link rel="icon" href="data:,">
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #faf8f5;
+      --paper: #ffffff;
+      --ink: #1c2027;
+      --muted: #6a7280;
+      --faint: #9aa1ad;
+      --line: #e6e1da;
+      --line-soft: #efeae3;
+      --accent: #e8541f;
+      --accent-deep: #c44217;
+      --accent-soft: #fdeee4;
+      --green: #1e7a4c;
+      --green-soft: #e5f2ea;
+      --amber: #a86b12;
+      --amber-soft: #f9efd9;
+      --red: #b04434;
+      --red-soft: #f9e9e5;
+      --gray-soft: #eef0f2;
+      --shadow: 0 18px 50px rgba(40, 32, 24, 0.07);
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 6% 0%, rgba(232, 84, 31, 0.07), transparent 26rem),
+        radial-gradient(circle at 97% 12%, rgba(30, 122, 76, 0.06), transparent 24rem),
+        var(--bg);
+      font-family:
+        Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+        "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei",
+        sans-serif;
+      line-height: 1.7;
+    }
+
+    .page {
+      width: min(1160px, calc(100% - 40px));
+      margin: 0 auto;
+      padding: 26px 0 72px;
+    }
+
+    /* ---------- top bar ---------- */
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+      margin-bottom: 68px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--accent-deep);
+      font-weight: 700;
+      letter-spacing: 0.1em;
+    }
+
+    .brand-mark {
+      width: 26px;
+      height: 26px;
+      border-radius: 7px;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.35), transparent 55%),
+        var(--accent);
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.3);
+      position: relative;
+    }
+
+    .brand-mark::after {
+      content: "";
+      position: absolute;
+      left: 6px; right: 6px; bottom: 6px;
+      height: 9px;
+      background:
+        linear-gradient(90deg, #fff 0 3px, transparent 3px 6px, #fff 6px 9px, transparent 9px 12px, #fff 12px 15px);
+      opacity: .85;
+      border-radius: 1px;
+    }
+
+    /* ---------- hero ---------- */
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 650px;
+      align-items: center;
+      gap: 36px;
+      margin-bottom: 92px;
+    }
+
+    .eyebrow {
+      margin: 0 0 14px;
+      color: var(--accent-deep);
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.16em;
+    }
+
+    h1 {
+      margin: 0 0 18px;
+      font-size: clamp(26px, 3.4vw, 38px);
+      line-height: 1.28;
+      letter-spacing: -0.01em;
+    }
+
+    .anchor-quote {
+      margin: 0 0 22px;
+      padding: 2px 0 2px 20px;
+      border-left: 4px solid var(--accent);
+    }
+
+    .anchor-quote ul {
+      margin: 0;
+      padding-left: 20px;
+      color: #41474f;
+      font-size: 15.5px;
+    }
+
+    .anchor-quote li { margin-bottom: 7px; }
+
+    .hero-lead {
+      margin: 0 0 24px;
+      max-width: 34em;
+      color: var(--muted);
+      font-size: 15.5px;
+    }
+
+    .hero-lead strong { color: var(--ink); }
+
+    .hero-points {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 9px;
+    }
+
+    .pill {
+      padding: 6px 13px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--paper);
+      color: var(--ink);
+      font-size: 12.5px;
+      font-weight: 600;
+    }
+
+    /* hero visual: 能力映射 */
+    .hero-visual {
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      box-shadow: var(--shadow);
+      padding: 24px 16px 20px;
+    }
+
+    .hero-visual-title {
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: .12em;
+      color: var(--faint);
+      margin-bottom: 16px;
+    }
+
+    .map-list { display: grid; gap: 8px; }
+
+    .map-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 11px 12px;
+      border: 1px solid var(--line-soft);
+      border-radius: 12px;
+      background: #fcfbf9;
+    }
+
+    .map-row .q {
+      flex: none;
+      white-space: nowrap;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .map-row .arr {
+      flex: none;
+      color: var(--accent);
+      font-weight: 800;
+    }
+
+    .map-row .a {
+      flex: none;
+      white-space: nowrap;
+      font-size: 12.5px;
+      font-weight: 600;
+    }
+
+    .map-row.hl {
+      border-color: rgba(232, 84, 31, .35);
+      background: var(--accent-soft);
+    }
+
+    /* ---------- sections ---------- */
+    section { margin-bottom: 92px; }
+
+    .section-heading {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(280px, 420px);
+      gap: 32px;
+      align-items: end;
+      margin-bottom: 34px;
+    }
+
+    .section-kicker {
+      margin: 0 0 10px;
+      color: var(--accent-deep);
+      font-size: 12.5px;
+      font-weight: 700;
+      letter-spacing: 0.16em;
+    }
+
+    h2 {
+      margin: 0;
+      font-size: clamp(23px, 2.6vw, 30px);
+      line-height: 1.3;
+      letter-spacing: -0.01em;
+    }
+
+    .section-intro {
+      margin: 0;
+      color: var(--muted);
+      font-size: 14.5px;
+    }
+
+    h3 { margin: 0 0 8px; font-size: 16px; }
+    p { margin: 0; }
+
+    /* ---------- daily paths ---------- */
+    .path {
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 24px 24px 8px;
+      margin-bottom: 16px;
+      box-shadow: 0 6px 18px rgba(40, 32, 24, 0.04);
+    }
+
+    .path-head {
+      display: flex;
+      align-items: baseline;
+      gap: 14px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
+
+    .path-head .path-no {
+      flex: none;
+      padding: 4px 11px;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      color: var(--accent-deep);
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .path-head h3 { font-size: 17px; margin: 0; }
+    .path-head .goal { color: var(--muted); font-size: 13px; margin-left: auto; }
+
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .step {
+      border: 1px solid var(--line-soft);
+      border-radius: 12px;
+      padding: 13px 14px;
+      background: #fcfbf9;
+    }
+
+    .step .s-no {
+      font-size: 11px;
+      font-weight: 800;
+      color: var(--accent);
+      letter-spacing: .08em;
+      margin-bottom: 5px;
+    }
+
+    .step strong { display: block; font-size: 13.5px; margin-bottom: 3px; }
+    .step p { font-size: 12.5px; color: var(--muted); }
+
+    .step.key { border-color: rgba(232, 84, 31, .35); background: var(--accent-soft); }
+
+    .path-note {
+      border-top: 1px dashed var(--line);
+      padding: 12px 2px 14px;
+      font-size: 12.5px;
+      color: var(--muted);
+    }
+
+    .path-note strong { color: var(--ink); }
+
+    /* ---------- 速览 dashboard mockup ---------- */
+    .snapshot {
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .snapshot-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 16px 22px;
+      border-bottom: 1px solid var(--line-soft);
+      background: #fcfbf9;
+      font-size: 13px;
+      color: var(--muted);
+      flex-wrap: wrap;
+    }
+
+    .snapshot-head strong { color: var(--ink); font-size: 14.5px; }
+    .snapshot-head .time { font-size: 12px; color: var(--faint); }
+
+    .snapshot-body {
+      display: grid;
+      grid-template-columns: minmax(0, 1.15fr) minmax(300px, .85fr);
+    }
+
+    .snapshot-col { padding: 22px; }
+    .snapshot-col + .snapshot-col { border-left: 1px solid var(--line-soft); }
+
+    .col-label {
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: .1em;
+      color: var(--faint);
+      margin-bottom: 14px;
+    }
+
+    .biz-row { margin-bottom: 16px; }
+
+    .biz-row .biz-name {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+
+    .biz-row .biz-name span { color: var(--muted); font-weight: 500; }
+
+    .bars { display: grid; gap: 5px; }
+
+    .bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 11.5px;
+      color: var(--muted);
+    }
+
+    .bar .tag { flex: none; width: 56px; }
+
+    .bar .track {
+      flex: 1;
+      height: 10px;
+      border-radius: 5px;
+      background: var(--gray-soft);
+      overflow: hidden;
+    }
+
+    .bar .fill { height: 100%; border-radius: 5px; }
+    .fill.rev { background: #d7dbe0; }
+    .fill.profit { background: var(--accent); }
+
+    .bar .val { flex: none; width: 38px; text-align: right; font-weight: 700; color: var(--ink); }
+
+    .legend {
+      display: flex;
+      gap: 16px;
+      margin-top: 4px;
+      font-size: 11.5px;
+      color: var(--faint);
+    }
+
+    .legend i {
+      display: inline-block;
+      width: 9px; height: 9px;
+      border-radius: 3px;
+      margin-right: 5px;
+    }
+
+    .watch-card {
+      border: 1px solid var(--line-soft);
+      border-radius: 12px;
+      padding: 12px 14px;
+      margin-bottom: 10px;
+      background: #fcfbf9;
+    }
+
+    .watch-card .t {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      font-size: 13px;
+      font-weight: 700;
+      margin-bottom: 3px;
+    }
+
+    .watch-card .t .dir { font-size: 11.5px; font-weight: 700; white-space: nowrap; }
+    .dir.up { color: var(--green); }
+    .dir.down { color: var(--red); }
+    .dir.flat { color: var(--amber); }
+
+    .watch-card p { font-size: 12px; color: var(--muted); }
+
+    .gap-list {
+      margin-top: 16px;
+      padding: 12px 14px;
+      border-radius: 12px;
+      background: var(--amber-soft);
+      font-size: 12.5px;
+      color: #6d5410;
+    }
+
+    .gap-list strong { display: block; margin-bottom: 4px; font-size: 12px; letter-spacing: .06em; }
+
+    .snapshot-foot {
+      padding: 12px 22px;
+      border-top: 1px solid var(--line-soft);
+      font-size: 12px;
+      color: var(--faint);
+    }
+
+    /* ---------- 资料维护 ---------- */
+    .archive-flow {
+      display: flex;
+      align-items: stretch;
+      margin-bottom: 18px;
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 6px 18px rgba(40, 32, 24, 0.04);
+    }
+
+    .af-node { flex: 1; padding: 18px 20px; }
+    .af-node + .af-node { border-left: 1px dashed var(--line); }
+
+    .af-node .af-no {
+      font-size: 11px;
+      font-weight: 800;
+      color: var(--accent);
+      letter-spacing: .08em;
+      margin-bottom: 5px;
+    }
+
+    .af-node strong { display: block; font-size: 14px; margin-bottom: 3px; }
+    .af-node p { font-size: 12.5px; color: var(--muted); }
+
+    .trust-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+    }
+
+    .trust {
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 20px;
+    }
+
+    .trust .t-mark {
+      width: 30px; height: 30px;
+      border-radius: 9px;
+      background: var(--accent-soft);
+      color: var(--accent-deep);
+      display: grid; place-items: center;
+      font-size: 14px; font-weight: 800;
+      margin-bottom: 12px;
+    }
+
+    .trust h3 { font-size: 14.5px; }
+    .trust p { font-size: 12.5px; color: var(--muted); }
+
+    .trust-note {
+      margin-top: 14px;
+      padding: 12px 16px;
+      border: 1px dashed var(--line);
+      border-radius: 12px;
+      color: var(--muted);
+      font-size: 12.5px;
+    }
+
+    .trust-note strong { color: var(--ink); }
+
+    /* ---------- object page skeleton ---------- */
+    .skeleton {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(320px, .9fr);
+      gap: 22px;
+      align-items: start;
+    }
+
+    .skeleton-flow { display: grid; gap: 9px; }
+
+    .sk-row {
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 15px 18px;
+    }
+
+    .sk-row .sk-no {
+      flex: none;
+      width: 24px; height: 24px;
+      border-radius: 8px;
+      background: var(--gray-soft);
+      color: var(--muted);
+      display: grid; place-items: center;
+      font-size: 11.5px; font-weight: 800;
+    }
+
+    .sk-row strong { display: block; font-size: 14px; margin-bottom: 2px; }
+    .sk-row p { font-size: 12.5px; color: var(--muted); }
+
+    .lights {
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 20px;
+      box-shadow: 0 6px 18px rgba(40, 32, 24, 0.04);
+    }
+
+    .light-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 11px 4px;
+      border-bottom: 1px dashed var(--line-soft);
+    }
+
+    .light-row:last-child { border-bottom: 0; }
+
+    .dot {
+      flex: none;
+      width: 14px; height: 14px;
+      border-radius: 50%;
+      margin-top: 4px;
+    }
+
+    .dot.g { background: var(--green); }
+    .dot.y { background: #d99a1f; }
+    .dot.r { background: var(--red); }
+    .dot.x { background: #b6bcc4; }
+
+    .light-row strong { display: block; font-size: 13.5px; }
+    .light-row p { font-size: 12.5px; color: var(--muted); }
+
+    .lights-note {
+      margin-top: 12px;
+      font-size: 12px;
+      color: var(--faint);
+    }
+
+    /* ---------- valuation ---------- */
+    .val-grid {
+      display: grid;
+      grid-template-columns: minmax(0, .95fr) minmax(0, 1.05fr);
+      gap: 22px;
+      align-items: stretch;
+    }
+
+    .val-panel {
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 22px;
+      box-shadow: 0 6px 18px rgba(40, 32, 24, 0.04);
+    }
+
+    .range-wrap { margin: 36px 0 6px; }
+
+    .range-track {
+      position: relative;
+      height: 14px;
+      border-radius: 7px;
+      background: linear-gradient(90deg, var(--red-soft), var(--green-soft) 30%, var(--green-soft) 70%, var(--red-soft));
+    }
+
+    .range-band {
+      position: absolute;
+      left: 30%;
+      width: 40%;
+      top: -4px; bottom: -4px;
+      border: 2px solid var(--green);
+      border-radius: 9px;
+    }
+
+    .range-price {
+      position: absolute;
+      left: 24%;
+      top: -9px;
+      width: 3px; height: 32px;
+      background: var(--ink);
+      border-radius: 2px;
+    }
+
+    .range-price span {
+      position: absolute;
+      top: -22px;
+      left: 50%;
+      transform: translateX(-50%);
+      white-space: nowrap;
+      font-size: 11.5px;
+      font-weight: 700;
+    }
+
+    .range-labels {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 10px;
+      font-size: 11.5px;
+      color: var(--faint);
+    }
+
+    .val-verdict {
+      margin-top: 14px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 13px;
+      border-radius: 999px;
+      background: var(--green-soft);
+      color: var(--green);
+      font-size: 12.5px;
+      font-weight: 700;
+    }
+
+    .val-list { display: grid; gap: 10px; margin-top: 16px; }
+
+    .val-item {
+      display: flex;
+      gap: 10px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .val-item::before {
+      content: "";
+      flex: none;
+      width: 7px; height: 7px;
+      border-radius: 2px;
+      background: var(--accent);
+      margin-top: 7px;
+    }
+
+    .scenario-flow { display: grid; gap: 8px; }
+
+    .sc-row {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      border: 1px solid var(--line-soft);
+      border-radius: 12px;
+      padding: 11px 14px;
+      background: #fcfbf9;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .sc-row .no {
+      flex: none;
+      width: 22px; height: 22px;
+      border-radius: 7px;
+      background: var(--gray-soft);
+      color: var(--muted);
+      display: grid; place-items: center;
+      font-size: 11px; font-weight: 800;
+    }
+
+    .sc-row.confirm { border-color: rgba(30, 122, 76, .4); background: var(--green-soft); }
+    .sc-row span.tail { margin-left: auto; font-size: 11.5px; color: var(--faint); font-weight: 500; }
+
+    /* ---------- pages ---------- */
+    .pages-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+    }
+
+    .page-card {
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 20px;
+    }
+
+    .page-card .p-tag {
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: .1em;
+      color: var(--accent-deep);
+      margin-bottom: 8px;
+    }
+
+    .page-card h3 { font-size: 15px; }
+    .page-card p { font-size: 12.5px; color: var(--muted); margin-bottom: 10px; }
+
+    .page-card ul {
+      margin: 0;
+      padding-left: 16px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .page-card li { margin-bottom: 3px; }
+
+    /* ---------- guardrails ---------- */
+    .guardrails {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+    }
+
+    .guardrail {
+      display: flex;
+      gap: 14px;
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 18px 20px;
+    }
+
+    .guardrail .g-mark {
+      flex: none;
+      width: 26px; height: 26px;
+      border-radius: 50%;
+      border: 2px solid var(--red);
+      color: var(--red);
+      display: grid; place-items: center;
+      font-size: 14px; font-weight: 800;
+    }
+
+    .guardrail h3 { font-size: 14px; margin-bottom: 4px; }
+    .guardrail p { font-size: 12.5px; color: var(--muted); }
+
+    /* ---------- cases ---------- */
+    .cases { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+
+    .case {
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 22px;
+    }
+
+    .case .c-tag {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 999px;
+      font-size: 11.5px;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+
+    .case.cyc .c-tag { background: var(--accent-soft); color: var(--accent-deep); }
+    .case.gro .c-tag { background: var(--green-soft); color: var(--green); }
+
+    .case h3 { font-size: 15.5px; }
+    .case p { font-size: 13px; color: var(--muted); }
+
+    .case-link {
+      display: inline-block;
+      margin-top: 14px;
+      padding: 7px 14px;
+      border: 1px solid var(--accent);
+      border-radius: 999px;
+      color: var(--accent-deep);
+      font-size: 12.5px;
+      font-weight: 700;
+      text-decoration: none;
+    }
+
+    .case-link:hover { background: var(--accent-soft); }
+
+    /* ---------- closing ---------- */
+    .closing {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 40px;
+      background: var(--ink);
+      color: #f5f2ec;
+      border-radius: 22px;
+      padding: 44px 48px;
+    }
+
+    .closing h2 { font-size: clamp(21px, 2.4vw, 27px); margin-bottom: 12px; }
+    .closing p { color: #b8b4ab; font-size: 14.5px; max-width: 40em; }
+
+    .closing-mark {
+      flex: none;
+      width: 66px; height: 66px;
+      border-radius: 50%;
+      border: 2px solid var(--accent);
+      color: var(--accent);
+      display: grid; place-items: center;
+      font-size: 30px; font-weight: 800;
+    }
+
+    footer {
+      margin-top: 44px;
+      color: var(--faint);
+      font-size: 12.5px;
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    /* ---------- responsive ---------- */
+    @media (max-width: 1100px) {
+      .hero { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 960px) {
+      .hero, .skeleton, .val-grid, .snapshot-body { grid-template-columns: 1fr; }
+      .trust-grid, .guardrails { grid-template-columns: 1fr 1fr; }
+      .pages-grid, .cases { grid-template-columns: 1fr; }
+      .archive-flow { flex-direction: column; }
+      .af-node + .af-node { border-left: 0; border-top: 1px dashed var(--line); }
+      .snapshot-col + .snapshot-col { border-left: 0; border-top: 1px solid var(--line-soft); }
+      .section-heading { grid-template-columns: 1fr; gap: 10px; }
+      .map-row { flex-direction: column; align-items: flex-start; gap: 4px; }
+      .map-row .arr { display: none; }
+      .map-row .q, .map-row .a { white-space: normal; }
+    }
+
+    @media (max-width: 620px) {
+      .trust-grid, .guardrails { grid-template-columns: 1fr; }
+      .closing { flex-direction: column; align-items: flex-start; padding: 32px 26px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <div class="topbar">
+      <div class="brand">
+        <span class="brand-mark" aria-hidden="true"></span>
+        VIBE FINANCE
+      </div>
+      <div class="topbar-note">面向 A 股投资者的投研助手 · 产品方案</div>
+    </div>
+
+    <header class="hero">
+      <div>
+        <p class="eyebrow">产品方案</p>
+        <h1>当分析个股或行业时，我们想要：</h1>
+        <div class="anchor-quote">
+          <ul>
+            <li>理解这个行业的发展趋势是什么；</li>
+            <li>这些报告怎么得出来的结论，证据在哪里；</li>
+            <li>当前整体行情还有哪些潜在的标的值得研究；</li>
+            <li>这家公司当前估值是否合理——它是低估了还是高估了；</li>
+            <li>如果我自己不会看财报、不懂专业分析方法，它可以帮我做；</li>
+            <li>它还会帮我持续整理资料，追踪关键指标，并定期复盘、更新判断。</li>
+          </ul>
+        </div>
+        <p class="hero-lead">
+          <strong>Vibe-Finance 就是照着这段话做的：</strong>
+          六件想知道的事，交给五个能力；落到每天使用的四件事。
+        </p>
+        <div class="hero-points" aria-label="核心价值">
+          <span class="pill">广度发现</span>
+          <span class="pill">主动分析</span>
+          <span class="pill">明确估值</span>
+          <span class="pill">证据可查</span>
+          <span class="pill">持续追踪</span>
+        </div>
+      </div>
+
+      <div class="hero-visual" aria-label="需求与能力对应">
+        <div class="hero-visual-title">六件想知道的事，五个能力来完成</div>
+        <div class="map-list">
+          <div class="map-row">
+            <span class="q">"理解这个行业的发展趋势"</span>
+            <span class="arr">→</span>
+            <span class="a">主动分析：看清行业在向哪走、由什么驱动</span>
+          </div>
+          <div class="map-row">
+            <span class="q">"报告的结论怎么来的、证据在哪里"</span>
+            <span class="arr">→</span>
+            <span class="a">证据可查：每个结论都能回到原文</span>
+          </div>
+          <div class="map-row">
+            <span class="q">"行情里还有哪些潜在标的"</span>
+            <span class="arr">→</span>
+            <span class="a">广度发现：从全市场筛出值得研究的候选</span>
+          </div>
+          <div class="map-row">
+            <span class="q">"估值合理吗、低估还是高估"</span>
+            <span class="arr">→</span>
+            <span class="a">明确估值：说清低估还是高估、凭什么</span>
+          </div>
+          <div class="map-row">
+            <span class="q">"我不会看财报、不懂分析方法"</span>
+            <span class="arr">→</span>
+            <span class="a">主动分析：不用你懂方法，它来做给你看</span>
+          </div>
+          <div class="map-row hl">
+            <span class="q">"持续整理、追踪指标、复盘更新"</span>
+            <span class="arr">→</span>
+            <span class="a">持续追踪：自动归档，有重要动态才更新结论</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <section aria-labelledby="loop-title">
+      <div class="section-heading">
+        <div>
+          <p class="section-kicker">日常使用</p>
+          <h2 id="loop-title">每天打开，就这四件事</h2>
+        </div>
+        <p class="section-intro">
+          不是做一次分析就结束。财报季、重大公告、每周复盘、季度回顾，它跟着你的节奏一直工作。
+        </p>
+      </div>
+
+      <article class="path">
+        <div class="path-head">
+          <span class="path-no">第一件事</span>
+          <h3>从全市场发现值得研究的行业和股票</h3>
+          <span class="goal">没有方向时，也能找到候选</span>
+        </div>
+        <div class="steps">
+          <div class="step"><div class="s-no">01</div><strong>看市场整体</strong><p>指数、板块热力、行业趋势、估值高低、资金流向，一眼看清。</p></div>
+          <div class="step"><div class="s-no">02</div><strong>点进行业或个股</strong><p>详情页摆的是实时数据，不替你下结论。</p></div>
+          <div class="step key"><div class="s-no">03</div><strong>快速看懂这家公司</strong><p>一张基本面速览，帮你判断值不值得花时间去研究。</p></div>
+          <div class="step"><div class="s-no">04</div><strong>一个或一批加入</strong><p>看中的直接加入，研究档案由它自己建好。</p></div>
+        </div>
+        <div class="path-note"><strong>你只管挑：</strong>看中的一个或一批都能加入；建档和分析由它自己完成，你不用盯进度。</div>
+      </article>
+
+      <article class="path">
+        <div class="path-head">
+          <span class="path-no">第二件事</span>
+          <h3>你关注的，现在怎么样了</h3>
+          <span class="goal">随时回答这个问题</span>
+        </div>
+        <div class="steps">
+          <div class="step"><div class="s-no">01</div><strong>打开研究页</strong><p>行业和股票两个列表，外加一条"最近更新"。</p></div>
+          <div class="step key"><div class="s-no">02</div><strong>先看最近更新</strong><p>有变化待确认、状态变了、报告更新了，或者"查过了，没变"。</p></div>
+          <div class="step"><div class="s-no">03</div><strong>扫一遍卡片</strong><p>每张卡上有你选的标签、当前状态、最近关键变化的时间。</p></div>
+          <div class="step"><div class="s-no">04</div><strong>点进去看究竟</strong><p>为什么是这个状态、依据是什么、数据是哪天的、什么情况会变。</p></div>
+        </div>
+        <div class="path-note"><strong>评估靠谱：</strong>健康评估不会跟着盘中价格跳来跳去，只反映最近一次深度分析的结果；我们关注价值，而不是价格。</div>
+      </article>
+
+      <article class="path">
+        <div class="path-head">
+          <span class="path-no">第三件事</span>
+          <h3>新消息自动整理好、分析清楚</h3>
+          <span class="goal">新消息变成新的认识，而不是一堆没看的推送</span>
+        </div>
+        <div class="steps">
+          <div class="step"><div class="s-no">01</div><strong>新消息来了</strong><p>财报、公告、商品价格、供需、订单或行业大事。</p></div>
+          <div class="step"><div class="s-no">02</div><strong>自动归档</strong><p>归到对应的行业或公司下面，该更新的更新。</p></div>
+          <div class="step key"><div class="s-no">03</div><strong>重要变化先标记</strong><p>重要指标有大变动才重新研究，不见风就是雨。</p></div>
+          <div class="step"><div class="s-no">04</div><strong>重新研究并更新</strong><p>重新算一遍利润和值多少钱，更新状态和报告。</p></div>
+        </div>
+        <div class="path-note"><strong>看得清楚：</strong>哪些结论变了、哪些查过了没变，都直接告诉你；不会另搞一套推送烦你。</div>
+      </article>
+
+      <article class="path">
+        <div class="path-head">
+          <span class="path-no">第四件事</span>
+          <h3>给你可靠的结论，有重要动态才更新</h3>
+          <span class="goal">为什么可靠：分析链路可查，结论证据清晰</span>
+        </div>
+        <div class="steps">
+          <div class="step"><div class="s-no">01</div><strong>当前结论</strong><p>健康评估、深度报告、估值，每个对象就一份，随时打开都是最新的。</p></div>
+          <div class="step"><div class="s-no">02</div><strong>价格天天变</strong><p>它随时告诉你：现在的价格在"该值多少钱"的什么位置。</p></div>
+          <div class="step"><div class="s-no">03</div><strong>没有重要动态就不变</strong><p>不会因为股价一天的涨跌就改口，也不会问一次变一次。</p></div>
+          <div class="step key"><div class="s-no">04</div><strong>有重要动态才更新</strong><p>改了会告诉你为什么改、依据是什么，以前的记录也都在。</p></div>
+        </div>
+        <div class="path-note"><strong>边界：</strong>不是有新消息就改——有重要动态才更新；结论是研究意见，不替你下交易单。</div>
+      </article>
+    </section>
+
+    <section aria-labelledby="snapshot-title">
+      <div class="section-heading">
+        <div>
+          <p class="section-kicker">探索时的第一眼</p>
+          <h2 id="snapshot-title">对一家感兴趣的公司，先拿到一张基本面速览</h2>
+        </div>
+        <p class="section-intro">
+          不管第一次见还是已经加入研究，速览都是图表和卡片：谁贡献收入、谁贡献利润、该重点关注什么，一眼看清，而不是一大段文字。
+        </p>
+      </div>
+
+      <div class="snapshot" aria-label="基本面速览示意（示意数据）">
+        <div class="snapshot-head">
+          <div><strong>某航运公司 · 基本面速览</strong>（示意数据）</div>
+          <div class="time">财务数据截至 2025 年报 · 行情截至今日收盘</div>
+        </div>
+        <div class="snapshot-body">
+          <div class="snapshot-col">
+            <div class="col-label">业务结构与利润占比</div>
+
+            <div class="biz-row">
+              <div class="biz-name">集装箱航运 <span>运价 × 运量驱动，周期性强</span></div>
+              <div class="bars">
+                <div class="bar"><span class="tag">收入占比</span><div class="track"><div class="fill rev" style="width:88%"></div></div><span class="val">88%</span></div>
+                <div class="bar"><span class="tag">利润占比</span><div class="track"><div class="fill profit" style="width:94%"></div></div><span class="val">94%</span></div>
+              </div>
+            </div>
+
+            <div class="biz-row">
+              <div class="biz-name">码头业务 <span>稳定现金流，弱周期</span></div>
+              <div class="bars">
+                <div class="bar"><span class="tag">收入占比</span><div class="track"><div class="fill rev" style="width:9%"></div></div><span class="val">9%</span></div>
+                <div class="bar"><span class="tag">利润占比</span><div class="track"><div class="fill profit" style="width:5%"></div></div><span class="val">5%</span></div>
+              </div>
+            </div>
+
+            <div class="legend"><span><i style="background:#d7dbe0"></i>收入占比</span><span><i style="background:#e8541f"></i>利润占比</span></div>
+
+            <div class="gap-list">
+              <strong>主要风险与还没搞清楚的</strong>
+              长协价与即期价的占比待核实；新船集中交付后运力能不能消化，缺最新数据。
+            </div>
+          </div>
+
+          <div class="snapshot-col">
+            <div class="col-label">当前应该重点关注什么</div>
+            <div class="watch-card">
+              <div class="t">即期运价（SCFI）<span class="dir up">近 4 周在涨</span></div>
+              <p>比财报早约一个季度反映；是这轮利润弹性的关键。</p>
+            </div>
+            <div class="watch-card">
+              <div class="t">新船交付与拆船量<span class="dir down">供给压力加大</span></div>
+              <p>决定下一轮供需；运价涨、供给也在涨时，要警惕周期见顶。</p>
+            </div>
+            <div class="watch-card">
+              <div class="t">燃油与租船成本<span class="dir flat">基本持平</span></div>
+              <p>成本端暂时没异常；关注长协重签会不会锁定成本。</p>
+            </div>
+          </div>
+        </div>
+        <div class="snapshot-foot">
+          速览先给结论和占比，每个数字都能查出处和数据日期；它帮你决定值不值得深入研究，但不代替完整估值。
+        </div>
+      </div>
+    </section>
+
+    <section aria-labelledby="archive-title">
+      <div class="section-heading">
+        <div>
+          <p class="section-kicker">"帮我持续整理"如何实现</p>
+          <h2 id="archive-title">行业和公司的研究资料，如何整理和维护</h2>
+        </div>
+        <p class="section-intro">
+          不用自己整理文件夹：每个行业和公司都有一份不断更新的研究档案，新消息自动归档，每条结论都能查到出处，改不改你说了算。
+        </p>
+      </div>
+
+      <div class="archive-flow" aria-label="新消息的处理路径">
+        <div class="af-node"><div class="af-no">01</div><strong>新消息进来</strong><p>财报、公告、行业数据，或你自己上传的资料。</p></div>
+        <div class="af-node"><div class="af-no">02</div><strong>自动归档</strong><p>归到对应行业或公司的档案里，该更新的更新。</p></div>
+        <div class="af-node"><div class="af-no">03</div><strong>更新结论</strong><p>有重要变化就重新研究，该改就改，没变就说没变。</p></div>
+        <div class="af-node"><div class="af-no">04</div><strong>留痕可找回</strong><p>每次改动都有记录，能回看，删错了能恢复。</p></div>
+      </div>
+
+      <div class="trust-grid">
+        <article class="trust">
+          <div class="t-mark">档</div>
+          <h3>自动建好研究档案</h3>
+          <p>加入一个行业或公司，档案就建好了：是干什么的、属于哪个行业、适合怎么分析、已经知道什么、还缺什么；公司自动关联所属行业，双向都能查。</p>
+        </article>
+        <article class="trust">
+          <div class="t-mark">源</div>
+          <h3>出处和时间一直在</h3>
+          <p>原始资料只加不改：出处、日期、原文位置都留着；要更正就加一条新记录，旧的不会被偷偷改掉。</p>
+        </article>
+        <article class="trust">
+          <div class="t-mark">整</div>
+          <h3>自动整理，矛盾不掩盖</h3>
+          <p>新消息自动整理进对应档案；两份资料打架时两边都摆出来、标上"存疑"，等有新证据再定论，不会偷偷盖掉一边。</p>
+        </article>
+        <article class="trust">
+          <div class="t-mark">级</div>
+          <h3>事实和猜测分开标</h3>
+          <p>哪些是事实、哪些是别人说的、哪些是推测，分开标清楚；你自己的想法在找到证据前会标成"待验证"，不会被当成事实。</p>
+        </article>
+        <article class="trust">
+          <div class="t-mark">控</div>
+          <h3>你的资料你说了算</h3>
+          <p>上传的文件、链接和文本集中管理；改或删之前，先告诉你会影响哪些结论，你点头才动；纠错也会留下原话和原因。</p>
+        </article>
+        <article class="trust">
+          <div class="t-mark">忆</div>
+          <h3>记得住你的思路</h3>
+          <p>你的假设、修正和待验证的问题会被长期记住，下次分析直接用；不会每次问答都从零开始。</p>
+        </article>
+      </div>
+
+      <div class="trust-note">
+        <strong>节奏与控制权：</strong>财报季、重大公告、每周复盘、季度回顾，它都跟着更新档案；用什么假设、信不信某个来源，都由你拍板。
+      </div>
+    </section>
+
+    <section aria-labelledby="object-title">
+      <div class="section-heading">
+        <div>
+          <p class="section-kicker">"我关注的现在怎么样了"如何回答</p>
+          <h2 id="object-title">每只股票，都是同一个看板、同一份健康评估</h2>
+        </div>
+        <p class="section-intro">
+          健康评估不是打分，点开能看到为什么、依据是什么、什么情况会变。
+        </p>
+      </div>
+
+      <div class="skeleton">
+        <div class="skeleton-flow">
+          <div class="sk-row"><span class="sk-no">1</span><div><strong>健康评估</strong><p>绿 / 黄 / 红 / 灰是公司的健康评估：显示最近一次深度分析的结果，看的是长期价值，不随表面股价波动。</p></div></div>
+          <div class="sk-row"><span class="sk-no">2</span><div><strong>实时数据</strong><p>股价、财务、估值和行业风向标，标明数据是哪天的、还新不新。</p></div></div>
+          <div class="sk-row"><span class="sk-no">3</span><div><strong>深度研究报告</strong><p>每个对象都有一份深度研究报告，随时打开都是最新的；业务和利润拆开用图表摆出来。</p></div></div>
+          <div class="sk-row"><span class="sk-no">4</span><div><strong>研究依据</strong><p>按业务讲清楚依据，缺什么也明说，能一直查到原文。</p></div></div>
+          <div class="sk-row"><span class="sk-no">5</span><div><strong>相互链接</strong><p>股票和所属行业连在一起，可以从一个看到另一个；为什么关联也有依据。</p></div></div>
+          <div class="sk-row"><span class="sk-no">6</span><div><strong>助手</strong><p>每个页面都在，知道你正在看什么，问题问到哪就讲到哪。</p></div></div>
+        </div>
+
+        <div class="lights" aria-label="健康程度的四种状态">
+          <div class="col-label">健康程度的四种状态</div>
+          <div class="light-row"><span class="dot g"></span><div><strong>绿 · 情况总体有利</strong><p>该重点关注的指标大方向都没问题。</p></div></div>
+          <div class="light-row"><span class="dot y"></span><div><strong>黄 · 有分化</strong><p>有好转的也有变差的，需要分清主次。</p></div></div>
+          <div class="light-row"><span class="dot r"></span><div><strong>红 · 明显变差</strong><p>情况和当初看好的理由明显对不上了。</p></div></div>
+          <div class="light-row"><span class="dot x"></span><div><strong>灰 · 证据不够</strong><p>暂时说不好，缺什么证据摆出来，不装明白。</p></div></div>
+          <p class="lights-note">每种状态都能点开：为什么、依据硬不硬、数据是哪天的、还缺什么、什么情况会变；颜色只是视觉提示。价格或指标有大变动时先标"待确认"，认真复查完才改状态。</p>
+        </div>
+      </div>
+    </section>
+
+    <section aria-labelledby="val-title">
+      <div class="section-heading">
+        <div>
+          <p class="section-kicker">"低估还是高估"如何回答</p>
+          <h2 id="val-title">明确说"低估还是高估"，也明确说"凭什么"</h2>
+        </div>
+        <p class="section-intro">
+          不同行业用不同的估值方法，不用一把尺子量所有公司；结论必须交代怎么算的、假设是什么、数据是哪天的、什么情况就不算数了。
+        </p>
+      </div>
+
+      <div class="val-grid">
+        <div class="val-panel" aria-label="价值区间示意（示意数据）">
+          <div class="col-label">当前价格与价值区间（示意）</div>
+          <div class="range-wrap">
+            <div class="range-track">
+              <div class="range-band"></div>
+              <div class="range-price"><span>当前价格</span></div>
+            </div>
+            <div class="range-labels"><span>明显低估</span><span>合理区间</span><span>明显高估</span></div>
+          </div>
+          <span class="val-verdict">当前位置：合理区间偏下 · 安全边际较足</span>
+          <div class="val-list">
+            <div class="val-item">为什么用这种方法估，而不是别的。</div>
+            <div class="val-item">哪些是真实数据、哪些是假设，分开写，假设可以追问。</div>
+            <div class="val-item">哪个因素一变结论就变，会直接告诉你。</div>
+            <div class="val-item">出现什么证据就算看走眼了，提前说清楚。</div>
+          </div>
+        </div>
+
+        <div class="val-panel" aria-label="估值情景确认流程">
+          <div class="col-label">想试试别的假设？</div>
+          <div class="scenario-flow">
+            <div class="sc-row"><span class="no">1</span>你提一个假设<span class="tail">"如果运价回落 20%…"</span></div>
+            <div class="sc-row"><span class="no">2</span>助手把要填的数列出来<span class="tail">默认值、算法、出处都有</span></div>
+            <div class="sc-row confirm"><span class="no">3</span>你检查并确认<span class="tail">不确认，不发生</span></div>
+            <div class="sc-row"><span class="no">4</span>按公式重新算<span class="tail">不是随口估的</span></div>
+            <div class="sc-row"><span class="no">5</span>助手讲清哪里变了、还缺什么</div>
+          </div>
+          <p class="lights-note">临时试算只在这一次管用；想把它当成长期假设，要再确认一次，系统会重新研究一遍。</p>
+        </div>
+      </div>
+    </section>
+
+    <section aria-labelledby="pages-title">
+      <div class="section-heading">
+        <div>
+          <p class="section-kicker">产品结构</p>
+          <h2 id="pages-title">三个模块，各司其职</h2>
+        </div>
+        <p class="section-intro">
+          行情负责发现机会，研究负责看懂和关注变化，数据负责管来源和资料；助手随时都在。
+        </p>
+      </div>
+
+      <div class="pages-grid">
+        <article class="page-card">
+          <div class="p-tag">行情</div>
+          <h3>发现机会与数据看板</h3>
+          <p>没有方向时，从这里看见市场结构；点进行业或个股，都是实时数据看板。</p>
+          <ul>
+            <li>总览：指数、热力、行业趋势、估值、资金</li>
+            <li>资讯：关注股票的公告与新闻</li>
+            <li>行业与个股详情：实时数据，不替你下结论</li>
+            <li>搜索与批量加入，详情页可直接"加入研究"</li>
+          </ul>
+        </article>
+        <article class="page-card">
+          <div class="p-tag">研究</div>
+          <h3>看懂与关注变化</h3>
+          <p>关注对象的列表、状态和深入分析。</p>
+          <ul>
+            <li>行业 / 个股两个列表与"最近更新"</li>
+            <li>关注 / 跟踪 / 持有标签</li>
+            <li>对象页：健康评估、数据、深度报告、依据、链接、助手</li>
+          </ul>
+        </article>
+        <article class="page-card">
+          <div class="p-tag">数据</div>
+          <h3>管来源与资料</h3>
+          <p>管理信息通道、个人资料与高级设置。</p>
+          <ul>
+            <li>数据源：各信息通道的连接状态</li>
+            <li>研究资料：你上传的，可增删改、可恢复</li>
+            <li>配置：分析方法、标签、时效与变更记录</li>
+          </ul>
+        </article>
+      </div>
+    </section>
+
+    <section aria-labelledby="guardrail-title">
+      <div class="section-heading">
+        <div>
+          <p class="section-kicker">产品边界</p>
+          <h2 id="guardrail-title">明确不做的事</h2>
+        </div>
+        <p class="section-intro">
+          把边界划清楚，是为了让结论可信：它负责把研究做扎实，投资决策始终是你自己的。
+        </p>
+      </div>
+
+      <div class="guardrails">
+        <article class="guardrail">
+          <div class="g-mark">×</div>
+          <div>
+            <h3>不替你下买卖单</h3>
+            <p>可以明确说低估、合理、高估或证据不足，但不输出买卖、点位或仓位指令。</p>
+          </div>
+        </article>
+        <article class="guardrail">
+          <div class="g-mark">×</div>
+          <div>
+            <h3>证据不足就老实说</h3>
+            <p>说不清就亮灰灯、列出缺什么；数据没拿到就明说，绝不编结论。</p>
+          </div>
+        </article>
+        <article class="guardrail">
+          <div class="g-mark">×</div>
+          <div>
+            <h3>不做量化、回测与自动交易</h3>
+            <p>现阶段把研究做扎实，不碰策略、回测和自动下单。</p>
+          </div>
+        </article>
+        <article class="guardrail">
+          <div class="g-mark">×</div>
+          <div>
+            <h3>不承诺港美股同等深度</h3>
+            <p>先把 A 股做完整；港美股只作为外围行情、产业链或可比参考。</p>
+          </div>
+        </article>
+        <article class="guardrail">
+          <div class="g-mark">×</div>
+          <div>
+            <h3>不跟着价格一惊一乍</h3>
+            <p>日常涨跌只更新估值位置；有重要动态、经过复查，才改结论。</p>
+          </div>
+        </article>
+        <article class="guardrail">
+          <div class="g-mark">×</div>
+          <div>
+            <h3>不另搞一套通知</h3>
+            <p>研究有变化就在"最近更新"和消息里告诉你，不新建推送渠道。</p>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section aria-labelledby="case-title">
+      <div class="section-heading">
+        <div>
+          <p class="section-kicker">代表案例</p>
+          <h2 id="case-title">用两类完全不同的行业验证同一套方法</h2>
+        </div>
+        <p class="section-intro">
+          周期型看价差与供需，成长型看技术与订单——同一套方法都要走得通。下面是这套方法跑出来的两个交互案例，点开就能看。
+        </p>
+      </div>
+
+      <div class="cases">
+        <article class="case cyc">
+          <span class="c-tag">周期型</span>
+          <h3>航运</h3>
+          <p>验证重点：运价涨跌怎么变成利润弹性、供需和运力数据怎么提前反映、周期行业的利润怎么估值。</p>
+          <a class="case-link" href="./shipping-viz/index.html">打开交互案例 →</a>
+        </article>
+        <article class="case gro">
+          <span class="c-tag">成长产业链型</span>
+          <h3>推理芯片</h3>
+          <p>验证重点：收入结构和订单质量、产业链位置和竞争格局、高增长但利润还不稳定时怎么估值。</p>
+          <a class="case-link" href="./inference-silicon-cn/index.html">打开交互案例 →</a>
+        </article>
+      </div>
+    </section>
+
+    <section class="closing" aria-label="最终价值">
+      <div>
+        <h2>回到开头那段话——这就是它每天在做的事</h2>
+        <p>
+          告诉你趋势、低估还是高估，拿出证据；不用你懂财报，它来分析；
+          资料自动整理，指标持续追踪，该复盘时复盘——
+          每个结论都能查出处、能纠错、能找回。
+        </p>
+      </div>
+      <div class="closing-mark" aria-hidden="true">✓</div>
+    </section>
+
+    <footer>
+      <span>Vibe-Finance · 产品方案</span>
+    </footer>
+    <!-- 内部说明（不对外展示）：本页面为产品方案的对外阅读稿，非权威文档；内容从 human-checklist.md 的对外锚定表述与已确认决策派生，如有差异以 human-checklist.md 与 docs/flow_design.md 为准。 -->
+  </main>
+</body>
+</html>

@@ -1,0 +1,1288 @@
+/* ==========================================================================
+   inference-silicon-cn · style.css
+   视觉系统：纯白底 + 深海军蓝文字 + #2251ff 强调色；宋体系 serif 正文。
+   禁止：米黄/暖纸色、全屏点阵、大渐变、厚圆角卡片、大阴影、玻璃拟态、
+         深色模式、SaaS dashboard 风。大面积背景只能是 #ffffff。
+   ========================================================================== */
+
+/* ---------- 1. 设计 Tokens（SPEC §2，一字不改） ---------- */
+:root {
+  --paper: #ffffff; --paper-hi: #f7f9fc;
+  --ink: #051c2c; --ink-md: #42566a; --ink-lo: #8595a6;
+  --line: #dbe2ea; --line-lo: #eef1f6;
+  --red: #2251ff; --red-hi: #1233b8;
+  --blue: #2251ff; --blue-hi: #1233b8; --blue-lo: #7d9bff;
+  --copper: #b07a10; --green: #008a6d; --violet: #7a45c9;
+  --gold: #b07a10; --neg: #c22f4e;
+  --serif: "et-book", "Songti SC", "Noto Serif CJK SC", "Source Han Serif SC", "STSong", "Iowan Old Style", Palatino, Georgia, serif;
+  --sans: var(--serif);
+  --mono: Menlo, Consolas, "SF Mono", "PingFang SC", monospace;
+}
+
+/* ---------- 2. 基础 ---------- */
+*, *::before, *::after { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  --railw: 460px;
+  margin: 0;
+  background: #fff;
+  color: var(--ink);
+  font-family: var(--serif);
+  font-size: 17px;
+  line-height: 1.68;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+[hidden] { display: none !important; }
+
+::selection { background: rgba(34, 81, 255, .12); }
+
+a { color: var(--blue); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
+
+button { font-family: inherit; }
+
+.visually-hidden {
+  position: absolute; width: 1px; height: 1px;
+  margin: -1px; padding: 0; overflow: hidden;
+  clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
+
+/* ---------- 3. 布局契约（SPEC §3，1280×720 验收几何） ---------- */
+main {
+  /* 不定宽：占满数据面板左侧全部宽度；1280×720 下由 1280−460 自然得出 820px */
+  margin-right: var(--railw);
+}
+
+#dash-rail {
+  position: fixed;
+  top: 0; right: 0; bottom: 0;
+  width: var(--railw);
+  border: 0;
+  background: #fff;
+  z-index: 60;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .6s ease;
+}
+#dash-rail.on { opacity: 1; pointer-events: auto; }
+#dash-rail canvas { width: 100%; height: 100%; display: block; }
+
+.prose { max-width: 692px; margin: 0 auto; padding: 0 24px; }   /* 文字宽 644px, x≈88 */
+.wide { max-width: 800px; margin: 0 auto; padding: 0 24px; }    /* 图表宽 752 */
+.wide.xl { max-width: 924px; }                                  /* 主栏内实际 820, 图表宽 772, x≈24 */
+
+/* 块间距节奏（照抄英文原版）：相邻内容块统一 28px 顶距 */
+.prose + .wide, .wide + .prose, .prose + .prose, .wide + .wide,
+.wide.xl + .prose, .prose + .wide.xl, .wide + .wide.xl, .wide.xl + .wide {
+  margin-top: 28px;
+}
+
+.band {
+  padding: 48px 0 56px;
+  border-top: 1px solid var(--line-lo);
+  scroll-margin-top: 58px;   /* 给 fixed era-rail 留出锚点偏移 */
+}
+.band:first-of-type { border-top: 0; }
+
+/* ---------- 4. 标题与正文 ---------- */
+.sec-no {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: .26em;
+  color: var(--blue);
+  margin-bottom: 14px;
+  text-transform: uppercase;
+}
+
+h2 {
+  font-family: var(--sans);
+  font-size: 36px;
+  font-weight: 700;
+  line-height: 1.25;
+  margin: 0 0 20px;
+}
+
+h3 {
+  font-family: var(--sans);
+  font-size: 21px;
+  font-weight: 700;
+  line-height: 1.4;
+  margin: 28px 0 14px;
+}
+
+.prose p { margin: 0 0 15px; }
+
+.dek {
+  max-width: 640px;
+  margin: -4px 0 24px;
+  padding: 0;
+  border: 0;
+  font-size: 18px;
+  font-style: italic;
+  line-height: 1.65;
+  color: var(--ink-md);
+}
+
+.prose ul, .prose ol { margin: 0 0 15px; padding-left: 1.4em; }
+.prose li { margin-bottom: 6px; }
+
+/* ---------- 5. Cover（SPEC §6；1280×720 下 cover-inner x=80 / 内容 x=104） ---------- */
+#cover {
+  position: relative;
+  min-height: 100vh;
+  overflow: hidden;
+  background: #fff;
+  border: 0;
+}
+
+/* 三个模式 canvas 全幅覆盖；同一时间只显示一个（JS 切换 display） */
+#cover-canvas, #cover-canvas-x, #cover-canvas-w {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.cover-inner {
+  position: relative;
+  z-index: 2;
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 14vh 24px 112px;   /* 原版节奏：顶 14vh / 底 112px 让位 SCROLL 提示 */
+}
+
+.cover-kicker {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: .26em;   /* 原版字距 */
+  color: var(--blue);      /* 原版：蓝色 kicker */
+  margin: 0 0 26px;
+}
+
+.cover-title {
+  font-family: var(--sans);
+  font-size: clamp(44px, 6.6vw, 78px);   /* 原版流体字号，下限 44px 覆盖移动端 */
+  font-weight: 700;
+  line-height: 1.06;
+  letter-spacing: -.01em;
+  color: var(--ink);
+  margin: 0;
+}
+/* 封面标题双色（P1）：「推理芯片的」墨蓝 +「四十二年」电光蓝 #2251ff */
+.cover-title .t-ink { color: var(--ink); }
+.cover-title .t-blue { color: var(--blue); }
+
+.cover-sub {
+  font-size: 26px;
+  font-weight: 700;        /* 原版副题加粗 */
+  line-height: 1.7;
+  color: var(--ink-md);    /* 原版：次级墨色 */
+  margin: 22px 0 0;
+}
+
+.cover-lede {
+  max-width: 620px;
+  font-size: 17px;
+  line-height: 1.68;
+  color: var(--ink-md);
+  margin: 26px 0 0;
+}
+
+.cover-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 56px 0 0;   /* 原版：chips 容器顶距 56px */
+}
+/* chip 按英文原版：serif 700 11.5px、1.5px 墨边、padding 8/11，hover 蓝底白字 */
+.cover-chips .chip,
+.cover-chips > a,
+.cover-chips > span {
+  display: inline-block;
+  -webkit-appearance: none;
+  appearance: none;
+  font-family: var(--serif);
+  font-weight: 700;
+  font-size: 11.5px;
+  line-height: 1.25;
+  color: var(--ink);
+  background: #fff;
+  border: 1.5px solid var(--ink);
+  border-radius: 6px;
+  padding: 8px 11px;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color .18s ease, color .18s ease, border-color .18s ease;
+}
+.cover-chips .chip:hover,
+.cover-chips .chip:focus-visible,
+.cover-chips > a:hover,
+.cover-chips > a:focus-visible {
+  background: var(--blue);
+  border-color: var(--blue);
+  color: #fff;
+  text-decoration: none;
+}
+.cover-chips .chip:focus-visible,
+.cover-chips > a:focus-visible {
+  outline: 2px solid var(--blue);
+  outline-offset: 2px;
+}
+
+.cover-anchor {
+  max-width: 720px;
+  font-family: var(--mono);
+  font-size: 10.5px;
+  line-height: 1.7;
+  color: var(--ink-lo);
+  margin: 20px 0 0;
+}
+
+/* 模式切换：恢复英文原版胶囊 pill（.cover-modes / .cover-mode）——
+   1px 边 + 999px 圆角 + 半透明白底，hover 浅蓝边，选中态蓝边蓝字；
+   role=tablist，aria-pressed / aria-selected / .on 均兼容；.mode-btn 与旧类名 .cover-mode-btn 通吃 */
+#cover-mode {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 24px 0 0;
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--ink-lo);
+}
+#cover-mode .cover-mode-label { margin-right: 4px; letter-spacing: .12em; }
+#cover-mode button,
+#cover-mode .mode-btn,
+#cover-mode .cover-mode-btn {
+  -webkit-appearance: none;
+  appearance: none;
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--ink-md);
+  background: rgba(255, 255, 255, .85);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 5px 11px;
+  cursor: pointer;
+  transition: border-color .2s ease, color .2s ease;
+}
+#cover-mode button:hover,
+#cover-mode .mode-btn:hover,
+#cover-mode .cover-mode-btn:hover {
+  border-color: var(--blue-lo);
+  color: var(--ink);
+}
+#cover-mode button[aria-pressed="true"],
+#cover-mode button[aria-selected="true"],
+#cover-mode button.on,
+#cover-mode .mode-btn[aria-pressed="true"],
+#cover-mode .mode-btn[aria-selected="true"],
+#cover-mode .mode-btn.on,
+#cover-mode .cover-mode-btn[aria-pressed="true"],
+#cover-mode .cover-mode-btn[aria-selected="true"],
+#cover-mode .cover-mode-btn.on {
+  border-color: var(--blue);
+  color: var(--blue);
+}
+
+/* scroll-hint 对齐原版（P1）：底部居中 1px 细线（48px）+ SCROLL mono 10px 弱色；
+   JS 滚动 >80px 加 .off 隐藏（main.js），逻辑保持兼容 */
+.scroll-hint {
+  margin: 52px auto 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: .3em;
+  text-transform: uppercase;
+  color: var(--ink-lo);
+  transition: opacity .5s ease, visibility .5s ease;
+}
+.scroll-hint::before {
+  content: "";
+  display: block;
+  width: 48px;
+  height: 1px;
+  background: var(--line);
+  animation: scroll-hint-pulse 2.4s ease-in-out infinite;
+}
+.scroll-hint.off { opacity: 0; visibility: hidden; }
+@keyframes scroll-hint-pulse {
+  0%, 100% { opacity: .35; }
+  50% { opacity: 1; }
+}
+
+/* ---------- 6. Era Rail（SPEC §7：历史时间轴，不是章节菜单） ---------- */
+#era-rail {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 460px;
+  z-index: 90;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 22px;
+  background: #fff;
+  border-bottom: 1px solid var(--line);
+  opacity: 0;
+  transform: translateY(-8px);
+  pointer-events: none;
+  transition: opacity .4s ease, transform .4s ease;
+}
+#era-rail.on {
+  opacity: 1;
+  transform: none;
+  pointer-events: auto;
+}
+
+/* 当前年份 badge */
+.era-badge {
+  flex: 0 0 auto;
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: .08em;
+  color: var(--blue);
+  border: 1px solid var(--blue);
+  border-radius: 999px;
+  padding: 1px 10px;
+  line-height: 1.6;
+  white-space: nowrap;
+}
+
+/* 横向轨道：6 个窗口段 + 年份标签 1985/1995/2004/2013/2019/2023→26 */
+.era-track {
+  flex: 1 1 auto;
+  display: flex;
+  align-items: stretch;
+  min-width: 0;
+}
+
+.era-seg {
+  position: relative;
+  flex: 1 1 0;
+  display: block;
+  padding: 10px 0 0;
+  border: 0;
+  background: transparent;
+  font-family: var(--mono);
+  font-size: 9.5px;
+  letter-spacing: .04em;
+  color: var(--ink-lo);
+  text-align: left;
+  white-space: nowrap;
+  cursor: pointer;
+}
+/* 段线：默认 2px 浅灰线 */
+.era-seg::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--line);
+  transition: height .25s ease, background-color .25s ease;
+}
+/* 段起点年份刻度 */
+.era-seg::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 1px;
+  height: 5px;
+  background: var(--line);
+}
+/* 当前段：4px 高亮蓝线 */
+.era-seg.on {
+  color: var(--blue);
+}
+.era-seg.on::before {
+  height: 4px;
+  background: var(--blue);
+}
+.era-seg:hover { color: var(--ink-md); }
+.era-seg.on:hover { color: var(--blue); }
+
+.era-seg .era-year { pointer-events: none; }
+
+/* ---------- 7. Chart frame（原版样式：透明底、无边框、无阴影） ---------- */
+.chart-frame {
+  background: transparent;
+  border: 0;
+  border-top: 1px solid var(--line);   /* 原版镀铬：图块顶部发丝线 */
+  box-shadow: none;
+  padding: 14px 0 4px;
+  position: relative;
+  margin: 0;
+}
+.chart-frame + .chart-frame { margin-top: 30px; }
+
+.chart-title {
+  font-family: var(--sans);
+  font-weight: 700;
+  font-size: 17.5px;
+  line-height: 1.4;
+  color: var(--ink);
+  margin: 0 0 3px;
+}
+
+.chart-sub {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: .09em;   /* 原版镀铬：字距 */
+  color: var(--ink-lo);
+  margin: 5px 0 12px;      /* 原版：去掉下划线分隔 */
+}
+
+.chart-body {
+  position: relative;
+  width: 100%;
+}
+.chart-body svg,
+.chart-body canvas {
+  display: block;
+  max-width: 100%;
+}
+
+.chart-src {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--ink-lo);
+  border-top: 1px solid var(--line-lo);  /* 原版镀铬：出处上方发丝线 */
+  margin: 12px 0 4px;
+  padding-top: 8px;
+}
+
+/* 并排图对（照抄英文原版）：两列网格，子图允许收缩不溢出 */
+.chart-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; }
+.chart-pair .chart,
+.chart-pair .chart-frame { min-width: 0; }
+/* 网格内第二幅不再吃相邻堆叠间距，保持两幅顶对齐 */
+.chart-pair .chart-frame + .chart-frame { margin-top: 0; }
+
+/* data-chart-height 高度预留（防 CLS）：规则块照抄英文原版 css/style.css:273-291，
+   并并入本站 index.html 现用的属性值，两组并集全覆盖 */
+figure[data-chart-height="300"] > .chart-body { min-height: 300px; }
+figure[data-chart-height="340"] > .chart-body { min-height: 340px; }
+figure[data-chart-height="350"] > .chart-body { min-height: 350px; }
+figure[data-chart-height="356"] > .chart-body { min-height: 356px; }
+figure[data-chart-height="380"] > .chart-body { min-height: 380px; }
+figure[data-chart-height="400"] > .chart-body { min-height: 400px; }
+figure[data-chart-height="402"] > .chart-body { min-height: 402px; }
+figure[data-chart-height="410"] > .chart-body { min-height: 410px; }
+figure[data-chart-height="420"] > .chart-body { min-height: 420px; }
+figure[data-chart-height="426"] > .chart-body { min-height: 426px; }
+figure[data-chart-height="430"] > .chart-body { min-height: 430px; }
+figure[data-chart-height="450"] > .chart-body { min-height: 450px; }
+figure[data-chart-height="457"] > .chart-body { min-height: 457px; }
+figure[data-chart-height="460"] > .chart-body { min-height: 460px; }
+figure[data-chart-height="470"] > .chart-body { min-height: 470px; }
+figure[data-chart-height="476"] > .chart-body { min-height: 476px; }
+figure[data-chart-height="490"] > .chart-body { min-height: 490px; }
+figure[data-chart-height="500"] > .chart-body { min-height: 500px; }
+figure[data-chart-height="504"] > .chart-body { min-height: 504px; }
+figure[data-chart-height="510"] > .chart-body { min-height: 510px; }
+figure[data-chart-height="520"] > .chart-body { min-height: 520px; }
+figure[data-chart-height="530"] > .chart-body { min-height: 530px; }
+figure[data-chart-height="540"] > .chart-body { min-height: 540px; }
+figure[data-chart-height="543"] > .chart-body { min-height: 543px; }
+figure[data-chart-height="570"] > .chart-body { min-height: 570px; }
+figure[data-chart-height="590"] > .chart-body { min-height: 590px; }
+figure[data-chart-height="610"] > .chart-body { min-height: 610px; }
+figure[data-chart-height="630"] > .chart-body { min-height: 630px; }
+figure[data-chart-height="637"] > .chart-body { min-height: 637px; }
+figure[data-chart-height="710"] > .chart-body { min-height: 710px; }
+figure[data-chart-height="750"] > .chart-body { min-height: 750px; }
+figure[data-chart-height="774"] > .chart-body { min-height: 774px; }
+figure[data-chart-height="880"] > .chart-body { min-height: 880px; }
+figure[data-chart-height="884"] > .chart-body { min-height: 884px; }
+figure[data-chart-height="1270"] > .chart-body { min-height: 1270px; }
+
+/* ---------- 8. Quote card（白底、上下 1px 细线、无背景色） ---------- */
+.quote-card {
+  margin: 26px 0;
+  padding: 18px 0 16px;
+  background: #fff;
+  border: 0;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+.quote-card p {
+  margin: 0 0 10px;
+  font-size: 16.5px;
+  font-style: italic;
+  line-height: 1.7;
+  color: var(--ink-md);
+}
+.quote-card p:last-child { margin-bottom: 0; }
+.quote-card cite,
+.quote-card .quote-src {
+  display: block;
+  margin-top: 10px;
+  font-family: var(--mono);
+  font-style: normal;
+  font-size: 10.5px;
+  line-height: 1.6;
+  color: var(--ink-lo);
+}
+
+/* ---------- 9. 表格（signals 等 DOM 表格；宽表用 .table-scroll 横向滚动） ---------- */
+.table-scroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+.table-scroll table { min-width: 640px; }
+
+.chart-body table,
+.table-scroll table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  line-height: 1.55;
+}
+.chart-body th,
+.table-scroll th {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  font-weight: 400;
+  letter-spacing: .06em;
+  text-align: left;
+  color: var(--ink-lo);
+  padding: 6px 10px 6px 0;
+  border-bottom: 1px solid var(--line);
+  white-space: nowrap;
+}
+.chart-body td,
+.table-scroll td {
+  padding: 7px 10px 7px 0;
+  border-bottom: 1px solid var(--line-lo);
+  color: var(--ink-md);
+  vertical-align: top;
+}
+
+/* ---------- 10. Tooltip（白底、深蓝文字、1px 细灰边、轻阴影；JS 以 left/top 定位） ---------- */
+#tooltip {
+  position: absolute;
+  z-index: 200;
+  max-width: 280px;
+  padding: 8px 11px;
+  background: #fff;
+  color: var(--ink);
+  font-family: var(--mono);   /* P2：全站 hover 出等宽 11px 深色 tooltip */
+  font-size: 11px;
+  line-height: 1.55;
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  box-shadow: 0 4px 14px rgba(5, 28, 44, .10);
+  pointer-events: none;
+}
+#tooltip .t-title { font-weight: 700; margin-bottom: 2px; }
+#tooltip .t-sub {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--ink-lo);
+  margin-top: 4px;
+}
+
+/* ---------- 11. Drill card（白底卡片；桌面居中，<768px 底部抽屉） ---------- */
+#drill-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 300;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(5, 28, 44, .32);
+}
+
+#drill-card {
+  position: relative;
+  width: 100%;
+  max-width: 560px;
+  max-height: 82vh;
+  overflow: auto;
+  background: #fff;
+  color: var(--ink);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  box-shadow: 0 12px 40px rgba(5, 28, 44, .14);
+  padding: 26px 28px 20px;
+}
+
+.drill-close {
+  position: absolute;
+  top: 8px;
+  right: 10px;
+  border: 0;
+  background: transparent;
+  font-family: var(--mono);
+  font-size: 18px;
+  line-height: 1;
+  color: var(--ink-lo);
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 3px;
+}
+.drill-close:hover { color: var(--ink); background: var(--paper-hi); }
+
+#drill-card .drill-title,
+#drill-card h4 {
+  font-family: var(--sans);
+  font-size: 19px;
+  font-weight: 700;
+  line-height: 1.35;
+  margin: 0 34px 10px 0;
+}
+#drill-card .drill-body {
+  font-size: 14.5px;
+  line-height: 1.7;
+  color: var(--ink-md);
+}
+#drill-card .drill-body p { margin: 0 0 10px; }
+#drill-card .drill-src {
+  margin-top: 12px;
+  padding-top: 8px;
+  border-top: 1px solid var(--line-lo);
+  font-family: var(--mono);
+  font-size: 10px;
+  line-height: 1.6;
+  color: var(--ink-lo);
+}
+
+/* ---------- 12. Dashboard HTML 层（#dash-html 覆盖在 globe canvas 之上） ----------
+   类名契约（dashboard.js 按此渲染）：
+   .dash-top > .dash-badge / .dash-title / .dash-stage / .dash-stages(>i|span.on)
+   .dash-spacer（中部留白，露出 canvas 地球）
+   .dash-bottom > .dash-mini(.dash-mini-title + .dash-mini-big(.v/.c) + svg + .dash-mini-read)
+                  / .dash-metrics>.dash-metric(.v+.l)
+                  / .dash-cohort>.dash-cohort-item(.on>.dash-cohort-sym+名) / .dash-cohort-legend
+                  / .dash-src（右栏底部来源行按钮）
+   pointer-events：容器 none，仅交互元素 auto，canvas 节点可 hover/click。
+--------------------------------------------------------------------------- */
+#dash-html {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  padding: 20px 22px 16px;
+  color: var(--ink);
+  pointer-events: none;
+}
+#dash-html a,
+#dash-html button,
+#dash-html .dash-cohort-item,
+#dash-html .dash-src-line,
+#dash-html [data-tip] {
+  pointer-events: auto;
+}
+
+.dash-top { flex: 0 0 auto; }
+
+.dash-badge {
+  display: inline-block;
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: .16em;
+  color: var(--blue);
+  border: 1px solid var(--blue);
+  border-radius: 999px;
+  padding: 1px 10px;
+  line-height: 1.6;
+  white-space: nowrap;
+}
+
+.dash-title {
+  font-family: var(--sans);
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1.3;
+  margin: 10px 0 2px;
+}
+
+.dash-stage {
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--ink-md);
+  margin: 0 0 6px;
+}
+
+/* 周期阶段指示器：细线段，当前段蓝色 */
+.dash-stages {
+  display: flex;
+  gap: 4px;
+  margin: 0 0 2px;
+}
+.dash-stages > i,
+.dash-stages > span {
+  flex: 1 1 0;
+  height: 2px;
+  background: var(--line-lo);
+  display: block;
+}
+.dash-stages > .on { background: var(--blue); }
+
+.dash-spacer { flex: 1 1 auto; min-height: 0; }
+
+.dash-bottom { flex: 0 0 auto; margin-top: auto; }
+
+/* mini chart：白底、细线、mono 小标签 */
+.dash-mini {
+  border-top: 1px solid var(--line-lo);
+  padding-top: 8px;
+  background: transparent;
+}
+.dash-mini-title {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: .04em;
+  color: var(--ink-lo);
+  margin: 0 0 4px;
+}
+.dash-mini svg { display: block; width: 100%; height: auto; }
+
+/* 大号蓝色关键数字（峰值/终点值 + 说明）：dashboard.js 内联兜底的正式类 */
+.dash-mini-big {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 2px 0 4px;
+}
+.dash-mini-big .v {
+  font-family: var(--mono);
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -.01em;
+  color: var(--blue);
+}
+.dash-mini-big .c {
+  font-family: var(--mono);
+  font-size: 9.5px;
+  letter-spacing: .04em;
+  color: var(--ink-lo);
+}
+
+/* 「如何阅读」一行：单位与口径说明 */
+.dash-mini-read {
+  font-family: var(--mono);
+  font-size: 9px;
+  line-height: 1.5;
+  color: var(--ink-lo);
+  margin-top: 3px;
+}
+
+/* 4 个 metric placard：2×2 网格，白底细线 */
+.dash-metrics {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px 14px;
+  margin-top: 10px;
+}
+.dash-metric {
+  border-top: 1px solid var(--line);
+  padding-top: 6px;
+  min-width: 0;
+}
+.dash-metric .v,
+.dash-metric .dash-metric-v {
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1.25;
+  color: var(--ink);
+}
+.dash-metric .l,
+.dash-metric .dash-metric-l {
+  font-family: var(--mono);
+  font-size: 9.5px;
+  line-height: 1.5;
+  color: var(--ink-lo);
+  margin-top: 2px;
+}
+
+/* 13-company cohort strip：纵向（符号图标上 / 公司名下横排）；
+   旧 ::before 圆点已移除——符号体系由 .dash-cohort-sym 接管
+   （JS 内联的 --line/--blue:transparent 兜底随之成为无害 no-op） */
+.dash-cohort {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 9px;
+  align-items: flex-start;
+  margin-top: 12px;
+  padding-top: 8px;
+  border-top: 1px solid var(--line-lo);
+}
+.dash-cohort-item {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  max-width: 64px;
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: .02em;
+  color: var(--ink-lo);
+  white-space: nowrap;
+}
+.dash-cohort-item.on { color: var(--ink); }
+
+/* cohort 符号：→=被收购 · L=被许可 · ×=解散 · 虚线框=成立前 · 实心=当前领先 · 点=活跃
+   （形状/颜色由 JS 按 data-sym 内联绘制，此处给布局与文字符号兜底） */
+.dash-cohort-sym {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 14px;
+  height: 12px;
+  line-height: 1;
+  flex: 0 0 auto;
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--ink-md);
+}
+.dash-cohort-item.on .dash-cohort-sym { color: var(--blue); }
+
+/* cohort 图例行：mono 8.5px 弱色 */
+.dash-cohort-legend {
+  flex: 1 1 100%;
+  margin-top: 6px;
+  font-family: var(--mono);
+  font-size: 8.5px;
+  line-height: 1.5;
+  letter-spacing: .02em;
+  color: var(--ink-lo);
+}
+
+/* 右栏底部来源行（按钮）：点击弹 drill 列出 mini 数据来源 */
+.dash-src {
+  display: block;
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: 0;
+  border-top: 1px solid var(--line-lo);
+  margin-top: 10px;
+  padding: 6px 0 0;
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: .04em;
+  line-height: 1.6;
+  color: var(--ink-lo);
+  cursor: pointer;
+}
+.dash-src:hover { color: var(--blue); }
+
+/* ---------- 13. Footer / 附录 · 来源与方法 ---------- */
+#appendix {
+  /* 不定宽：与 main 一致，占满数据面板左侧全部宽度 */
+  margin-right: var(--railw);
+  padding: 54px 0 96px;
+  background: #fff;
+  border-top: 1px solid var(--line);
+}
+#appendix .dek { margin-top: -4px; }
+
+#appendix h3 { margin: 30px 0 12px; }
+#appendix p { margin: 0 0 14px; color: var(--ink-md); font-size: 15px; }
+
+/* 方法/缺口说明条目 */
+#appendix ul {
+  list-style: none;
+  margin: 0 0 20px;
+  padding: 0;
+}
+#appendix ul li {
+  position: relative;
+  margin: 0 0 8px;
+  padding-left: 16px;
+  font-size: 15px;
+  line-height: 1.65;
+  color: var(--ink-md);
+}
+#appendix ul li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: .72em;
+  width: 6px;
+  height: 1px;
+  background: var(--ink-lo);
+}
+
+/* 来源分类列表：公司披露 / 券商研究 / 行业与官方 / 研究综合 */
+.src-list {
+  list-style: none;
+  margin: 0 0 22px;
+  padding: 0;
+}
+/* #appendix 提权：压过 #appendix ul li（短横标记/16px 缩进/15px 衬线） */
+#appendix .src-list li {
+  margin: 0;
+  padding: 9px 0;
+  border-bottom: 1px solid var(--line-lo);
+  font-family: var(--mono);   /* P2-③：footer 来源分组列表每条 mono 11px */
+  font-size: 11px;
+  line-height: 1.6;
+  color: var(--ink-md);
+}
+#appendix .src-list li::before { content: none; }   /* 不用 #appendix ul li 的短横标记 */
+#appendix .src-list .src-date { color: var(--ink-lo); white-space: nowrap; }
+.src-tag {
+  display: inline-block;
+  margin-right: 8px;
+  padding: 1px 7px;
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  font-family: var(--mono);
+  font-size: 9.5px;
+  letter-spacing: .06em;
+  line-height: 1.6;
+  color: var(--ink-lo);
+  vertical-align: 1px;
+  white-space: nowrap;
+}
+/* 来源类别着色：极少量使用，不成为页面主色 */
+.src-tag--company { color: var(--blue); border-color: var(--blue-lo); }   /* 公司披露 */
+.src-tag--broker  { color: var(--violet); border-color: var(--violet); }  /* 券商研究 */
+.src-tag--official{ color: var(--green); border-color: var(--green); }    /* 行业与官方 */
+.src-tag--synth   { color: var(--copper); border-color: var(--copper); }  /* 研究综合 */
+
+.appendix-meta {
+  margin-top: 26px;
+  padding-top: 14px;
+  border-top: 1px solid var(--line-lo);
+  font-family: var(--mono);
+  font-size: 10.5px;
+  line-height: 1.8;
+  color: var(--ink-lo);
+}
+
+/* ---------- 14. 响应式 ---------- */
+/* Dashboard 隐藏断点：1180px（不是 1024px） */
+@media (max-width: 1180px) {
+  body { --railw: 0px; }
+  #dash-rail { display: none; }
+  main { width: 100%; margin-right: 0; }
+  #era-rail { right: 0; }
+  #appendix { width: 100%; margin-right: 0; }
+}
+
+@media (max-width: 768px) {
+  html, body { overflow-x: hidden; }
+
+  body { font-size: 16px; }
+
+  /* Cover */
+  .cover-inner { padding: 9vh 20px 48px; }
+  .cover-title { font-size: 44px; line-height: 1.12; }
+  .cover-sub { font-size: 20px; }
+  .cover-lede { font-size: 16px; max-width: 100%; }
+  .cover-kicker { letter-spacing: .16em; }
+
+  /* 正文 */
+  h2 { font-size: 27px; }
+  h3 { font-size: 19px; }
+  .dek { font-size: 16.5px; }
+  .prose, .wide, .wide.xl { padding: 0 18px; }
+  .band { padding: 40px 0 46px; scroll-margin-top: 52px; }
+
+  /* 图表 100% 宽；宽表格横向滚动 */
+  .chart-frame { width: 100%; }
+  .chart-body { overflow-x: auto; }
+  .table-scroll { overflow-x: auto; }
+  .chart-pair { grid-template-columns: 1fr; }   /* 原版：<768px 图对转单列 */
+
+  /* Era rail 紧凑化 */
+  #era-rail { padding: 8px 12px; gap: 8px; }
+  .era-badge { font-size: 10px; padding: 0 8px; }
+  .era-seg { font-size: 8.5px; letter-spacing: 0; }
+
+  /* Drill card：底部抽屉 */
+  #drill-overlay { padding: 0; align-items: flex-end; justify-content: stretch; }
+  #drill-card {
+    max-width: none;
+    max-height: 76vh;
+    border-left: 0;
+    border-right: 0;
+    border-bottom: 0;
+    border-radius: 8px 8px 0 0;
+    padding: 22px 20px calc(18px + env(safe-area-inset-bottom, 0px));
+  }
+
+  /* Tooltip 改点击后的浮层约束 */
+  #tooltip { max-width: 76vw; }
+}
+
+/* ---------- 15. prefers-reduced-motion：停动画（JS 同时停 rAF 地球/cover） ---------- */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+  }
+  .scroll-hint::before { animation: none; opacity: .6; }
+}
+
+/* ---------- 16. 对标补齐（P1/P2）：VERDICT 芯片 / ANALYST NOTE / ◆ 来源 /
+   深藏青 drill 卡 / Dashboard 点阵 mini 与 cohort 符号 / 页脚 K 表 ----------
+   全部沿用既有 tokens（--ink/--blue/--neg/--copper/--mono 等），无新视觉语言。 */
+
+/* 16.1 VERDICT 芯片（P2：行首内联 VERDICT·FAILS/OPEN/LATE）
+   注意：:not(g) 守卫——assumptions 图 SVG 内有 <g class="verdict">，不可波及。 */
+.verdict:not(g) {
+  display: inline-block;
+  font-family: var(--mono);
+  font-size: 10.5px;
+  font-weight: 400;
+  letter-spacing: .18em;
+  line-height: 1.5;
+  border: 1px solid;
+  border-radius: 3px;
+  padding: 2px 7px;
+  margin-right: 8px;
+  vertical-align: 2px;
+  white-space: nowrap;
+}
+.v-fails:not(g) { color: var(--neg); border-color: var(--neg); }
+.v-open:not(g),
+.v-late:not(g) { color: var(--copper); border-color: var(--copper); }
+
+/* 16.2 ANALYST NOTE 注释框（P2：白底、上下 1px 细线、mono 10px 蓝标签+分隔线、内文 15px）
+   标签由 CSS ::before 自动生成「ANALYST NOTE」；HTML 侧若自带标签元素，加 .no-label 抑制。 */
+.analyst-note {
+  margin: 26px 0;
+  padding: 14px 0 16px;
+  background: #fff;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  font-size: 15px;
+  line-height: 1.65;
+  color: var(--ink-md);
+}
+.analyst-note::before {
+  content: "ANALYST NOTE";
+  display: block;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: .2em;
+  color: var(--blue);
+  padding-bottom: 8px;
+  margin-bottom: 10px;
+  border-bottom: 1px solid var(--line-lo);
+}
+.analyst-note.no-label::before { content: none; display: none; }
+.analyst-note .an-label {   /* 兼容显式标签元素 */
+  display: block;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: .2em;
+  color: var(--blue);
+  padding-bottom: 8px;
+  margin-bottom: 10px;
+  border-bottom: 1px solid var(--line-lo);
+}
+.analyst-note p { margin: 0 0 8px; }
+.analyst-note p:last-child { margin-bottom: 0; }
+
+/* 16.3 ◆ 来源按钮（P2-①：关键数字旁点出 {fact, cite} 出处卡）
+   行内小按钮：透明底无边框，--blue，hover 变 --blue-hi，对齐基线不撑行高。 */
+.src-dot {
+  display: inline-block;
+  -webkit-appearance: none;
+  appearance: none;
+  padding: 0 2px;
+  border: 0;
+  background: transparent;
+  font-family: var(--mono);
+  font-size: 9px;
+  line-height: 1;
+  color: var(--blue);
+  cursor: pointer;
+  vertical-align: 1px;
+}
+.src-dot:empty::before { content: "◆"; }
+.src-dot:hover { color: var(--blue-hi); }
+
+/* 16.4 深藏青 drill 卡（P0/P2：挂在 #drill-card 上；移动端底部抽屉行为不变） */
+#drill-card.drill-dark {
+  background: var(--ink);
+  color: #fff;
+  border-color: var(--ink);
+  border-radius: 6px;
+  box-shadow: 0 12px 32px rgba(5, 28, 44, .28);   /* 阴影克制 */
+}
+#drill-card.drill-dark .drill-title,
+#drill-card.drill-dark h4 { color: #fff; }
+#drill-card.drill-dark .drill-num,
+#drill-card.drill-dark .drill-big,
+#drill-card.drill-dark .drill-value {   /* 标题大数字：mono 28–34px --blue-lo */
+  font-family: var(--mono);
+  font-size: 30px;
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--blue-lo);
+  margin: 2px 0 8px;
+}
+#drill-card.drill-dark .drill-body { color: var(--paper-hi); }
+#drill-card.drill-dark .drill-body a { color: var(--blue-lo); }
+#drill-card.drill-dark .drill-src {     /* 来源行：mono 10px 灰蓝 */
+  border-top-color: rgba(255, 255, 255, .16);
+  color: var(--ink-lo);
+}
+#drill-card.drill-dark .drill-close {   /* 关闭按钮反色 */
+  color: rgba(255, 255, 255, .62);
+}
+#drill-card.drill-dark .drill-close:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, .08);
+}
+
+/* 16.5 Dashboard 点阵 mini 与 cohort 符号（P1；dashboard.js 内联 style 兜底的正式类） */
+.dash-halftone {                        /* 点阵 mini 容器：点阵面积+深色虚线趋势 */
+  border-top: 1px solid var(--line-lo);
+  padding-top: 8px;
+  margin-top: 10px;
+  background: transparent;
+}
+.dash-halftone svg { display: block; width: 100%; height: auto; }
+.dash-big {                             /* 大号蓝色关键数字（如 2026 · $8.4B） */
+  font-family: var(--mono);
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1.25;
+  color: var(--blue);
+  margin: 4px 0 2px;
+}
+.dash-howto {                           /* “How to read: …” 一行 */
+  font-family: var(--mono);
+  font-size: 9.5px;
+  line-height: 1.5;
+  color: var(--ink-lo);
+  margin: 2px 0 0;
+}
+.dash-src-line {                        /* 右栏底部来源行，可点击 hover 蓝 */
+  margin-top: 8px;
+  padding-top: 6px;
+  border-top: 1px solid var(--line-lo);
+  font-family: var(--mono);
+  font-size: 9px;
+  line-height: 1.6;
+  letter-spacing: .02em;
+  color: var(--ink-lo);
+  cursor: pointer;
+}
+.dash-src-line a,
+a.dash-src-line { color: var(--ink-lo); text-decoration: none; }
+.dash-src-line:hover,
+.dash-src-line a:hover,
+a.dash-src-line:hover { color: var(--blue); text-decoration: none; }
+
+/* cohort 队列条符号：→=被收购 · L=被许可 · ×=解散 · 虚线框=成立前 · 实心=当前领先 · 点=活跃 */
+.coh-sym {
+  display: inline-block;
+  min-width: 12px;
+  font-family: var(--mono);
+  font-size: 10px;
+  line-height: 1.2;
+  text-align: center;
+  color: var(--ink-md);
+}
+.coh-sym.on { color: var(--blue); }     /* 实心/当前领先 */
+.coh-name {                             /* 公司名 9px 横排（图标下） */
+  display: block;
+  font-family: var(--mono);
+  font-size: 9px;
+  line-height: 1.4;
+  letter-spacing: .02em;
+  color: var(--ink-lo);
+  white-space: nowrap;
+  writing-mode: horizontal-tb;
+}
+.coh-legend {                           /* 图例行 mono 9px 弱色 */
+  margin-top: 6px;
+  font-family: var(--mono);
+  font-size: 9px;
+  line-height: 1.6;
+  color: var(--ink-lo);
+}
+
+/* 16.6 页脚 K 表（P2-②：K1–K41 关键量化事实表；套 .table-scroll 横滚）与已退役行（P2-③）
+   选择器均以 #appendix 提权：压过 §9 .table-scroll table/th/td 与 #appendix p/ul li 基础规则 */
+#appendix .k-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--mono);
+  font-size: 11px;
+  line-height: 1.5;
+  color: var(--ink-md);
+}
+#appendix .k-table th {
+  font-weight: 400;
+  font-size: 10px;
+  letter-spacing: .08em;
+  text-align: left;
+  color: var(--ink-lo);
+  padding: 6px 12px 6px 0;
+  border-bottom: 1px solid var(--line);
+  white-space: nowrap;
+}
+#appendix .k-table td {
+  padding: 6px 12px 6px 0;
+  border-bottom: 1px solid var(--line-lo);
+  vertical-align: top;
+}
+#appendix .k-table td:last-child,
+#appendix .k-table th:last-child { white-space: nowrap; }   /* 来源日期列不换行 */
+#appendix .k-table .k-id,
+#appendix .k-table td.k-id { color: var(--blue); white-space: nowrap; }   /* K 编号列蓝 */
+
+#appendix .retired-line {               /* 已退役数字披露行 */
+  font-family: var(--mono);
+  font-size: 10.5px;
+  line-height: 1.6;
+  color: var(--ink-lo);
+  margin: 10px 0;
+}
+#appendix .retired-line del,
+#appendix .retired-line s { text-decoration: line-through; }
+#appendix .retired-line .retired-tag {  /* 或「已退役」标签 */
+  display: inline-block;
+  margin-left: 6px;
+  padding: 0 6px;
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: .1em;
+  line-height: 1.6;
+  color: var(--ink-lo);
+  vertical-align: 1px;
+  white-space: nowrap;
+}
+
+/* 16.7 响应式：<768px 新元素不溢出（几何契约 1180/768 不动） */
+@media (max-width: 768px) {
+  .analyst-note { margin: 22px 0; font-size: 14.5px; }
+  .verdict:not(g) { letter-spacing: .12em; padding: 2px 6px; }
+  #drill-card.drill-dark { border-radius: 6px 6px 0 0; }   /* 抽屉形态保留，圆角≤6px */
+  #appendix .k-table { font-size: 10.5px; }
+  #appendix .k-table th, #appendix .k-table td { padding-right: 10px; }
+  .coh-sym { min-width: 10px; }
+}

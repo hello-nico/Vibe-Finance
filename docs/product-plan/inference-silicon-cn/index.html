@@ -1,0 +1,891 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>推理芯片的四十二年 · 1985–2026 周期重建与行业深研</title>
+<meta name="description" content="交互式中文研究报告：以六个历史窗口重建 1985–2026 年推理芯片与定制计算的四十二年周期，比较需求点火、供应约束、重复下单、产能到达与出清的共同机制，压力测试 2027 年 ASIC 交叉点等三项共识，给出两种情景、+14% 失效阈值与八个季度监测触发器。仅供信息参考，不构成投资建议。">
+<link rel="icon" href="favicon.ico" type="image/x-icon">
+<link rel="stylesheet" href="css/fonts.css">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header id="cover">
+  <canvas id="cover-canvas" aria-label="封面动画：递归分割的芯片版图"></canvas>
+  <canvas id="cover-canvas-x" aria-label="封面动画：芯片封装分层爆炸图"></canvas>
+  <canvas id="cover-canvas-w" aria-label="封面动画：蓝图网格与走线"></canvas>
+  <div class="cover-inner">
+    <div class="cover-kicker">推理芯片 · 1985–2026 · 周期重建 × 行业深研</div>
+    <h1 class="cover-title"><span class="t-ink">推理芯片的</span><br><span class="t-blue">四十二年</span></h1>
+    <div class="cover-sub">这一次，真的不一样吗？</div>
+    <p class="cover-lede">从 1985 年 Xilinx XC2064 到 2026 年 TPU v8，围绕定制计算供应权的竞争已经持续四十余年。三代挑战者进入，两轮出清发生，而退出语法始终没有改变：并购，而非破产——途中有一例 Chapter 11 重整。本报告把四十二年切分为六个窗口，重建每个时点当时能够观察到的证据，并追问一个问题：2023–2026 年的推理芯片繁荣，究竟是旧周期的重演，还是一轮受新约束驱动的新周期？</p>
+    <div class="cover-chips">
+      <button type="button" class="chip" data-goto="#sec-frame">核心结论</button>
+      <button type="button" class="chip" data-goto="#sec-grave">生存者记录</button>
+      <button type="button" class="chip" data-goto="#sec-w3">最近历史类比</button>
+      <button type="button" class="chip" data-goto="#sec-w7">当前周期</button>
+      <button type="button" class="chip" data-goto="#sec-crossover">交叉点压力测试</button>
+      <button type="button" class="chip" data-goto="#sec-verdict">两种情景</button>
+      <button type="button" class="chip" data-goto="#sec-assumptions">三项大胆假设</button>
+      <button type="button" class="chip" data-goto="#sec-signals">八个触发器</button>
+    </div>
+    <div class="cover-anchor">交互式研究版 · 六个窗口，1985–2026 · 24 条一手资料引文，9 条完整呈现 · 每张图均可追溯至带日期来源 · 仅供信息参考，不构成投资建议</div>
+    <div id="cover-mode" role="tablist" aria-label="封面模式切换">
+      <span class="cover-mode-label">封面</span>
+      <button type="button" class="mode-btn" data-mode="a" role="tab" aria-selected="true" aria-pressed="true">A · 递归</button>
+      <button type="button" class="mode-btn" data-mode="b" role="tab" aria-selected="false" aria-pressed="false">B · 爆炸图</button>
+      <button type="button" class="mode-btn" data-mode="c" role="tab" aria-selected="false" aria-pressed="false">C · 蓝图</button>
+    </div>
+    <div class="scroll-hint"><span class="line"></span><span class="txt">SCROLL</span></div>
+  </div>
+</header>
+
+<nav id="era-rail" aria-label="历史时间轴">
+  <span class="era-badge" id="era-badge">1985</span>
+  <div class="era-track">
+    <span class="era-seg" data-sec="sec-w2" role="button" tabindex="0" aria-label="跳转到窗口一：1985–1995 FPGA 创立期"><span class="era-line"></span><span class="era-year">1985</span></span>
+    <span class="era-seg" data-sec="sec-w3" role="button" tabindex="0" aria-label="跳转到窗口二：1995–2003 繁荣与崩塌"><span class="era-line"></span><span class="era-year">1995</span></span>
+    <span class="era-seg" data-sec="sec-w4" role="button" tabindex="0" aria-label="跳转到窗口三：2004–2012 安静的十年"><span class="era-line"></span><span class="era-year">2004</span></span>
+    <span class="era-seg" data-sec="sec-w5" role="button" tabindex="0" aria-label="跳转到窗口四：2013–2018 点火"><span class="era-line"></span><span class="era-year">2013</span></span>
+    <span class="era-seg" data-sec="sec-w6" role="button" tabindex="0" aria-label="跳转到窗口五：2019–2022 短缺与并购超级周期"><span class="era-line"></span><span class="era-year">2019</span></span>
+    <span class="era-seg" data-sec="sec-w7" role="button" tabindex="0" aria-label="跳转到窗口六：2023–2026 当前周期"><span class="era-line"></span><span class="era-year">2023→26</span></span>
+  </div>
+</nav>
+
+<main id="article">
+
+<!-- §1 · 执行摘要 -->
+<section class="band" id="sec-frame">
+  <div class="prose">
+    <div class="sec-no">§1 · 执行摘要</div>
+    <h2>这一次，真的不一样吗？</h2>
+    <p class="dek">需求最接近 1995–2000 年光通信繁荣，但约束已经从晶圆厂迁移到 HBM、先进封装和电网；这是最接近的历史类比，也是没有真正先例的一轮周期。</p>
+    <p>本报告回答一个问题：2023–2026 年的推理芯片繁荣，是旧周期的再次上演，还是一轮受新约束驱动的新周期？方法不是预测，而是重建——把 1985–2026 年切成六个窗口，用 14 家公司样本与 K1–K41 数据注册表，还原每个时点当时能够观察到的证据，再比较需求点火、供应约束、重复下单、产能到达与行业出清这五个环节的共同机制。</p>
+    <p>阅读路径：§1–§2 给出结论与生存者记录；§3–§8 及挖矿插曲是六个窗口的历史重建；9a–9f 是对当前窗口的五项深入检验；S10 与 §9、§9b 完成压力测试与情景算术；§10–§11 给出可执行的监测表与公司深研。右侧数据面板随章节切换：地球节点、迷你图与四个指标，与当前章节一一对应。</p>
+    <p>需求侧的证据是硬数字。NVIDIA 数据中心业务收入从 2023 年 4 月季度（Q1 FY2024，42.8 亿美元）到 2026 年 4 月季度（Q1 FY2027，752 亿美元）增长约 17.6 倍——12 个季度间隔、13 个季度观测值（公司披露）<button type="button" class="src-dot" data-source="K10" aria-label="查看来源"></button>，这是半导体历史上从未出现过的斜率。需求高度集中：Microsoft、Alphabet、Amazon、Meta 四家云厂商贡献绝大部分增量，Top-4 合计资本开支 2025 年约 4,100–4,130 亿美元（编制估计）<button type="button" class="src-dot" data-source="K5" aria-label="查看来源"></button>，2026 年指引区间 6,950–7,250 亿美元<button type="button" class="src-dot" data-source="K5" aria-label="查看来源"></button>。买家只有 4–5 家，这是比 2000 年更高的集中度。</p>
+  </div>
+  <div class="wide xl">
+    <figure class="chart-frame" id="timeline42-chart" data-chart="timeline42" data-chart-height="504">
+      <h4 class="chart-title">四十二年，一条时间线</h4>
+      <p class="chart-sub">1985–2026 墙图 · 窗口底纹带 · 13 块事件牌匾 · 悬停查看事实，点击展开资料卡</p>
+      <div class="chart-body" role="img" aria-label="1985 至 2026 年推理芯片六窗口十三事件时间线图"></div>
+      <figcaption class="chart-src">来源：<span class="src-tag src-tag--synth">研究综合</span> 本报告 13 事件库（1985–2026），各事件出处与日期见点击详情 · 数据截至 2026-07-18</figcaption>
+    </figure>
+  </div>
+  <div class="prose">
+    <p>供给侧的证据更像历史。交期拉长、不可取消订单（NCNR）、长期供应协议与重复下单的迹象依次重现；不同之处在于约束的位置——2023 年是 GPU 板卡与晶圆产能，2024 年是 HBM 与 CoWoS 先进封装，2025–2026 年轮到电力与并网。约束沿供应链一站一站迁移，而不是消失。本轮需求与 1995–2000 年光通信繁荣的相似处在于：单一叙事点火、买家集中采购、订单被交期放大。</p>
+    <p>历史给过伤痕。2001 年半导体行业收入下降约 32%，FPGA 双寡头 Xilinx 与 Altera 各自下滑约 39%；从订单取消到收入确认再到库存出清，传导滞后约 9–12 个月——管理层在顶部仍在按旧需求扩产。同一套机制，点火、产能假设失效、恐慌性重复下单、大块产能到达、出清，在 1995–2003 与 2019–2022 两个窗口都完整走过一遍，只是振幅不同。</p>
+  </div>
+  <div class="wide">
+    <figure class="chart-frame" id="mechanism-chart" data-chart="mechanism" data-chart-height="460">
+      <h4 class="chart-title">周期机制：五段放大，一次断裂</h4>
+      <p class="chart-sub">需求点火 → 产能假设失效 → 恐慌性重复下单 → 大块产能到达 → 出清 · 悬停查看各阶段，点击展开资料卡</p>
+      <div class="chart-body" role="img" aria-label="半导体周期五阶段机制波形图：放大、断裂与研发穿越低谷的回路"></div>
+      <figcaption class="chart-src">来源：<span class="src-tag src-tag--synth">研究综合</span> 周期机制框架，基于 SIA/WSTS 行业数据与公司披露重建 · 2026-07</figcaption>
+    </figure>
+  </div>
+  <div class="prose">
+    <p>本轮周期与历史最不同的地方有三处：约束的最后一站落在电网（1995 年与 2019 年都不存在这一层）、买家集中到 4–5 家云厂商、以及第二轮云厂自研芯片同时进入量产。相同的地方更多：需求由单一叙事点火、产能假设正在经受检验、重复下单已经开始、而利润池始终位于最紧的那道关口。出清一旦发生，其语法大概率仍是并购而非破产——这是四十二年里没有改变过的一条。</p>
+    <h3>三项大胆假设，三种不同判定</h3>
+    <p>市场共识里藏着三项大胆假设，本报告逐条放到证据前检验：A1「利润跟随芯片」——<strong>不成立</strong>，利润池位于 HBM、先进制程与 CoWoS 等关口，而非云端（见 9e）；A2「2027 年 ASIC 单位出货超过 GPU」——<strong>无法判定</strong>，算术成立、模型支持，但公开证据未闭合（见 9c）；A3「需求可见至 2028 年」——<strong>延迟</strong>，已签约与指引给出的可见性目前只闭合到 2026–2027 年（见 S10）。</p>
+    <p>结论落在两种情景而非一个点位：Base case 定制硅加速器收入 2025→2028E 增长约 2.5 倍（区间 2.0–4.7x，美元口径）<button type="button" class="src-dot" data-source="K1" aria-label="查看来源"></button>，Conservative ≈2.0x（band 1.9–2.1x）；若 Top-4 2027 年资本开支同比增速低于 +14%，则切换至 Contraction 路径（−15% 至 −35%）。+14% 是本报告的 kill switch<button type="button" class="src-dot" data-source="K4" aria-label="查看来源"></button>——一个每季度可以复核的明确失效阈值，而不是一句模糊的"保持谨慎"。</p>
+    <p>阅读纪律：情景乘法只使用美元口径；TPU 等外部估计并列展示、不强行统一；缺失数据一律标「未披露」，不做插值；聚合与转载来源不进入情景计算；每张图表都在图注中给出四类来源（公司披露 / 券商研究 / 行业与官方 / 研究综合）与日期。本报告不提供买入、卖出或持有评级，不提供目标价。</p>
+    <aside class="analyst-note"><p>编辑注：事实带来源与日期，判定带复核规则；引用任何数字时请连同口径一起引用，剥离口径的单点重述均为误读。</p></aside>
+  </div>
+</section>
+
+<!-- §2 · 生存者 · 1975–2026 -->
+<section class="band" id="sec-grave">
+  <div class="prose">
+    <div class="sec-no">§2 · 生存者 · 1975–2026</div>
+    <h2>三代企业，同一种出清语法</h2>
+    <p class="dek">三代挑战者——可编程逻辑双寡头、定制 ASIC 设计商、AI 芯片创业公司——进场的方式各不相同，离场的方式却几乎一致：被并购，而不是破产清算。</p>
+    <p>本报告跟踪 14 家公司样本，时间跨度 1975–2026 年：从 LSI Logic 的门阵列，到 Xilinx 与 Altera 的 FPGA 双寡头，再到 2010 年后的一批 AI 芯片创业公司。把它们放进同一条时间泳道，终点结局分布为：6 家被并购、1 家资产出售、1 家完成许可交易、1 家完成 IPO、5 家保持独立、0 家解散清算——破产清算没有出现在任何一家的终点（Wave 在途中经过一次 Chapter 11）。这条规律是本报告判断下一轮出清形态的基准。</p>
+    <p>第一代是 FPGA 与定制逻辑的奠基者。Xilinx（1984 年成立）于 2022 年 2 月被 AMD 以约 490 亿美元交割价全股票收购（2020 年 10 月报价约 350 亿美元）；Altera（1983 年成立）于 2015 年被 Intel 以 167 亿美元现金收购，2025 年 9 月 16 日 Intel 又将 Altera 51% 股权售予 Silver Lake；LSI Logic（1981 年成立）在 2014 年被 Avago 以 66 亿美元收编。三家公司定义了定制计算的前三十年，也都在增长见顶或周期下行时选择出售，而不是硬撑到清算。</p>
+    <p>第二代是挑战双寡头的可编程逻辑创业公司。Tabula 以"三维可编程架构"高调融资逾 2 亿美元，2015 年 3 月关停——这是样本中少见的清算结局，但它从来不是龙头。Achronix 数次推迟上市、转向嵌入式 FPGA 授权，至今保持独立。挑战者输给双寡头的原因不在架构参数，而在工具链成熟度与客户转换成本。</p>
+    <p>第三代是 2010 年后的 AI 芯片创业潮。Habana Labs（2016 年成立）2019 年被 Intel 以约 20 亿美元收购；Graphcore 在 2022 年 10 月 7 日前后披露持续经营压力，2024 年 7 月出售给 SoftBank；Wave Computing（2008 年创立）2020 年进入 Chapter 11 破产重整，2021 年以 MIPS 复出，2025 年 8 月被 GlobalFoundries 收购——样本中唯一的破产法事件，最终仍走向出售。Groq 于 2025 年 12 月 24 日与 NVIDIA 达成非独占许可（据报道约 200 亿美元，CNBC 报道、未获 NVIDIA 确认，不进入情景计算），创始团队与工程师加入 NVIDIA，残余实体保持独立。Cerebras 于 2026 年 5 月完成 IPO（Nasdaq: CBRS，定价 185 美元，募资约 55 亿美元）。SambaNova、Tenstorrent 仍保持独立，持续观察。</p>
+  </div>
+  <div class="wide xl">
+    <figure class="chart-frame" id="clearing-chart" data-chart="clearing" data-chart-height="774">
+      <h4 class="chart-title">14 家公司，一种出清语法</h4>
+      <p class="chart-sub">1975–2026 · 成立 → 结局（并购 / 资产出售 / 许可 / IPO / 独立）· 悬停查看公司档案，点击展开资料卡</p>
+      <div class="chart-body" role="img" aria-label="14 家芯片公司生存者时间泳道图：成立年份、存续区间与结局分类"></div>
+      <figcaption class="chart-src">来源：<span class="src-tag src-tag--company">公司披露</span> 各公司公告与收购文件（1981–2026）；<span class="src-tag src-tag--synth">研究综合</span> 结局口径整理 · 数据截至 2026-07-18</figcaption>
+    </figure>
+  </div>
+  <div class="prose">
+    <p>汇总这张生存者记录：14 家样本中 6 家被并购、1 家资产出售、1 家完成许可交易、1 家完成 IPO、5 家仍独立，解散清算数为零；2016 年前后成立的那批 AI 芯片创业公司多数已有归宿；仍独立的五家各有各的未竟之局。出清很少以破产的形式到来——芯片公司的价值沉淀在团队、IP 与客户关系里，下行周期中收购方用股票或折价现金把这些资产整体接走，行业产能随之完成整并。这就是"并购，而非破产"的出清语法。</p>
+    <p>样本偏差需要声明：14 家样本不含未上市即悄然消失的早期项目——它们没有公告、没有披露，消失在统计之外。这会让"破产为零"的读数偏乐观；但结论的方向不变：成规模的头部公司，退出方式几乎总是出售与并购。</p>
+    <p>出清的语法为什么是并购？因为下行周期里买卖双方的分歧反而最容易弥合：卖方按峰值收入的心智定价，买方按整合后的协同定价，股票交易把两者的分歧"存"进对价里；而破产清算会把团队、IP 与客户关系瞬间清零——对现金充裕的平台公司而言，折价收购几乎是唯一理性的选择。出清语法不是行业文化，是估值结构。</p>
+    <p>决定生存的从来不是架构优劣，而是软件工具链与生态。FPGA 双寡头真正的护城河是综合与布局布线软件；NVIDIA 的护城河是 CUDA 及其开发者生态；第三代创业公司里，活得好的无一例外都先把软件栈补齐，倒下的多数倒在编译器与生态上，而不是倒在硅片上。购买芯片的客户本质上在购买未来五年的软件更新承诺。</p>
+    <p>出清之后，约束会迁移。每一轮整并把旧瓶颈消化掉——晶圆产能、封装产能、设计人才——同时把新的瓶颈推向更下游：今天轮到 HBM、先进封装与电网。下面这张流图把四十二年的约束迁移画在一起：利润池跟着约束走，而不是跟着芯片走。</p>
+  </div>
+  <div class="wide">
+    <figure class="chart-frame" id="conflow-chart" data-chart="conflow" data-chart-height="710">
+      <h4 class="chart-title">出清流：三代企业的去向</h4>
+      <p class="chart-sub">生命线路径 · 流带宽度=披露交易额 · ×=解散 · 圆点=IPO</p>
+      <div class="chart-body" role="img" aria-label="出清流桑基图：三代 14 家样本企业生命线汇入去向框，流带宽度为披露交易额，红叉为解散，圆点为已完成 IPO"></div>
+      <figcaption class="chart-src">来源：<span class="src-tag src-tag--company">公司披露</span> 并购交易公告与财报披露（2015–2026，金额按披露口径，未披露为细流带）· Cerebras IPO（2026-05，Nasdaq: CBRS）；<span class="src-tag src-tag--synth">研究综合</span> 14 家样本整理至 2026-07-18</figcaption>
+    </figure>
+  </div>
+  <div class="prose">
+    <p>对当前周期的直接含义：如果 2027 年前后发生出清，最可能的形式不是创业公司成片倒闭，而是又一轮并购超级周期——现金充裕的平台型公司收编设计团队与订单管线，正如 2015–2020 年发生过的那样。判断谁能活下来，看软件生态与现金流量表，不看架构参数表；判断谁会被接走，看团队与在制项目，不看流片次数。</p>
+  </div>
+</section>
+
+<!-- §3 · 窗口一 · 1985–1995 · FPGA 创立期 -->
+<section class="band" id="sec-w2">
+  <div class="prose">
+    <div class="sec-no">§3 · 窗口一 · 1985–1995 · FPGA 创立期</div>
+    <h2>“更好的 ASIC”：定位本身就是战略</h2>
+    <p class="dek">1985 年，Xilinx 用一颗约千门级的芯片回答了一个当时没人提出的问题：如果逻辑可以在出厂之后反复改写，ASIC 的固定成本还合理吗？</p>
+    <p>窗口一的主角是两家几乎同时成立的公司。Altera 于 1983 年、Xilinx 于 1984 年相继创立，前者从可编程逻辑器件（PLD）起步，后者在 1985 年推出 XC2064——业界第一颗商用现场可编程门阵列（FPGA）。XC2064 只有约千门级规模，性能与密度都远逊于同期门阵列 ASIC，但它做对了一件事：把"流片之后才定义功能"变成了产品。</p>
+    <p>把 XC2064 放回当时的经济环境里看：2 微米 CMOS 工艺、64 个可配置逻辑块，单位逻辑成本比门阵列高出数倍。客户之所以买单，算的是另一本账——一次流片失败的掩膜损失、数月的上市延迟、需求变化时的库存报废。FPGA 从第一天起卖的就是"风险定价"，而不是"性能定价"；这套定价逻辑，四十年后在 TPU 与 Trainium 的商业论证里原样重现。</p>
+    <p>当时的市场结构对比悬殊。定制 ASIC 是数十亿美元量级的市场，由 LSI Logic 等厂商主导；可编程逻辑的整体规模只有几亿美元。正面对抗没有胜算，Xilinx 的选择是把 FPGA 定位成"更好的 ASIC"——不是更快的 ASIC，而是更容易进入的 ASIC：没有动辄数十万美元的掩膜费用，没有数月的流片周期，没有设计失误即报废的库存风险。</p>
+    <p>这是教科书式的低端进入。FPGA 先服务 ASIC 看不上的场景：原型验证、小批量设备、需求多变的工业与军工客户。这些客户对单位成本不敏感，对上市时间与设计风险极度敏感。一旦在这些场景站稳，制程每前进一代、门密度翻一倍，FPGA 的适用边界就向中端 ASIC 市场推进一步——蚕食从底部开始，缓慢但不可逆。</p>
+    <p>Xilinx 同时是 fabless 模式的早期样本。它不建晶圆厂，把制造外包给代工伙伴，自己专注架构与开发软件。轻资产结构让它挨过了 1980 年代末的行业衰退，也让"设计公司 + 代工厂"的分工在十年后成为行业默认——今天所有 AI ASIC 玩家沿用的仍是这条路径。</p>
+    <blockquote class="quote-card">
+      <p>Ross Freeman 为 XC2064 做的定位是商业判断而非物理参数：这颗芯片在每一项单位门指标上都落败，却赢在了日历上——一个定制逻辑项目，从九个月的掩膜流片压缩到一个下午的桌面工作。Xilinx 1985 年 11 月 1 日的发布稿将 XC2064 称为「ASIC 的一个新品类」（"a new class of ASIC"）——公司把自己的可编程产品定位成 ASIC 的替代品，而不是它的穷亲戚。（转述）</p>
+      <cite><span class="src-tag src-tag--company">公司披露</span>—— Ross Freeman，Xilinx 联合创始人，谈 XC2064 定位；引文出自 Xilinx XC2064 发布稿，1985-11-01</cite>
+    </blockquote>
+    <p>窗口一的前半段，可编程逻辑的主战场其实是结构更简单的 PLD——Altera 靠 EP 系列站稳，Xilinx 的 FPGA 一度被质疑过于复杂、过于昂贵。转折发生在 1980 年代末：门密度跨过实用阈值后，FPGA 开始承接 PLD 放不下的设计，品类边界被重新定义。1994 年 Xilinx 取得 PLD 市场领先，本质上是用 FPGA 的工具链把两个品类的客户合并到了一起。</p>
+    <p>到 1994 年，Xilinx 取得 PLD 市场的领先地位，可编程逻辑从 ASIC 的附庸变成独立品类。窗口一结束时双寡头格局已经成型：两家公司共享大部分市场，工具链开始累积，客户开始被转换成本锁定。此后三十年，这个格局几乎没有被任何第三方真正撼动过。</p>
+    <p>窗口一给全报告留下两条线索。其一，定制计算的竞争从一开始就是"固定成本与灵活性"的定价问题——今天的 GPU 与 ASIC 之争仍是同一个问题的新版本。其二，定位本身就是战略：XC2064 不是一颗更好的芯片，而是一个更好的进入点；后来的 TPU 与 Trainium，都是用同样的方式进入的。</p>
+    <p>同样值得注意的是双寡头的价格纪律：从窗口一开始，两家公司就避免了毁灭性价格战——差异化的工具链与客户转换成本，让"降价换份额"变得低效。竞争被引导到制程、架构与软件上，而不是价格上。这为整个品类保住了穿越出清所需的利润空间，也是可编程逻辑领域从未出现龙头破产的微观原因之一。</p>
+  </div>
+</section>
+
+<!-- §4 · 窗口二 · 1995–2003 · 繁荣与崩塌 -->
+<section class="band" id="sec-w3">
+  <div class="prose">
+    <div class="sec-no">§4 · 窗口二 · 1995–2003 · 繁荣与崩塌</div>
+    <h2>−39%：同一次冲击，四种不同伤痕</h2>
+    <p class="dek">1995–2000 年的通信繁荣把 FPGA 双寡头推上历史高点；2001 年，同一批客户、同一套不可取消订单，把它们一起拖进约 −39% 的收入修正。</p>
+    <p>窗口二的点火者是互联网骨干网。1995 年后，路由器、光传输设备与基站建设同步启动，通信设备商成为 FPGA 最大的买家——高峰时期通信占到双寡头需求的一半以上。客户集中度是后来一切放大器的第一环：订单收缩时，它不是线性回落，而是整排客户同时转向。</p>
+    <p>订单机制把繁荣放大成泡沫。交期从 8 周拉长到 20 周以上，客户的理性反应是重复下单——同一块板子的需求同时发给原厂与多家分销商，谁的货先到就用谁的，其余取消。不可取消订单（NCNR）条款随后被引入自保，账面订单因此被进一步垫高：真实需求在每个环节各被数了一遍。</p>
+    <p>事后看，2000 年的顶部并非没有信号：分销商库存周数连续上升、半导体订单出货比（book-to-bill）从高点回落、客户开始取消"加急"订单。但当时每个信号都有合理化的解释——"季节性调整""客户在切换平台""新的下单模式"。顶部从来不是被数据宣布的，而是被叙事延迟的；这条经验直接写进了 §10 触发器表的设计里。</p>
+    <p>2000 年，电信资本开支见顶，订单先于收入消失。2001 年，半导体行业收入下降约 32%（WSTS/SIA 口径）<button type="button" class="src-dot" data-source="K17" aria-label="查看来源"></button>；Xilinx 与 Altera 各自下滑约 39%。同一次 −39% 落在四类玩家身上却是四种伤痕：双寡头靠软件工具链与客户粘性率先修复；通信设备商带着巨额库存减值退场；代工厂吞下产能利用率的深坑；分销商在应收账款里完成出清。</p>
+    <p>不可取消订单条款在繁荣期是供应商的护身符，在崩塌期变成客户的负担：订单不能取消，只能推迟交付，于是库存先从晶圆厂转移到客户仓库，再从客户仓库转移到减记公告里。2001–2002 年，通信设备商的库存减记以数十亿美元计——账面需求的清算，最终都经过库存科目完成。订单簿不会说谎两次：先虚增，后减记。</p>
+    <p>滞后是这一课的核心数字：从订单取消，到收入确认，再到库存出清，传导需要约 9–12 个月。管理层在 2000 年下半年仍按旧需求扩产，新产能恰好在需求谷底投产——产能到达的时点由 12–18 个月前的假设决定，而假设总是死于顶部。这条滞后结构在 2023–2026 年没有任何改变，只是产能的形态从晶圆换成了 HBM 与先进封装。</p>
+    <p>同样是约 −39% 的收入冲击，双寡头的修复路径并不相同：Xilinx 靠更激进的制程迁移与通信以外市场的分散，率先回到增长轨道；Altera 的产品代际节奏稍慢，两家份额在随后几年此消彼长。同样的冲击、不同的伤痕、不同的恢复曲线——这正是把"出清"拆到环节与公司层面观察、而不是只看行业总量的原因。</p>
+    <blockquote class="quote-card">
+      <p>时任 Xilinx CEO 的 Wim Roelandts 对 2001 年崩落的记述是：这不是一次普通的减速——订单不是下滑，而是停止；为扩产备下的库存，从此变成要管理的问题。备案记录留着他所描述的繁荣形状：Xilinx 收入从 FY1999 的 6.62 亿美元爬到 FY2000 的 10.2 亿、FY2001 的 16.6 亿美元——然后重置到来。（转述）</p>
+      <cite><span class="src-tag src-tag--company">公司披露</span>—— Wim Roelandts，Xilinx CEO，谈 2001 年重置；收入数字见 Xilinx 10-K（FY1999–FY2001，SEC EDGAR）</cite>
+    </blockquote>
+    <p>崩塌没有阻止工艺演进。2003 年，约 1,200 万门级别的 FPGA 进入出货，把可编程逻辑推进通信之外的计算场景。研发穿越低谷——这正是机制图中那条从出清返回点火的大回路在真实历史中的样子：低谷期的研发投入，决定下一轮周期的技术底座。</p>
+    <p>窗口二留下三条可复用的规律：客户集中度决定出清的同步性；交期是需求的多重放大器；出清沿供应链传导时，每一环的伤痕形状都不相同。2023 年之后重读这一节，请把"通信设备商"替换成"云厂商"，把"光模块"替换成"GPU 系统"——语法完全一致。</p>
+  </div>
+</section>
+
+<!-- §5 · 窗口三 · 2004–2012 · 安静的十年 -->
+<section class="band" id="sec-w4">
+  <div class="prose">
+    <div class="sec-no">§5 · 窗口三 · 2004–2012 · 安静的十年</div>
+    <h2>先部署，后披露</h2>
+    <p class="dek">2004–2012 年，行业最重要的动作发生在水面之下：Microsoft 在数据中心里部署了 1,632 台 FPGA 服务器，直到 2014 年才告诉世界。</p>
+    <p>这十年表面安静，双寡头的竞争收敛到两条主线：制程与工具链。2011–2012 年，Xilinx 与 Altera 相继推出 28nm 系列（Virtex-7 与 Stratix-V），把 FPGA 的密度与功耗比推进一个世代；同一时期，综合、布局布线与时序分析软件持续加厚，工具链成为真正的进入壁垒——挑战者可以买 IP，买不到十年积累的软件。</p>
+    <p>28nm 节点是 FPGA 历史的分水岭之一：这一代产品把高速收发器、DSP 资源与功耗效率推到可以承接通信与计算混合负载的水平，单颗芯片的售价台阶随之上移。双寡头在 28nm 上的量产时间差以季度计——谁早一个季度量产，谁就拿走高端通信客户的下一代平台；制程竞赛的本质，是争夺客户平台的"换代表决权"。</p>
+    <p>经济账在这一窗口被悄然改写。先进制程的掩膜与设计成本飙升，一颗主流 ASIC 的一次性工程费用（NRE）抬升到千万美元量级，定制硅的经济门槛越来越高；中等批量的应用开始回流 FPGA。定制计算没有消失，只是性价比平衡点移动了——这为后来的云端加速器埋下伏笔。</p>
+    <p>安静十年的另一面是需求结构的去集中化：通信占比缓慢下降，工业、汽车、测试测量与军工稳步上升。这并非主动多元化，而是通信客户在 2001 年之后收紧资本开支纪律的结果。去集中化降低了下一轮冲击的同步性——对照今天 4–5 家云买家的结构，方向恰好相反：本轮周期的集中度风险，比 2000 年更高。</p>
+    <p>水面之下的关键事件发生在 Microsoft。其研究院的 Catapult 项目先在 2010–2011 年完成小规模试点，验证用 FPGA 加速 Bing 搜索排序的可行性；2012 年底，Microsoft 在生产数据中心部署了 1,632 台搭载 FPGA 的服务器，构成当时全球最大规模的 FPGA 加速集群之一。</p>
+    <p>部署被严格保密。直到 2014 年，Microsoft 才在 ISCA 会议上发表论文披露：FPGA 加速使 Bing 排序吞吐量接近翻倍，而每台服务器新增成本被控制在可接受范围内。行业第一次确认——可编程逻辑可以作为数据中心的一级加速层，而不只是通信设备的配件。</p>
+    <p>Catapult 的工程选择值得细看：每台服务器插入一张 FPGA 加速卡，卡间通过私有协议互联成资源池，平时承担 Bing 排序的特征计算，需要时可以整体重配置为其他加速功能。"可重配置"是它与同期 ASIC 方案的本质区别——Microsoft 买的不是一颗固定功能的芯片，而是一层可以随算法演进的数据中心基础设施。</p>
+  </div>
+  <div class="wide">
+    <figure class="chart-frame" id="submarine-chart" data-chart="submarine" data-chart-height="420">
+      <h4 class="chart-title">潜水艇：部署与披露之间的两年</h4>
+      <p class="chart-sub">2010–2014 · Catapult 隐蔽期水位线 · 悬停查看各时点，点击展开资料卡</p>
+      <div class="chart-body" role="img" aria-label="Catapult 项目从 2010 试点、2012 年底部署 1,632 台到 2014 披露的隐蔽期示意图"></div>
+      <figcaption class="chart-src">来源：<span class="src-tag src-tag--company">公司披露</span> Microsoft Catapult 论文，ISCA（2014-06）；部署时点为 2012 年底 · 研究综合整理</figcaption>
+    </figure>
+  </div>
+  <div class="prose">
+    <blockquote class="quote-card">
+      <p>「我们在一个由 1,632 台服务器组成的基座上，描述了这种可重构 Fabric 的中等规模部署。」在高负载下，该 Fabric「把每台服务器的排序吞吐量提升 95%（固定延迟分布下）——或者说，在保持同等吞吐量的同时，把尾延迟降低 29%」。（原文：“We describe a medium-scale deployment of this fabric on a bed of 1,632 servers… improves the ranking throughput of each server by a factor of 95% for a fixed latency distribution — or, while maintaining equivalent throughput, reduces the tail latency by 29%.”）</p>
+      <cite><span class="src-tag src-tag--company">公司披露</span>—— Andrew Putnam、Adrian Caulfield 等，Microsoft Research，ISCA 论文《A Reconfigurable Fabric for Accelerating Large-Scale Datacenter Services》，2014-06</cite>
+    </blockquote>
+    <p>"先部署，后披露"从此成为行业范式：TPU 在 2015 年部署、2016 年公开；Trainium 与 MTIA 沿用同一节奏。外部观察者看到的公告永远滞后真实部署 1–4 年。这条经验在本报告的语境里意味着：今天云厂商自研芯片的真实进度，大概率比公开路线图更靠前。</p>
+    <p>窗口三的另一面是集中度的代价。双寡头之外，同期高调融资的挑战者 Tabula 于 2015 年初关停——架构差异化没有换来软件生态，也就没有换来客户。安静的十年其实只做了一件事：把进入壁垒从硅搬到了软件。</p>
+  </div>
+</section>
+
+<!-- §6 · 窗口四 · 2013–2018 · 点火 -->
+<section class="band" id="sec-w5">
+  <div class="prose">
+    <div class="sec-no">§6 · 窗口四 · 2013–2018 · 点火</div>
+    <h2>TPU 与 167 亿美元支票：两种答案，同一场考试</h2>
+    <p class="dek">同一道考题——深度学习需要多少定制计算——Google 用一次静默部署作答，Intel 用一张 167 亿美元的支票作答。</p>
+    <p>2012 年 AlexNet 之后，深度学习以远超预期的速度进入数据中心。训练侧，GPU 迅速成为默认设备；推理侧，账开始算不过来：模型每大一点，推理成本就吃掉产品毛利多一点。到 2013–2014 年，"要不要为推理做定制芯片"成为每一家大型云厂商桌面上的同一道考题。</p>
+    <p>Google 的答案是自研。2013 年立项，2015 年 TPU v1 已经在生产数据中心承载真实推理流量——部署先于披露整整一年。2016 年 5 月，Google 公开 TPU 的存在；2017 年 4 月，ISCA 论文给出完整数据：这颗为推理定制的脉动阵列芯片，能效比同期 CPU 与 GPU 高出一个数量级。</p>
+    <p>ISCA 论文里最有说服力的不是峰值性能，而是替代成本的反推：Google 披露，如果没有 TPU，仅凭当时的 CPU 与 GPU 承载 2015 年的推理负载，需要的将是数倍的数据中心投入。定制芯片的经济性不是节省几个百分点的电费，而是让一类产品在成本上变得可行——这与 XC2064 当年的"风险定价"遥相呼应：都是把不可行的成本结构变成可行的。</p>
+    <p>TPU v1 的意义不在参数，而在证明：一家云厂商可以绕过芯片公司，为自己的负载定制硅片，并且比通用方案便宜一个量级。这是"更好的 ASIC"战略在三十年后的回响——只不过这一次，进入者不再是芯片公司，而是客户自己。</p>
+    <blockquote class="quote-card">
+      <p>「我们已经在自己的数据中心里运行 TPU 一年多了，实测它们为机器学习带来的每瓦性能优化高出一个数量级。」（原文：“We've been running TPUs inside our data centers for more than a year, and have found them to deliver an order of magnitude better-optimized performance per watt for machine learning.”）</p>
+      <cite><span class="src-tag src-tag--company">公司披露</span>—— Norm Jouppi，Google 杰出硬件工程师，官方博客《Google supercharges machine learning tasks with custom chip》，2016-05-18</cite>
+    </blockquote>
+    <blockquote class="quote-card">
+      <p>「Intel 的增长战略，是把我们的核心资产扩展到有利可图、相互补充的细分市场。通过这次收购，我们将借助摩尔定律的力量，让下一代解决方案不只是更好，而是能做更多事。」（原文：“Intel's growth strategy is to expand our core assets into profitable, complementary market segments. With this acquisition, we will harness the power of Moore's Law to make the next generation of solutions not just better, but able to do more.”）</p>
+      <cite><span class="src-tag src-tag--company">公司披露</span>—— Brian Krzanich，Intel CEO，167 亿美元收购 Altera 新闻稿，2015-06-01</cite>
+    </blockquote>
+  </div>
+  <div class="wide">
+    <figure class="chart-frame" id="tpu-chart" data-chart="tpu" data-chart-height="430">
+      <h4 class="chart-title">TPU 代际：先部署，后披露</h4>
+      <p class="chart-sub">log 轴 peak compute · 精度口径不直接可比 · 约 12 个月迭代节奏</p>
+      <div class="chart-body" role="img" aria-label="TPU 2015 年至 2026 年代际演进图：v1 到 v8 对数轴峰值算力，含部署与披露时点"></div>
+      <figcaption class="chart-src">来源：<span class="src-tag src-tag--company">公司披露</span> Google 官方博客（2016-05）、ISCA 论文（2017-04）、Ironwood 发布（2025-04）、TPU 8t/8i（2026-04-22）等；<span class="src-tag src-tag--synth">研究综合</span> 代际整理至 2026-07</figcaption>
+    </figure>
+  </div>
+  <div class="prose">
+    <p>Intel 的答案是并购。2015 年 6 月 1 日，Intel 宣布以 167 亿美元现金收购 Altera——当时其历史上最大的收购之一，同年 12 月完成。逻辑清晰：数据中心正在定制化，FPGA 是加速层的最短路径，买下第二名比自建更快。事后回看，整合远未达预期：FPGA 事业部在 Intel 体系内数次重组，2025 年 9 月 16 日 Intel 将 Altera 51% 股权售予 Silver Lake；而真正的 AI 加速红利流向了 GPU 与云厂自研 ASIC。</p>
+    <p>两种答案的对照值得停下来看。Google 用一支小团队和两年静默，换来了延续至今的八代 TPU；Intel 用 167 亿美元，换来一个需要持续修补的业务部门。同一场考试的评分标准不是预算，而是谁离自己的负载更近——定制计算的优势从来建立在"确切知道负载长什么样"之上，这一点买不来。</p>
+    <p>这一窗口还有一条伏线：CUDA。NVIDIA 在此时期把十年积累的软件生态变成真正的护城河——训练框架、算子库、开发者社区全部围绕 CUDA 生长。此后所有挑战者的结局，几乎都可以从"是否正面撞上 CUDA"来预判：绕开它做推理定制的活了下来，正面硬拼训练市场的多数倒下。</p>
+    <p>窗口四的结局：定制计算从边缘议题变成云厂商的战略核心；2016 年前后，一批 AI 芯片创业公司（Habana、Graphcore、Groq 等）拿到大额融资，AI ASIC 的第一轮创业潮开启。点火完成。</p>
+  </div>
+</section>
+
+<!-- §7 · 窗口五 · 2019–2022 · 短缺与并购超级周期 -->
+<section class="band" id="sec-w6">
+  <div class="prose">
+    <div class="sec-no">§7 · 窗口五 · 2019–2022 · 短缺与并购超级周期</div>
+    <h2>定时装置</h2>
+    <p class="dek">短缺、不可取消订单，和 108 天里的五笔大型交易——这十年最拥挤的一次产能假设失效，被精确地写进了日历。</p>
+    <p>2019 年，行业先经历了一轮库存修正与贸易摩擦扰动；2020 年疫情到来，需求先崩后爆——远程办公、云服务、游戏与矿机同时拉货，而产能按疫情前的假设排布。产能假设失效，定时装置开始计时。</p>
+    <p>2021 年，芯片交期拉长到 36–52 周（行业追踪口径），不可取消订单（NCNR）重现，长期供应协议与预付款成为拿货的标准条件。这套语法与 2000 年完全同构：交期是放大器，重复下单是理性反应，账面需求再一次高于真实需求——区别只是这一轮连汽车厂都被卷了进来。</p>
+    <p>36–52 周的交期改变了买家的行为模式：下单从"按需求"变成"按配额博弈"——客户多报需求以争取分配额度，供应商按订单簿而非真实需求排产。双方都知情，也都无法单独停下：先按真实需求下单的一方，会在分配中吃亏。这是典型的囚徒困境，也是重复下单在每个短缺周期必然重现的机制根源——它不需要任何人犯错，只需要所有人理性。</p>
+    <p>并购超级周期在顶部到来。2020 年 7 月到 10 月的 108 天里，五笔大型交易密集宣布：Analog Devices 收购 Maxim（约 210 亿美元，7 月 13 日）；NVIDIA 宣布收购 Arm（400 亿美元，9 月 13 日，后于 2022 年 2 月终止）；SK hynix 收购 Intel NAND 业务（90 亿美元，10 月 20 日）；AMD 全股票收购 Xilinx（约 350 亿美元，10 月 27 日）；Marvell 收购 Inphi（约 100 亿美元，10 月 29 日）。</p>
+    <p>五笔交易的后续结局同样值得记录：NVIDIA 对 Arm 的收购在多国监管反对下于 2022 年 2 月终止，Arm 转而独立上市；AMD 对 Xilinx 的全股票交易于同月以约 490 亿美元完成交割（2020 年 10 月报价约 350 亿美元），成为 AMD 数据中心叙事的核心资产；ADI/Maxim、Marvell/Inphi、SK hynix/Intel NAND 相继完成。顶部宣布的交易，一半靠股票的高估值成全，一半由监管的态度决定去留。</p>
+    <p>为什么并购集中在顶部？因为上行周期里股票是最好的货币，而"供应权"比短期利润更值钱。AMD 用股票买下了 FPGA 的第一名；NVIDIA 试图买下整个生态的底座。出清语法在上行期同样成立——只是方向相反：不是弱者退出，而是强者整军。</p>
+    <p>2022 年 10 月 7 日，周期在高点撞上两件事：美国对华先进计算出口管制新规落地，切断部分需求的地理流向；同一时点前后，Graphcore 披露持续经营压力与融资困境——AI 芯片创业潮出现第一个明确裂痕。六周之后，ChatGPT 发布（2022-11-30），需求叙事被彻底改写：上一轮短缺的库存尚未消化完，下一轮点火已经开始。</p>
+    <p>窗口五的结局：短缺没有给新进入者带来持久份额，带来的是集中度的进一步提高，和在高点完成的昂贵整合。定时装置的读数留给了窗口六：当重复下单堆出的订单簿遇到新的需求叙事，哪些是真的，哪些要还？</p>
+  </div>
+</section>
+
+<!-- 插曲 · 2017–2022 · 挖矿镜像 -->
+<section class="band" id="sec-mining">
+  <div class="prose">
+    <div class="sec-no">插曲 · 2017–2022 · 挖矿镜像</div>
+    <h2>加密货币孵化了定制芯片，又让它两次坠落</h2>
+    <p class="dek">加密货币把定制 ASIC 的效率逻辑推到极限，又两次把它摔在地上——这是一面关于"单一负载定制芯片"的镜子。</p>
+    <p>挖矿是定制芯片的极限形态。SHA-256 算法十年不变，负载单一、可预测、对能效极度敏感——恰好是 ASIC 最理想的战场。Bitmain 2013 年成立，凭 Antminer 系列在 2017–2018 年的币价繁荣中收入爆发，一度成为全球最大的挖矿芯片与矿机厂商，2018 年 9 月向港交所递交招股书。</p>
+    <p>挖矿 ASIC 的工艺军备竞赛常被低估：币价繁荣期，矿机芯片是最早批量采用最先进制程的产品之一——16nm、7nm 矿机芯片的量产时点甚至早于多数手机芯片。逻辑很直接：电费占挖矿运营成本的大头，制程每前进一代，同样的电力挖出更多的币。能效就是利润率，这让矿机厂商对先进制程的支付意愿超过当时几乎所有行业。</p>
+    <p>镜像的第一面是熟悉的周期语法。需求由币价点火；矿机以期货模式销售——先收款、后交付，订单被币价预期而非真实算力需求驱动；繁荣期矿机芯片挤占代工厂产能。2017 年 12 月比特币见顶约 1.97 万美元，2018 年币价自高点回落约八成，Bitmain 招股书披露了巨额存货减值，IPO 于 2019 年 3 月失效。产能假设失效、库存出清，一样不少。</p>
+    <p>期货销售把周期放大器装进了商业模式本身：矿机按"数月后的算力"定价预售，币价上涨时，矿工为锁定未来算力支付溢价，订单量领先真实需求；币价下跌时，已付款的订单变成沉没成本，矿机厂商手里的排产承诺变成库存。价格信号跳过时间差，直接打击产能假设——这比一般的交期放大更凶猛，因为连回款都是提前的。</p>
+    <p>Bitmain 后来的轨迹是这面镜子的另一半：招股书失效后，公司尝试向 AI 芯片转型，但矿机时代的现金流结构、客户构成与软件积累都难以平移。单一负载公司在周期顶部攒下的利润，并不自动兑换成下一个周期的入场券。</p>
+    <p>NVIDIA 的两次库存冲击是这面镜子的另一部分。第一次是 2019 年：上一轮币价崩塌后，挖矿显卡需求骤停，渠道库存高企，游戏业务连续数个季度下滑——管理层在财报电话会上称之为 "crypto hangover"（加密货币宿醉）。第二次是 2021–2022 年：比特币 2021 年 11 月见顶约 6.9 万美元，以太坊 2022 年 9 月合并转向权益证明（PoS），GPU 挖矿需求结构性归零，叠加币价下跌，游戏收入再次大幅修正。</p>
+    <blockquote class="quote-card">
+      <p>「加密货币宿醉持续的时间比我们预期的更长。价格跌下去之后，我们原以为需求会更快回来。」（原文：“The crypto hangover lasted longer than we expected. When prices went down, we expected demand to pick up more quickly.”）</p>
+      <cite><span class="src-tag src-tag--company">公司披露</span>—— Jensen Huang，NVIDIA 创始人兼 CEO，Q3 FY2019 财报电话会，2018-11-15</cite>
+    </blockquote>
+    <p>两次冲击的教训被认真研究过。NVIDIA 此后在财报中淡化挖矿相关敞口，并在 2021 年推出限制挖矿算力的产品线与专用矿卡系列，试图把"随币价波动的需求"从"稳定的产品需求"中隔离出去。隔离是管理手段，不是免疫——2022 年的修正证明了这一点。</p>
+    <p>两次库存冲击在财务上都清晰可查：2019 年那次，NVIDIA 游戏业务单季同比下滑 45%（crypto hangover 之后的那个季度），此前已连续数个季度走低；2022 年那次，游戏收入再次大幅修正，随后两个季度才见底。两次冲击的共同点是：需求消失的速度远快于渠道出清的速度——收入在订单之前见底，库存在收入之后出清，节奏与 2001 年的通信库存周期完全一致。</p>
+  </div>
+  <div class="wide">
+    <figure class="chart-frame" id="mining-chart" data-chart="mining" data-chart-height="476">
+      <h4 class="chart-title">挖矿周期：两次点火，两次坠落</h4>
+      <p class="chart-sub">2017–2022 · Bitmain 与 NVIDIA 的两次库存冲击 · 悬停查看事件，点击展开资料卡</p>
+      <div class="chart-body" role="img" aria-label="2017 至 2022 年加密货币挖矿芯片周期图：两次繁荣与 2019、2022 两次库存冲击"></div>
+      <figcaption class="chart-src">来源：<span class="src-tag src-tag--company">公司披露</span> Bitmain 港交所招股书（2018-09）、NVIDIA 财报与电话会（2019、2022）；<span class="src-tag src-tag--official">行业与官方</span> 以太坊合并（2022-09）· 研究综合整理</figcaption>
+    </figure>
+  </div>
+  <div class="prose">
+    <p>真正有意思的是设计服务商的锯齿。Alchip（世芯电子）与 GUC（创意电子）是两家为矿机厂商做定制 ASIC 的设计服务公司，收入曲线呈标准锯齿：2018 年与 2021 年两次被挖矿芯片推上峰值，随后在出清期深跌——Alchip 峰值时期挖矿相关收入占比约 30–40%。锯齿的振幅可以点名：Alchip 年收入 2017 年 NT$6.9B → 2018 年 NT$5.24B → 2019 年 NT$3.87B；GUC 从约 NT$11.6B（2017）走向约 NT$24.9B（2024），2019–2024 年序列为 10.8 / 14.5 / 21.3 / 27.6 / 25.5 / 24.9（NT$B）。锯齿没有杀死它们，反而锻造了先进制程大尺寸 ASIC 的完整能力栈：设计流程、封装协同、量产管理。</p>
+    <p>2023 年之后，这条伏线兑现。当云厂商开启第二轮自研芯片，市场上现成的大尺寸先进制程 ASIC 设计能力，相当一部分正来自挖矿周期留下的团队与流程。加密货币孵化了定制芯片，两次让它坠落，然后把它的人才与产能遗赠给了 AI。</p>
+  </div>
+  <div class="wide chart-pair">
+    <figure class="chart-frame" id="sawtooth-alchip-chart" data-chart="sawtooth-alchip" data-chart-height="340">
+      <h4 class="chart-title">Alchip 的锯齿：挖矿占比的兴衰</h4>
+      <p class="chart-sub">2016–2025 · 世芯电子收入与挖矿相关占比 · 悬停查看年度数据</p>
+      <div class="chart-body" role="img" aria-label="Alchip 世芯电子 2016 至 2025 年收入锯齿图，标注挖矿相关收入占比"></div>
+      <figcaption class="chart-src">来源：<span class="src-tag src-tag--company">公司披露</span> Alchip（世芯电子）月度营收与年报（2016–2025）：2017 年 NT$6.9B → 2018 年 NT$5.24B → 2019 年 NT$3.87B；挖矿峰值占比约 30–40%</figcaption>
+    </figure>
+    <figure class="chart-frame" id="sawtooth-guc-chart" data-chart="sawtooth-guc" data-chart-height="340">
+      <h4 class="chart-title">GUC 的锯齿：同一条曲线，另一家幸存者</h4>
+      <p class="chart-sub">2016–2025 · 创意电子收入与挖矿相关占比 · 悬停查看年度数据</p>
+      <div class="chart-body" role="img" aria-label="GUC 创意电子 2016 至 2025 年收入锯齿图，标注挖矿相关收入占比"></div>
+      <figcaption class="chart-src">来源：<span class="src-tag src-tag--company">公司披露</span> GUC（创意电子）月度营收与年报：2019–2024 年 10.8 / 14.5 / 21.3 / 27.6 / 25.5 / 24.9（NT$B）</figcaption>
+    </figure>
+  </div>
+  <div class="prose">
+    <p>这面镜子对当前周期有两条提醒。其一，单一负载的定制芯片对需求断崖零缓冲——今天 AI ASIC 绑定的是远比币价稳定的企业级负载，但"负载集中度"这一风险因子同构。其二，能力建设与需求兑现之间可能隔着整整一轮周期：挖矿退潮留下的设计能力，五年后才在 AI 上重新定价。判断设计服务商，要看它穿越了几次锯齿，而不是最近一次锯齿的高度。</p>
+  </div>
+</section>
+
+<!-- §8 · 窗口六 · 2023–2026 · 当前周期 -->
+<section class="band" id="sec-w7">
+  <div class="prose">
+    <div class="sec-no">§8 · 窗口六 · 2023–2026 · 当前周期</div>
+    <h2>需求、卖铲者，以及不断迁移的约束</h2>
+    <p class="dek">2023 年之后，需求第一次由训练与推理双轮点火；卖铲者创下纪录，而约束沿着供应链一站一站地迁移。</p>
+    <p>2022 年 11 月 30 日 ChatGPT 发布，2023 年生成式 AI 资本开支周期正式点火。与前五轮都不同：这一次需求由训练与推理双轮驱动——训练追逐更大的模型，推理承载真实产品流量，两者同时争抢同一套产能。点火强度因此超过了 1995 年的通信，也超过了 2019 年的短缺。</p>
+    <p>NVIDIA 数据中心业务是这轮周期最干净的读数：2023 年 4 月季度收入 42.8 亿美元（Q1 FY2024），至 2026 年 4 月季度 752 亿美元（Q1 FY2027）增长约 17.6 倍——12 个季度间隔、13 个季度观测值（公司披露口径）<button type="button" class="src-dot" data-source="K10" aria-label="查看来源"></button>。历史上没有任何一家半导体公司在这样的基数上走出过这样的斜率；上一个可比的形态，是 1995–2000 年光通信链条上连续几个财年的翻倍再翻倍。</p>
+    <p>需求集中在四张资产负债表上。Microsoft、Alphabet、Amazon、Meta 的 Top-4 合计资本开支，2023 年 1,543 亿美元、2024 年 2,505 亿美元、2025 年约 4,100–4,130 亿美元（编制估计：Amazon ≈1,250 亿、Microsoft ≈1,150 亿、Alphabet 1,030 亿、Meta 699 亿）<button type="button" class="src-dot" data-source="K5" aria-label="查看来源"></button>；2026 年指引区间 6,950–7,250 亿美元（2026 年 1–2 月财报季给出：Amazon ≈2,000 亿、Microsoft ≈1,900 亿日历年、Alphabet 1,800–1,900 亿、Meta 1,250–1,450 亿）<button type="button" class="src-dot" data-source="K5" aria-label="查看来源"></button>。4–5 家买家决定整条供应链的产能假设——这比 2000 年通信设备商时代的集中度更高：繁荣时同步点火，转向时也必然同步。</p>
+  </div>
+  <div class="wide xl chart-pair">
+    <figure class="chart-frame" id="capex3d-chart" data-chart="capex3d" data-chart-height="520">
+      <h4 class="chart-title">Top-4 资本开支：从纪录到指引</h4>
+      <p class="chart-sub">点击任意柱查看底层数据 · 实心=Capex · 描边=OCF · 比率=Capex÷OCF</p>
+      <div class="chart-body" role="img" aria-label="Top-4 云厂商 2023 至 2027 年资本开支（实心柱）与经营现金流（描边柱）分组柱状图，标注 capex÷OCF 比率"></div>
+      <figcaption class="chart-src">来源：<span class="src-tag src-tag--company">公司披露</span> 10-K/10-Q 现金流量表与 2026 年指引（四家公司，2026-01–02 财报季，2026-04 整理；MSFT 日历年化）；2025 年合计约 $410–413B 为编制估计，2026E 指引区间 $695–725B</figcaption>
+    </figure>
+    <figure class="chart-frame" id="capex-stairs-chart" data-chart="capex-stairs" data-chart-height="400">
+      <h4 class="chart-title">资本开支与现金流的阶梯</h4>
+      <p class="chart-sub">2023–2026E · capex 与经营现金流的相对位置 · 悬停查看逐季数据</p>
+      <div class="chart-body" role="img" aria-label="Top-4 云厂商资本开支与经营现金流阶梯约束图"></div>
+      <figcaption class="chart-src">来源：<span class="src-tag src-tag--company">公司披露</span> Top-4 现金流量表与指引（2023–2026E）；<span class="src-tag src-tag--synth">研究综合</span> capex/OCF 测算：0.45–0.56（2021–24）→ 0.80（2025）→ ≈1.21（2026E，区间 1.18–1.24，OCF 为 working estimate）· 2026-07</figcaption>
+    </figure>
+  </div>
+  <div class="prose">
+    <p>钱从哪里来，是 2026 年的新问题。Top-4 资本开支占经营现金流的比率持续抬升，自由现金流开始分化；部分厂商启用发债、售后回租与表外融资工具补充弹药。核心压力指标是 capex/OCF 比率（K29）：Top-4 经营现金流 2025 年约 5,130 亿美元，2026E 约 5,870 亿美元（working estimate，无公开一致预期总量）；比率从 2021–2024 年的 0.45–0.56，到 2025 年的 0.80，再到 2026E 的 ≈1.21x（区间 1.18–1.24，capex 取指引中点约 7,100 亿美元）。</p>
+    <aside class="analyst-note"><p>编辑注：capex 口径以各公司现金流量表披露为准，指引取区间而不取中点；任何把指引中点当作承诺的读法，都会系统性高估需求的确定性。</p></aside>
+    <p>资本开支还有第二本账：折旧。AI 服务器通常按 4–6 年计提，2024–2026 年采购的算力将在 2027–2030 年集中进入利润表。只要收入增速跑赢折旧增速，利润率叙事就成立；一旦增速换挡，同一批资产会从"增长投资"变成"成本负担"。这是 Conservative 情景的核心机制——它不需要需求崩塌，只需要增速放缓。</p>
+  </div>
+  <div class="prose">
+    <p>卖铲者先富。NVIDIA 毛利率维持在 70% 以上；TSMC 先进制程与 CoWoS 先进封装持续满载；HBM 三大厂（SK hynix、Samsung、Micron）连续上调合约价。利润池的分布印证本报告主线：钱不在云端，在关口——谁卡住最紧的约束，谁拿走最多的利润。</p>
+    <p>约束的迁移清晰可见。2023 年卡在 GPU 板卡与晶圆产能；2024 年卡在 HBM 与 CoWoS；2025–2026 年，电力与并网成为头条约束。每一站都遵循同一节奏：短缺 → 扩产承诺 → 新瓶颈暴露。9e 与 9f 两节逐站检验这四道关卡与最后一站。</p>
+    <p>与历史同构的信号也在累积：长期供应协议与不可取消订单重现；同一批 GPU 产能被多方重复计算的迹象开始出现；2025 年 5 月 NVLink Fusion 打开平台，允许第三方定制芯片接入 NVLink 生态——卖铲者开始把"定制"也变成自己的生意。繁荣与脆弱，共用同一套语法。</p>
+    <blockquote class="quote-card">
+      <p>「一场构造板块级的变迁正在进行：几十年来第一次，数据中心必须被彻底重构——AI 正被熔入每一个计算平台。NVLink Fusion 打开 NVIDIA 的 AI 平台与丰富生态，让合作伙伴构建专用的 AI 基础设施。」（原文：“A tectonic shift is underway: for the first time in decades, data centers must be fundamentally rearchitected — AI is being fused into every computing platform. NVLink Fusion opens NVIDIA's AI platform and rich ecosystem for partners to build specialized AI infrastructures.”）</p>
+      <cite><span class="src-tag src-tag--company">公司披露</span>—— Jensen Huang，NVIDIA 创始人兼 CEO，NVLink Fusion 新闻稿，Computex，2025-05-19</cite>
+    </blockquote>
+  </div>
+</section>
+
+<!-- 9a · 当前窗口 -->
+<section class="band" id="sec-now">
+  <div class="prose">
+    <div class="sec-no">9a · 当前窗口</div>
+    <h2>9b · 第二轮自研芯片浪潮，以及测量纪律</h2>
+    <p class="dek">2025–2026 年，第二代云厂自研芯片同时进入量产；讨论"份额"之前，必须先约定用哪一把尺子。</p>
+    <p>第二轮自研浪潮与第一轮有本质区别。第一代（TPU v1–v5、Trainium 1–2、MTIA 早期）以自用为主，目标是内部总拥有成本；第二轮全部面向更重的负载与更开放的客户：Google 的 Ironwood（TPU v7，2025 年 4 月发布，专为推理优化；TPU 8t/8i 已于 2026 年 4 月 22 日发布（Cloud Next），≈9 PFLOPS FP4（估计），2026 年晚些时候 GA）、AWS 的 Trainium 3（2025 年 12 月 re:Invent 发布，公司披露 12 个月 140 万颗 Trainium 2、环比 ≈10 倍（re:Invent 2024））、Microsoft 的 Maia 200（2025 年 11 月发布）、Meta 的 MTIA v3（面向推荐与推理负载）。</p>
+    <p>更关键的是外向化。2025 年 10 月，Anthropic 与 Google 达成协议，将使用最多一百万颗 TPU、2026 年获得超过 1 GW 算力（公司披露）；同月，OpenAI 与 Broadcom 宣布合作部署 10 GW 定制加速器。自研芯片第一次拥有了外部大客户——它们不再只是内部成本工具，开始成为商品化的算力供给。</p>
+    <p>测量纪律：谈份额之前先选尺子。单位口径（出货颗数）、CoWoS 口径（先进封装产能分配）、美元口径（收入），三种份额给出三个不同答案。单位口径天然放大低价 ASIC 的存在感；CoWoS 分配是计划而非产出；美元口径最接近利润池，但滞后且向高价 GPU 倾斜。本报告并列展示三种口径，绝不混用；情景乘法只使用美元口径。</p>
+    <aside class="analyst-note"><p>编辑注：三种口径不可互换、不可平均；凡未标注口径的份额数字，都不应进入任何模型。</p></aside>
+    <p>CoWoS 口径需要单独说明：它是"产能分配"口径，反映各家在 TSMC 先进封装产能中拿到的份额，而不是出货量或收入。<button type="button" class="src-dot" data-source="K7" aria-label="查看来源"></button>分配基于订单与长期协议，会随追加与砍单调整；把 CoWoS 分配读成"市场份额"，等于把餐厅订位读成营业额——订位可以提前一年锁定，营业额要到用餐后才发生。</p>
+  </div>
+  <div class="wide">
+    <figure class="chart-frame" id="penetration-chart" data-chart="penetration" data-chart-height="350">
+      <h4 class="chart-title">三种口径，三个份额</h4>
+      <p class="chart-sub">2024–2027E · 单位 / CoWoS 分配 / 美元 · 口径并列展示，不可混用 · 悬停查看数值</p>
+      <div class="chart-body" role="img" aria-label="定制 ASIC 渗透率三种口径对比图：单位份额、CoWoS 分配份额与美元份额"></div>
+      <figcaption class="chart-src">来源：<span class="src-tag src-tag--broker">券商研究</span> 单位 / CoWoS / 美元三种口径并列（2026-05）；<span class="src-tag src-tag--synth">研究综合</span> 整理；聚合转载口径不进入情景计算</figcaption>
+    </figure>
+  </div>
+  <div class="prose">
+    <p>用四张邮戳卡固定第二轮浪潮的规格：Ironwood、Trainium 3、Maia 200、MTIA v3。所有规格取自公司披露；未公开的字段一律标「未披露」，不做推测填充。比较它们时请记住：单芯片参数不构成竞争力，系统层——互连、软件栈、集群效率——才是战场。</p>
+    <p>四张邮戳卡的定位并不相同：Ironwood 是 Google 第一次把"推理优先"写进 TPU 的代际定义；Trainium 3 强调与 AWS 自有网络及虚拟化系统的整柜协同；Maia 200 同时服务 Microsoft 自家推理负载与其合作伙伴的工作负载；MTIA v3 聚焦推荐排序这一 Meta 最核心的单一场景。共同点只有一个：都为明确负载做过减法——减法，正是定制芯片的定价来源。</p>
+  </div>
+  <div class="wide xl">
+    <figure class="chart-frame" id="stamps-chart" data-chart="stamps" data-chart-height="543">
+      <h4 class="chart-title">自研与定制芯片玩家图鉴</h4>
+      <p class="chart-sub">12 枚 · 规格以公司披露为准 · 缺数据标「未披露」· 悬停查看字段，点击展开资料卡</p>
+      <div class="chart-body" role="img" aria-label="自研与定制芯片玩家图鉴：12 枚规格邮戳卡，缺数据标未披露"></div>
+      <figcaption class="chart-src">来源：<span class="src-tag src-tag--company">公司披露</span> Google（2025-04）、AWS（2025-12）、Microsoft（2025-11）、Meta 等 12 家发布资料；缺失字段标「未披露」· 数据截至 2026-07-18</figcaption>
+    </figure>
+  </div>
+  <div class="prose">
+    <p>平台方的反包围同时在进行。2025 年 5 月 Computex，NVIDIA 发布 NVLink Fusion，向第三方 CPU 与定制 ASIC 开放 NVLink 互连生态，合作伙伴包括 MediaTek、Marvell 等；迄今没有经确认的 NVIDIA 设计定制 die，但 "NVIDIA-inside" 的 ASIC 路径已经出现——定制芯片可以借用 NVLink 的系统层，代价是让渡一部分架构主权。</p>
+    <p>第一轮浪潮留下的教训也被认真吸收：纯粹自用闭环限制了芯片的规模经济与迭代速度，第一代自研项目里不止一个在内部评审中被砍或降级。第二轮全部带有外部客户或开放生态设计——规模，是自研芯片唯一的护城河。</p>
+    <p>本节结论：第二轮自研浪潮是真实的、规模化的，并且第一次外向化；但它的计量必须分口径进行。下一节用这三把尺子，检验市场上最大胆的主张——2027 年，ASIC 单位出货超过 GPU。</p>
+  </div>
+</section>
+
+<!-- 9c · 深入检验 -->
+<section class="band" id="sec-crossover">
+  <div class="prose">
+    <div class="sec-no">9c · 深入检验</div>
+    <h2>9c · 深入检验：2027 年交叉点是否成立</h2>
+    <p class="dek">"2027 年 ASIC 单位出货超过 GPU"在算术上成立、在证据上未闭合——它可能为真，但今天的公开数据不足以判定。</p>
+    <p>这是当前市场传播最广的主张之一：到 2027 年，定制 ASIC 的单位出货量将超过 GPU 的单位出货量。它出现在多份券商研究中，支撑着"ASIC 替代 GPU"的叙事。本节的任务不是反驳它，而是检查它能否被公开证据闭合。</p>
+    <p>算术是这样的。以 TPU 为例，2026 年出货量的已发表估计分布在 650–1,500 万颗的宽区间<button type="button" class="src-dot" data-source="K31" aria-label="查看来源"></button>，本报告并列展示、不强行统一；按 50% 单位份额反推，2027 年需要约 800–840 万颗<button type="button" class="src-dot" data-source="K33" aria-label="查看来源"></button>——这是份额所需量，不是区间中值（中值约 1,075 万颗）——恰好触及 GPU 单位出货的量级。也就是说，交叉线的位置对估计的选择极度敏感：取乐观口径，交叉早已发生；取保守口径，交叉在 2027 年之后。</p>
+    <p>单位口径本身还有定义问题：什么算"一颗"？单 die、多 die 封装、SXM 模组，还是整卡？不同研究的计数单位并不一致，有的把多 die 封装按一颗计，有的按模组计。定义差异可以直接移动交叉线的位置——所以在比较任何两个出货估计之前，必须先比较它们的计数单位。</p>
+    <p>换算误差同样致命。许多估计从电力口径（GW）反推芯片颗数，而单颗芯片的实际功耗、系统配比与上架率假设，会给颗数带来约 ±40% 的误差带。±40% 足以把交叉点前后各推一年——这意味着"交叉何时发生"在今天本质上是假设选择问题，而不是数据问题。</p>
+    <p>650–1,500 万颗的宽区间不是研究不严谨，而是换算链条太长：从云厂商的 GW 规划，到机柜配置，到单芯片功耗与上架率，再到封装分配与良率——每一环都是一个区间，连乘之后自然超过两倍。诚实的做法不是取一个中值假装精确，而是承认区间本身就是信息：交叉点的位置，对假设的敏感性远高于对数据的敏感性。</p>
+    <p>美元口径给出另一个世界。即使单位交叉成立，2027 年美元口径下 GPU 仍明显占优：ASIC 平均售价远低于旗舰 GPU，收入份额的移动远慢于颗数份额。本报告的情景乘法只使用美元口径，因此"单位交叉"不改变 Base case 的算术——它改变的是叙事，不是利润池。</p>
+    <aside class="analyst-note"><p>编辑注：三种口径并非彼此独立——封装分配约束单位放量，平均售价决定美元份额；但交互关系是定性的，不构成口径混用的理由。</p></aside>
+  </div>
+  <div class="wide">
+    <figure class="chart-frame" id="revenue-split-chart" data-chart="revenue-split" data-chart-height="426">
+      <h4 class="chart-title">交叉点检验：单位接近，美元未至</h4>
+      <p class="chart-sub">2024–2027E · 800–840 万颗=50% 单位份额所需量 · 2026 年估计区间 650–1,500 万颗 · 美元口径 GPU 仍占优</p>
+      <div class="chart-body" role="img" aria-label="2027 年 ASIC 与 GPU 交叉点检验图：单位口径交叉线与美元口径差距"></div>
+      <figcaption class="chart-src">来源：<span class="src-tag src-tag--broker">券商研究</span> TPU 2026 年出货估计区间 650–1,500 万颗（2026 年发表）；<span class="src-tag src-tag--synth">研究综合</span> 800–840 万颗=50% 份额所需量测算（区间中值约 1,075 万颗，不作交叉依据）· 估计并列展示，不强行统一</figcaption>
+    </figure>
+  </div>
+  <div class="prose">
+    <p>有什么能闭合证据？三样东西可以季度跟踪：Broadcom 与 MediaTek 的 ASIC 代工排产与指引、TSMC CoWoS 的分配表述、以及云厂商自研芯片的放量节奏（TPU 估计区间是否收敛）。这三项都在本报告 §10 监测的八个触发器之列。</p>
+    <p>这场争论最终不由研报裁决，而由三张排产表裁决：TSMC 的 CoWoS 分配、Broadcom 与 MediaTek 的 ASIC 项目排产、NVIDIA 自身的出货指引。三者都是季度更新、公开可查的硬数据；当 TPU 的外部估计区间收敛到无法同时兼容"已交叉"与"未交叉"时，A2 就可以改判了。</p>
+    <p>如果交叉最终成立，二阶含义也要提前写好：单位口径的胜利首先利好设计服务商与 CoWoS 分配的获得者，而非笼统的"ASIC 概念"；美元口径的追赶则要再等数年。把两种口径的结局混为一谈，是这个主张最常见的误用。</p>
+    <p>判定：合理、模型支持、未被证明。A2 的状态是「无法判定」——不是否定，而是承认公开数据不足以在 ±40% 的误差带内定位交叉点。任何给出确定日期的断言，都超出了证据。</p>
+  </div>
+</section>
+
+<!-- 9d · 深入检验 -->
+<section class="band" id="sec-mismatch">
+  <div class="prose">
+    <div class="sec-no">9d · 深入检验</div>
+    <h2>9d · 深入检验：为什么模型与芯片的节奏错配仍可管理</h2>
+    <p class="dek">模型每六个月换一代，芯片每两年流一次片——让节奏错配仍可管理的，是稳定的算子层与训练/推理双轨。</p>
+    <p>一个常被提起的担忧：Transformer 及其变体快速演进，而一颗 ASIC 从立项到量产需要 18–24 个月。芯片会不会出厂即过时？这是"节奏错配"问题，也是质疑定制 ASIC 的核心论据——如果负载在硅片交付前就已经改变，定制的意义何在？</p>
+    <p>错配是真实的，但它的层级常被高估。模型架构在变，算子层没变：矩阵乘、注意力、归一化、激活——这些基本算子十年未换。架构演进发生在算子的组合与调度层，而非算子本身；硬件要加速的是算子，而这一层是稳定的。定制芯片赌的不是某个模型，而是算子层的稳定性。</p>
+    <p>所谓稳定算子层，落到工程上是一张很短的清单：通用矩阵乘及其分块变体、注意力的核心计算、归一化与激活、少量嵌入查找。Transformer 家族的演进——从稠密模型到混合专家（MoE）——改变的是这些算子的形状与调度，而不是算子本身。硬件只要为这张短清单优化，就不会被架构演进甩开；这是过去十年被反复验证的经验。</p>
+    <p>训练与推理的双轨结构进一步降低了风险。训练追逐最新模型，交给最灵活的 GPU；推理负载固化极快——一个上线产品的推理计算图在数月内基本不变，这正是 ASIC 的甜区。定制芯片不需要跑赢"未来的模型"，只需要在"已经固化的负载"上跑赢总拥有成本（TCO）。</p>
+    <p>工程层还有两道保险。编译器栈（XLA 及各家自研工具链）持续把新算子映射到已有芯片；互连与系统级伸缩（ICI、以太网、机柜级设计）让集群效率绕开单芯片代际的限制。芯片会老，系统可以重组——代际风险被分摊到了系统层。</p>
+    <p>但编译器补救不是免费的：新算子映射到旧芯片，效率通常有明确折扣；MoE 的路由与稀疏性对互连拓扑敏感，集群效率会随模型形态波动。错配没有消失，而是被定价——它体现在旧代际芯片的利用率折扣上，进而体现在折旧与换代的假设里。工程管理错配的方式，本质上是把它从"风险"改记为"成本"。</p>
+    <p>证据是八代 TPU。从 2015 年 v1 到 2026 年 v8，每一代 TPU 都承载过当时的生产负载，没有一代因为"模型变了"而报废。错配被工程化管理了十年：它是真实的成本，体现在折旧与换代的保守假设里；但它不是致命风险。</p>
+    <p>甜区的算术很直接：一颗推理 ASIC 只要在部署周期内，把已固化负载的单位 token 成本压到 GPU 方案的一半以下，换代风险就被覆盖。Google 用八代 TPU 反复验证了这本账；对新进入者而言，关键问题从来不是"芯片会不会过时"，而是"负载固化的速度是否快过芯片交付的速度"——前者是产品问题，后者是周期问题。</p>
+    <p>边界条件也要写明：如果出现全新的算子类别——而非算子的新组合——稳定层假设就需要重估。这正是本报告把八个触发器设计为可由证据改判的原因：假设可以改判，但必须由证据触发，而不是由叙事触发。</p>
+  </div>
+  <div class="wide">
+    <figure class="chart-frame" id="pergw-chart" data-chart="pergw" data-chart-height="300">
+      <h4 class="chart-title">每 GW 的算术：换算带 ±40%</h4>
+      <p class="chart-sub">GW → 颗数 / 成本 · 单颗功耗、系统配比与上架率假设构成误差带 · 悬停查看区间</p>
+      <div class="chart-body" role="img" aria-label="每 GW 算力对应的芯片颗数与成本换算图，误差带正负 40%"></div>
+      <figcaption class="chart-src">来源：<span class="src-tag src-tag--synth">研究综合</span> 每 GW 成本与颗数换算带 ±40%（2026-07）；单位成本为区间估计 · TSMC revenue/GW 派生值 ≈$2.1B/GW（K21）</figcaption>
+    </figure>
+  </div>
+  <div class="prose">
+    <p>附带一条换算纪律：本报告在涉及电力口径时，统一使用 ±40% 的换算带。±40% 听起来很大，却是诚实的区间——单颗功耗、系统配比与上架率的真实分布就是这么宽。比较任何 GW 与颗数口径时，请先检查背后的换算假设；9c 节的交叉点争议，一半以上来自这道换算。</p>
+  </div>
+</section>
+
+<!-- 9e · 供应关卡 -->
+<section class="band" id="sec-bottleneck">
+  <div class="prose">
+    <div class="sec-no">9e · 供应关卡</div>
+    <h2>9e · 四道供应关卡：利润池位于关口，而非云端</h2>
+    <p class="dek">利润不分布在云端，而集中在四道关口；按缺口与议价力排序：HBM &gt; 先进制程 &gt; CoWoS &gt; 光互连。</p>
+    <p>把 AI 硬件链拆成四道关卡：高带宽存储（HBM）、先进制程晶圆、CoWoS 先进封装、光互连。每一轮周期，利润池收敛到最紧的那一道。2026 年年中的排序：HBM 最紧，先进制程次之，CoWoS 再次，光互连当前不是瓶颈但权重在上升。排序每半年复核一次。</p>
+  </div>
+  <div class="wide xl">
+    <figure class="chart-frame" id="gates-chart" data-chart="gates" data-chart-height="880">
+      <h4 class="chart-title">四道关卡的排序</h4>
+      <p class="chart-sub">HBM &gt; 先进制程 &gt; CoWoS &gt; 光互连 · 缺口与议价力双维排序 · 悬停查看依据</p>
+      <div class="chart-body" role="img" aria-label="四道供应关卡排序图：HBM、先进制程、CoWoS、光互连"></div>
+      <figcaption class="chart-src">来源：<span class="src-tag src-tag--synth">研究综合</span> 四道关卡排序（2026-07）；各环节数据与出处见本节后续图注</figcaption>
+    </figure>
+  </div>
+  <div class="prose">
+    <p>HBM 是第一道关卡。HBM 占 DRAM 收入的比重，从 2023 年的约 8% 升至 2027 年预估的约 41%（券商研究口径；2026E 约 33%）<button type="button" class="src-dot" data-source="K13" aria-label="查看来源"></button>——位元占比远低于收入占比，扩张惊人，却仍跟不上需求。三家供应商（SK hynix、Samsung、Micron）的产能被长期协议锁定，合约价逐季上调；HBM 是本轮周期议价力最强的环节，也是 ASIC 与 GPU 共同绕不开的一道。</p>
+  </div>
+  <div class="wide chart-pair">
+    <figure class="chart-frame" id="cowos-chart" data-chart="cowos" data-chart-height="457">
+      <h4 class="chart-title">CoWoS：缺口收敛，仍是硬约束</h4>
+      <p class="chart-sub">2023–2027E · 供需测算 · 75–80kwpm（2025 末）→120–130kwpm（2026 末目标，第三方估计）· 悬停查看逐年</p>
+      <div class="chart-body" role="img" aria-label="CoWoS 先进封装供需测算图"></div>
+      <figcaption class="chart-src">来源：<span class="src-tag src-tag--broker">券商研究</span> CoWoS 供需测算（2026）：75–80kwpm（2025 末）→120–130kwpm（2026 末目标，第三方估计；TSMC 不披露 kwpm 指引）</figcaption>
+    </figure>
+    <figure class="chart-frame" id="hbm-chart" data-chart="hbm" data-chart-height="400">
+      <h4 class="chart-title">HBM：占 DRAM 收入约 8% → 约 41%</h4>
+      <p class="chart-sub">2023–2027F · 收入占比 8%→41%（2026E 约 33%）· 位元占比远低于收入占比 · 悬停查看分项</p>
+      <div class="chart-body" role="img" aria-label="HBM 占 DRAM 收入比重、供需缺口与合约定价图"></div>
+      <figcaption class="chart-src">来源：<span class="src-tag src-tag--broker">券商研究</span> HBM 占 DRAM 收入约 8%→41%（2023→2027F，2026E 约 33%）；<span class="src-tag src-tag--company">公司披露</span> SK hynix / Samsung / Micron 财报与指引</figcaption>
+    </figure>
+  </div>
+  <div class="prose">
+    <p>代际切换加重紧张。HBM3 向 HBM4 的切换在 2026 年进行，新代际的良率爬坡与认证周期，使"名义产能"与"可用产能"之间持续存在折扣。HBM4 的堆叠层数与接口宽度继续提高，单机柜的 HBM 价值量进一步上移——关卡越紧，关卡的门票越贵。</p>
+  </div>
+  <div class="wide">
+    <figure class="chart-frame" id="hbmgen-chart" data-chart="hbmgen" data-chart-height="356">
+      <h4 class="chart-title">HBM 代际路线：HBM3 → HBM4</h4>
+      <p class="chart-sub">2024–2027 · 堆叠、带宽与认证节奏 · 悬停查看代际参数</p>
+      <div class="chart-body" role="img" aria-label="HBM3 到 HBM4 的代际路线图"></div>
+      <figcaption class="chart-src">来源：<span class="src-tag src-tag--official">行业与官方</span> JEDEC 标准与各厂公开路线图（2024–2026）</figcaption>
+    </figure>
+  </div>
+  <div class="prose">
+    <p>先进制程是第二道关卡。N3 产能被 AI 与旗舰手机同时争夺，N2 的爬坡在 2026–2027 年展开；TSMC 的议价力体现在代工价格的结构性上调，以及客户为锁定产能签下的长期承诺。先进制程的缺口不如 HBM 尖锐，但恢复弹性同样有限——一座先进晶圆厂的建设周期以年计。</p>
+    <p>CoWoS 是第三道关卡。先进封装产能在 2024 年曾是最紧约束，2025–2026 年供需缺口收敛但仍然紧绷<button type="button" class="src-dot" data-source="K11" aria-label="查看来源"></button>；它直接决定 ASIC 项目的放量节奏——设计完成不等于拿到封装产能。产能路径采用第三方估计：75–80kwpm（2025 年末）→ 120–130kwpm（2026 年末目标；TSMC 不披露 kwpm 指引）。</p>
+  </div>
+  <div class="prose">
+    <p>光互连排在第四，不是因为不重要，而是因为还没到时候。机柜功率密度持续提升，铜互连的功耗与距离极限逼近，共封装光学（CPO）与光模块的权重将在 2027 年后上升。它是下一站的约束，不是这一站的——但提前卡位的厂商已经开始收获订单。</p>
+    <p>光互连的时间表由功耗书写：单链路速率继续翻倍时，铜互连的功耗与传输距离开始挤压整机柜的功率预算，共封装光学（CPO）把光引擎移到交换芯片近旁，省下的每一瓦电都可以还给计算。它排在第四而非更靠前，是因为 2026 年的机柜功率预算还没有把它逼到非上不可的位置——这个时点，将由下一代平台的功率密度决定。</p>
+    <p>关卡的财务表达直接而清楚：HBM 厂商毛利率扩张，TSMC 结构性涨价，封装产能满载——利润池位于关口，而非云端。云厂商承担资本开支，关口供应商拿走定价权；这正是假设 A1「利润跟随芯片」不成立的微观机制，也是公司深研（§11）筛选六家公司的逻辑起点。</p>
+    <aside class="analyst-note"><p>编辑注：利润池排序按缺口与议价力每半年复核一次；关卡名单不变时，排序本身的变化也是信号。</p></aside>
+  </div>
+</section>
+
+<!-- 9f · 电网 -->
+<section class="band" id="sec-partition">
+  <div class="prose">
+    <div class="sec-no">9f · 电网</div>
+    <h2>9f · 约束的最后一站：电网</h2>
+    <p class="dek">芯片可以买，电力必须等——所有约束的最后一站是电网。</p>
+    <p>需求侧的所有算术，最后都要回答一个问题：电从哪里来。全球数据中心用电量约 415 TWh（2024 年），到 2030 年预计约 945 TWh（IEA 口径）<button type="button" class="src-dot" data-source="K26" aria-label="查看来源"></button>——六年翻一倍多，AI 是增量的主要来源。电力第一次成为半导体周期的硬约束，这在 1995 年与 2019 年都不曾发生。</p>
+    <p>415→945 TWh 的口径需要交代：415 TWh 是 2024 年全球数据中心用电量的估计值（约占全球用电量的 1.5%），945 TWh 是 2030 年的预测中枢，AI 负载贡献了增量的主要部分。IEA 同时给出高低两条路径，区间相当宽；本报告采用中枢值，只用其说明方向与量级，不做精确外推——电力数字的用途是校准节奏，不是预测收入。</p>
+    <p>密度的变化同样剧烈。以 NVIDIA GB200 NVL72 为例，单机柜功率约 120 kW——传统机柜的十倍量级。供电、液冷与机房设计必须整体重构；机柜级系统的电力密度，把"数据中心"从地产问题变成了电力工程问题。</p>
+    <p>电网的节奏远慢于芯片。美国部分市场的并网排队以年计；大型变压器、燃气轮机等关键设备交期长达 2–3 年；电力因此成为数据中心选址的第一变量。芯片产能两年可以扩出来，电网不能——这是两种完全不同的时间常数。</p>
+    <p>区域差异提供了缓冲，也提供了观察样本：并网排队以年计的市场，催生自备燃气、核电重启与"表后供电"（behind-the-meter）等绕行方案；电力相对充裕的市场则以更低电价吸引算力落地。电力约束是全球性的，但它的价格标签是区域性的。</p>
+    <p>云厂商的应对已经写在公开新闻里：多年期电力采购协议（PPA）、直接签约核电重启与小型模块化反应堆（SMR）选项、向电力充裕地区迁移选址。这些动作的共同点是提前锁定——与锁定 HBM 和 CoWoS 的逻辑完全一致：在约束到来之前，先把约束买下来。区别只在于，电力合约的期限以十年计，远超任何芯片供货协议。</p>
+    <p>这里出现两个节拍器的错配。芯片按订单节拍器生产——以季度为单位，随订单起伏；电力按部署节拍器到达——以年度为单位，刚性且滞后。两个节拍器错配时，就会出现"已购未装"的芯片库存：GPU 到货了，电还没接上。2026 年，观察这批库存的规模与消化速度，比观察订单更重要。</p>
+    <p>两个节拍器的错配并非首次出现：2000 年通信繁荣时，光纤铺设以年计，路由器采购以季度计，错配的结果是大量"暗光纤"沉睡多年后才被点亮。今天的"已购未装"GPU 与当年的暗光纤同构——资产没有消失，兑现只是迟到。但迟到本身会改写财务模型：折旧照常计提，收入却尚未确认。</p>
+    <aside class="analyst-note"><p>编辑注：两个节拍器的错配不以"问题"形式出现，而以"库存"形式累积；观察错配的窗口在资产负债表，不在新闻稿。</p></aside>
+    <blockquote class="quote-card">
+      <p>「AI 是当今能源世界最大的故事之一——但直到现在，政策制定者与市场都缺少充分理解其广泛影响的工具。全球数据中心的电力需求将在未来五年翻一倍多；到 2030 年，数据中心的用电量将相当于今天整个日本的用电量。」（原文：“AI is one of the biggest stories in the energy world today — but until now, policy makers and markets lacked the tools to fully understand the wide-ranging impacts. Global electricity demand from data centres is set to more than double over the next five years, consuming as much electricity by 2030 as the whole of Japan does today.”）</p>
+      <cite><span class="src-tag src-tag--official">行业与官方</span>—— Fatih Birol，国际能源署（IEA）执行主任，《Energy and AI》特别报告，2025-04-10</cite>
+    </blockquote>
+  </div>
+  <div class="wide">
+    <figure class="chart-frame" id="partition-chart" data-chart="partition" data-chart-height="400">
+      <h4 class="chart-title">电网：约束的最后一站</h4>
+      <p class="chart-sub">415 → 945 TWh（2024 → 2030E）· GB200 NVL72 约 120 kW · 部署节拍器 vs 订单节拍器</p>
+      <div class="chart-body" role="img" aria-label="数据中心用电量增长与机柜功率密度图：415 到 945 TWh，部署节拍器与订单节拍器对比"></div>
+      <figcaption class="chart-src">来源：<span class="src-tag src-tag--official">行业与官方</span> IEA 数据中心用电展望（2025-04：415→945 TWh）；<span class="src-tag src-tag--company">公司披露</span> NVIDIA GB200 NVL72 规格（约 120 kW）</figcaption>
+    </figure>
+  </div>
+  <div class="prose">
+    <p>对周期判断的含义：电力不改变需求的方向，只改变需求兑现的节奏。它把 2000 年式"需求消失"的风险，部分转换成"需求延迟"的风险——延迟的需求仍然是需求，但它会平滑收入的峰值，也会推迟出清的时点。这是本轮周期与所有历史类比都不相同的变量。</p>
+    <p>监测含义同样直接：并网速度、电力采购协议（PPA）与"已购未装"库存，是比芯片订单更领先的指标。它们已被编入 §10 监测的八个触发器之中（"库存与预建行为"一项）。</p>
+  </div>
+</section>
+
+<!-- S10 · 共识压力测试 -->
+<section class="band" id="sec-assumptions">
+  <div class="prose">
+    <div class="sec-no">S10 · 共识压力测试</div>
+    <h2>三项大胆假设</h2>
+    <p class="dek">把市场的三条共识放到证据前：一条不成立，一条无法判定，一条被推迟。</p>
+    <p>检验方法：每项假设按同一格式处理——主张、支持证据、反证、判定。判定只有四种：成立、不成立、无法判定、延迟。不允许"大概率成立"这类模糊结论；判定的价值在于可复核——每一项都可以在后续季度被新证据改判。</p>
+    <h3>A1 · 利润跟随芯片 — 不成立</h3>
+    <p><span class="verdict v-fails">VERDICT · FAILS</span>主张：利润跟着芯片走，谁卖出更多 AI 芯片，谁拿走更多利润。反证比支持证据强：利润池位于 HBM、先进制程与 CoWoS 等关口（见 9e），卖芯片的环节反而要向关口缴纳租金；云厂商自研芯片的"利润"体现为成本节约，而非芯片业务利润；NVIDIA 的高毛利来自系统与软件（NVLink、CUDA），而非硅片本身。判定：<strong>不成立</strong>——利润跟随的是关卡，不是芯片。</p>
+    <p>A1 的反证可以用数字落地：2025–2026 年，HBM 厂商与代工厂的毛利率与营业利润率持续扩张，而云端自研芯片的经济性以"成本节约"形式存在——节约不会出现在任何一张利润表的收入端。芯片越卖越多，利润却沿关卡向上游集中：这正是"利润跟随芯片"在财务上的反例，也是 §11 按关口而非按芯片筛选公司的理由。</p>
+    <h3>A2 · 2027 年 ASIC 单位超过 GPU — 无法判定</h3>
+    <p><span class="verdict v-open">VERDICT · OPEN</span>主张与算术见 9c 节：TPU 800–840 万颗为 50% 单位份额所需量（非区间中值），2026 年外部估计区间 650–1,500 万颗，GW→单位换算误差带 ±40%。误差带完整覆盖交叉区，公开证据不足以定位交叉时点。判定：<strong>无法判定</strong>——这是本报告有意保留的一项：承认不可判定，比强行给出方向更诚实。A2 被标记为可季度复核的开放命题，对应 §10 触发器中的"TPU 数量收敛"。</p>
+    <p>"无法判定"不是修辞，而是有明确标准：当支持证据与反证在误差带内兼容两个相反结论，且未来两个季度内没有公开数据能区分它们时，本报告给出无法判定。A2 正符合这一标准——±40% 的换算误差带内，"已经交叉"与"2028 年才交叉"同时成立。这不是研究的失败，而是对证据边界的如实标注；承认边界，是后续改判的前提。</p>
+  </div>
+  <div class="wide chart-pair">
+    <figure class="chart-frame" id="assume-a2-chart" data-chart="assume-a2" data-chart-height="380">
+      <h4 class="chart-title">A2：支持与反对，并列放置</h4>
+      <p class="chart-sub">2027 年 ASIC 单位 vs GPU · 证据并列，不做方向裁决 · 悬停查看各条证据</p>
+      <div class="chart-body" role="img" aria-label="假设 A2 证据并列图：2027 年 ASIC 单位出货超过 GPU 的支持与反对证据"></div>
+      <figcaption class="chart-src">来源：<span class="src-tag src-tag--synth">研究综合</span> 支持与反对证据并列（2026-07）；判定：无法判定</figcaption>
+    </figure>
+    <figure class="chart-frame" id="assume-a3-chart" data-chart="assume-a3" data-chart-height="380">
+      <h4 class="chart-title">A3：可见性的边界在哪里</h4>
+      <p class="chart-sub">2025–2028 · 已签约 / 指引 / 管线意向分层 · 悬停查看各层证据</p>
+      <div class="chart-body" role="img" aria-label="假设 A3 需求可见性分层图：已签约、公司指引与管线意向"></div>
+      <figcaption class="chart-src">来源：<span class="src-tag src-tag--company">公司披露</span> Top-4 指引与长期协议（2026-02）；<span class="src-tag src-tag--synth">研究综合</span> 可见性评估；判定：延迟</figcaption>
+    </figure>
+  </div>
+  <div class="prose">
+    <h3>A3 · 需求可见至 2028 — 延迟</h3>
+    <p><span class="verdict v-late">VERDICT · LATE</span>主张：AI 算力需求的可见性已经延伸到 2028 年。证据：Top-4 的资本开支指引与长期供应协议，确实给到 2026–2027 年很高的可见度；本轮每一次指引修订都是上调——Meta 从 600–650 亿到 700–720 亿美元、Alphabet 从 750 亿到 910–930 亿美元、Microsoft 从约 800 亿到 1,400 亿美元以上（年化）、Amazon 从约 1,050 亿到约 1,250 亿美元——但 2028 年的"可见性"主要来自尚未签约的管线、框架协议与意向声明——它存在，但没有闭合；只会上修的台账证明的是动能，不是可见性。判定：<strong>延迟</strong>——不是证伪，而是兑现时点右移；2028 年的需求大概率会到，只是"可见"这件事被推迟了。</p>
+    <p>"延迟"与"证伪"的区别必须说清：证伪意味着需求不会来，延迟意味着可见证据尚未闭合。2028 年的需求有大量支撑——在建的数据中心、已签约的电力、模型路线图的算力需求——但这些都还不是 2028 年收入口径的订单。把"延迟"读成"证伪"，与把"管线"读成"订单"，是同一种错误的两个方向。</p>
+  </div>
+  <div class="prose">
+    <p>三项判定放在一起使用：A1 不成立，意味着利润池分析必须走关口路线——§11 的六家公司筛选由此而来；A2 无法判定，意味着不给"ASIC 替代"叙事提前定价；A3 延迟，意味着 Base case 的收入爬坡更陡地集中在 2026–2027 年，远端权重下调。</p>
+  </div>
+</section>
+
+<!-- §9 · 结论 -->
+<section class="band" id="sec-analog">
+  <div class="prose">
+    <div class="sec-no">§9 · 结论</div>
+    <h2>四十二年放进一张表；结论落在两种情景</h2>
+    <p class="dek">把四十二年放进同一张机制表：当前周期是需求侧的 1995–2003 与供应侧的 2019–2022 的叠加。</p>
+    <p>机制矩阵的做法：横向是五个机制环节——需求点火、供给约束、重复下单、产能到达、行业出清；纵向是六个历史窗口。每一格按证据标记强、弱、无。这张表是全报告的压缩版本：所有"这一次不一样"的争论，都可以落到具体格子上逐格核对。</p>
+    <p>矩阵的用法可以示范一行：把"重复下单"这一行读过去——1995–2003 强、2019–2022 强、2023–2026 已出现早期信号；再把"出清"一行读过去——前两轮完整发生，本轮尚未开始。当前周期在这张表里的位置因此非常具体：机制的前三段已经重演，后两段仍是开放问题。</p>
+    <p>匹配结果：当前周期在需求侧最像 1995–2003——单一叙事点火（光通信 / 生成式 AI）、买家集中采购、交期放大订单；在供应侧最像 2019–2022——短缺、不可取消订单、长期协议与并购超级周期。它不是任何一个窗口的重演，而是两个窗口不同侧面的叠加。</p>
+    <p>两个被拒绝的类比必须记录。1997–98 年（亚洲金融危机）：需求冲击真实存在，但产能假设没有失效——出清快而浅，不构成类比。2008–09 年（全球金融危机）：冲击来自信用系统而非产能周期，半导体随宏观 beta 波动，机制不同。这两个窗口被标记为 rejected windows，理由写入矩阵，避免被轻易引用。</p>
+    <p>1997–98 窗口值得多写一笔：亚洲金融危机确实压垮了部分需求，但半导体产能假设没有失效——此前没有长交期与重复下单，库存修正来得快、去得也快，两个季度内基本完成出清。缺少"产能假设失效"这一环，它就只是一次宏观需求冲击，不构成机制类比。</p>
+    <p>2008–09 年被拒绝的理由不同：冲击从信用系统传入，订单是"冻结"而非"取消—重复下单—再取消"，半导体随宏观 beta 同步下跌、同步修复。机制链条里缺少放大器，周期形状因此完全不同——它是需求冲击的样本，不是产能周期的样本；把它引为类比，会系统性低估真实周期的深度。</p>
+    <p>没有先例的部分同样要写清楚：约束落在电网（史无前例）；买家集中到 4–5 家；第二轮自研芯片同时量产且第一次外向化。这三点决定本轮周期的出清形态可能与历史不同——更同步、更集中于少数资产负债表，也更依赖电力的兑现节奏。</p>
+    <p>叠加的算术值得写清楚：需求侧像 1995–2003，意味着订单放大系数与滞后结构类似——出清前的账面需求会系统性高于真实需求；供应侧像 2019–2022，意味着约束的缓解以 2–3 年为周期，不会在一个季度内完成。两者叠加的净效果：峰值被推得更高，出清被拖得更晚。</p>
+    <p>对"新周期"假说也要诚实评估：如果电力兑现与模型需求持续超预期，本轮周期可能在真正出清之前完成软着陆——那对应的是 Conservative 路径，而非 Base 路径。矩阵不回答"会不会不一样"，它回答的是"哪些环节一样、哪些环节没有先例"。</p>
+  </div>
+  <div class="wide xl">
+    <figure class="chart-frame" id="matrix-chart" data-chart="matrix" data-chart-height="402">
+      <h4 class="chart-title">机制矩阵：六个窗口 × 五个环节</h4>
+      <p class="chart-sub">需求点火 / 供给约束 / 重复下单 / 产能到达 / 出清 · 1997–98 与 2008–09 为被拒绝窗口 · 悬停查看格内证据</p>
+      <div class="chart-body" role="img" aria-label="六窗口五环节机制矩阵表，含两个被拒绝的历史窗口"></div>
+      <figcaption class="chart-src">来源：<span class="src-tag src-tag--synth">研究综合</span> 机制矩阵（2026-07）；1997–98 与 2008–09 为被拒绝窗口（rejected），理由见正文</figcaption>
+    </figure>
+  </div>
+  <div class="prose">
+    <p>所以结论落在两种情景，而不是一个方向。把"需求侧 1995–2003"外推，得到的是出清剧本：重复下单堆积、产能到达、收入修正。把"供应侧 2019–2022"外推，得到的是延迟剧本：约束逐站迁移、需求兑现被电力平滑、出清推迟。两个剧本共用同一批证据，区别只在时间轴——下一节把两个剧本写成可算术检验的情景。</p>
+  </div>
+</section>
+
+<!-- §9b · 情景算术 -->
+<section class="band" id="sec-verdict">
+  <div class="prose">
+    <div class="sec-no">§9b · 情景算术</div>
+    <h2>情景算术：Base case 三年增长约 2.5 倍</h2>
+    <p class="dek">不做点预测，只做算术：三种路径、一个失效阈值，以及每个季度的复核机制。</p>
+    <p>情景设定（全部使用美元口径）。Base case：定制硅加速器收入 2025→2028E 增长约 2.5 倍，区间 2.0–4.7x<button type="button" class="src-dot" data-source="K1" aria-label="查看来源"></button>——前提是 2026 年 capex 指引大体兑现、推理占比过半、HBM 与 CoWoS 关口如期缓解、电力只延迟不阻断。Conservative：≈2.0x（band 1.9–2.1x）——指引打折、电力延迟明显、ASIC 放量慢于预期。Contraction：−15% 至 −35%——capex 增速跌破阈值，重复下单进入出清。</p>
+    <p><span class="verdict v-fails">KILL SWITCH</span>kill switch 是这套算术的刹车线：若 Top-4 2027 年资本开支同比增速低于 +14%，切换至 Contraction 路径。<button type="button" class="src-dot" data-source="K4" aria-label="查看来源"></button>+14% 不是拍脑袋：它大约对应在建产能与折旧线所需的最低增速——低于它，已锁定的供给会压倒新增需求，库存周期启动。这是本报告给出的唯一明确失效阈值。</p>
+    <p>+14% 的推导可以公开：它大致等于"已宣布产能对应的资本开支摊到 2027 年所需的最低同比增速"——低于它，意味着部分已宣布项目被砍或推迟，供给曲线开始左移；同时它也接近 Top-4 经营现金流自然增速的底线。资本开支增速跌破 +14%，说明连维持在建规模的意愿都在动摇——这正是库存周期启动前的最后一个可观察信号。</p>
+  </div>
+  <div class="wide chart-pair">
+    <figure class="chart-frame" id="verdict-tree-chart" data-chart="verdict-tree" data-chart-height="460">
+      <h4 class="chart-title">情景树：三种路径与一条刹车线</h4>
+      <p class="chart-sub">Base ≈2.5x（区间 2.0–4.7x）· Conservative ≈2.0x（band 1.9–2.1x）· Contraction −15%~−35% · kill switch +14%</p>
+      <div class="chart-body" role="img" aria-label="情景树图：Base、Conservative 与 Contraction 三种路径及 kill switch 阈值"></div>
+      <figcaption class="chart-src">来源：<span class="src-tag src-tag--synth">研究综合</span> 情景算术（美元口径，2026-07）；情景乘法不使用单位或 CoWoS 口径</figcaption>
+    </figure>
+    <figure class="chart-frame" id="scenario-chain-chart" data-chart="scenario-chain" data-chart-height="300">
+      <h4 class="chart-title">情景链：触发 → 传导 → 结果</h4>
+      <p class="chart-sub">每条链均可对照 §10 触发器复核 · 悬停查看各环节</p>
+      <div class="chart-body" role="img" aria-label="情景链图：从触发器到传导路径再到收入结果"></div>
+      <figcaption class="chart-src">来源：<span class="src-tag src-tag--synth">研究综合</span> 触发 → 传导 → 结果链（2026-07）</figcaption>
+    </figure>
+  </div>
+  <div class="prose">
+    <p>情景链把从触发到结果的路径写死：触发（订单取消扩散、库存与预建行为异常、CoWoS 表述松动）→ 传导（ASIC 项目先被砍，因为其可替代性强于 GPU 通用产能；设计服务商的 NRE 收入先行下滑）→ 结果（美元口径收入 −15% 至 −35%，恢复速度取决于电力与模型需求是否仍在）。</p>
+    <p>−15% 至 −35% 的区间有历史锚：2001 年行业 −32% 是"需求消失＋库存出清"的完整形态；本轮若触发，买方资产负债表远强于当年，电力约束与已签约需求构成缓冲——−15% 对应缓冲起效，−35% 对应缓冲失效、重复下单全额出清。区间之所以宽，是因为出清深度取决于订单簿中重复下单的真实比例，而这个比例今天无法观察。</p>
+  </div>
+  <div class="prose">
+    <p>与 2001 年的差异值得明确：本轮买家的现金流更强——Top-4 的利润表可以承受当前的 capex 强度，这与当年靠债务扩张的通信设备商不同。但集中度更高意味着：一旦转向，同步性更强，跌幅可能更快更深；而只要电力与模型需求仍在，复苏也会比 2001 年更快。</p>
+    <p>三种情景不附概率——概率伪装精确，权重更新规则才有用：初始权重偏向 Base（指引与订单证据最厚），此后每季度按触发器复核结果机械调整。给出"70% 概率 Base"是叙事，给出"触发几项、权重如何移动"才是纪律。</p>
+    <p>三种情景在时间轴上也不互斥：先走 Base 的 2026 年，再在 2027 年触发 kill switch 转入 Contraction，是完全自洽的路径；Conservative 也可以是 Base 与 Contraction 之间的过渡态。情景算术的目的不是选定一条路，而是把每条路上的路标提前画好——这样无论走哪条，都不需要在恐慌中临时读地图。</p>
+    <blockquote class="quote-card">
+      <p>「我们相信，到 2027 年，他们每一家都计划在单一 Fabric 上部署百万颗规模的 XPU 集群。我们预计，仅在 2027 财年，这将为 XPU 与网络业务带来 600 亿到 900 亿美元的 AI 收入可服务市场（SAM）。」（原文：“In 2027, we believe each of them plans to deploy 1 million XPU clusters across a single fabric. We expect this to represent an AI revenue serviceable addressable market, or SAM, for XPUs and network in the range of $60 billion to $90 billion in fiscal 2027 alone.”）</p>
+      <cite><span class="src-tag src-tag--company">公司披露</span>—— Hock Tan，Broadcom 总裁兼 CEO，Q4 FY2024 财报电话会，2024-12-12</cite>
+    </blockquote>
+    <p>使用方式：这不是择时工具。每季度财报季结束后，对照下一节的八个触发器逐项复核，更新三个情景的权重；kill switch 触发即改判，不争论。情景的价值不在"猜对"，在于事先写好每一种结果对应的动作。</p>
+  </div>
+</section>
+
+<!-- §10 · 监测 -->
+<section class="band" id="sec-signals">
+  <div class="prose">
+    <div class="sec-no">§10 · 监测</div>
+    <h2>八个证伪触发器：一份时点登记表</h2>
+    <p class="dek">八个可以证伪的触发器，每个都带证伪条件、当前读数与下一个观察窗口；当前状态：1 项 confirmed（HBM 售罄）+ 7 项 partial——时点登记表（point-in-time register），研究截止 2026-07-18。</p>
+    <p>为什么是触发器而不是预测：点预测会被打脸，而且无法复核。触发器把判断变成纪律——事先写好"看到什么就改变什么"，然后机械执行。八个触发器覆盖链条的四个位置：设计服务商、代工与封装、平台指引、现金流与库存。</p>
+    <p>八个触发器总览：① Top-4 capex 指引同比增速跌破 +20%；② NVIDIA 数据中心收入连续两个季度增速低于 +20%；③ HBM3E ASP 下跌超过 15%；④ CoWoS 产能利用率低于 85%；⑤ 2027F 统计中定制芯片美元份额低于 15%；⑥ TPU 出货估计收敛到 8.0M 颗以下；⑦ 吉瓦级并网审批在指定地点连续两个季度停滞；⑧ 披露缺口——没有任何云厂商披露的"定制 vs 商用"美元拆分，这是一项长期缺口（standing gap）。</p>
+    <p>五个触发器看钱，三个看关口，一个直接看交叉算术；每个都写成带数字的证伪条件。从组合看，触发器覆盖周期的三种失败方式，并按顺序展开：需求失败最先印在触发器 ①②，关口失败印在 ③④⑦，叙事失败——交叉故事在美元换算中消亡——印在 ⑤⑥⑧。</p>
+    <p>使用规则：每个读数窗口结束后逐项核对读数。单项触发，降权 Base、升权 Conservative；三项及以上同向触发，切换情景。其中触发器 ① 与 kill switch（Top-4 2027 年资本开支增速 +14%）直接关联——它触发即改判，不争论。</p>
+    <p>登记纪律：触发器以"看到什么就改变什么"的方式预先写死；本表不作例行替换——清单稳定，读数移动。每个触发器记录证伪条件、当前读数与下一个观察窗口，不与上期读数争论，不平均、不打折。</p>
+    <p>读表纪律：表述松动不等于需求崩塌——语言总是先于数字变化，TSMC 的措辞是领先指标而非同步指标；订单取消先看扩散性，单一客户的项目取消是噪音，跨客户、跨产品的取消才是信号；库存要区分"战略预建"（主动，为电力等待）与"滞销堆积"（被动，需求消失）——前者是延迟，后者才是出清的前奏。</p>
+    <p>「partial」的读法需要精确：它意味着当前读数远离证伪线、但仪表仍然活着；「1 项 confirmed」对一轮年轻周期是正确的计数——确认是成熟供应挤压才有的属性，HBM 售罄信号挣得了它。</p>
+    <p>阈值随基线移动：以 capex/OCF 为例，折旧基数抬升会改变同一增速对应的现金流压力；CoWoS 与 HBM 的"紧张"表述也会随产能扩张而移动基线。这正是登记表带研究截止时间戳的原因——本页当前版本为 2026-07-18。</p>
+  </div>
+  <div class="wide xl">
+    <figure class="chart-frame" id="signals-chart" data-chart="signals" data-chart-height="530">
+      <h4 class="chart-title">八个证伪触发器</h4>
+      <p class="chart-sub">证伪条件 · 当前读数 · 下一观察窗口 · 时点登记表（研究截止 2026-07-18）</p>
+      <div class="chart-body table-scroll"></div>
+      <figcaption class="chart-src">来源：<span class="src-tag src-tag--synth">研究综合</span> 八个触发器与读数（研究截止 2026-07-18）；状态：1 confirmed（HBM 售罄）+ 7 partial · 指标口径见 §9b 情景算术</figcaption>
+    </figure>
+  </div>
+  <div class="prose">
+    <p>这张表是本报告的"活页"：它不预测方向，只记录证据；八个触发器全部对应到 §9b 的情景权重与 +14% 失效阈值。下一次读数窗口：2026 年第三季度财报季。</p>
+  </div>
+</section>
+
+<!-- §11 · 公司深研 -->
+<section class="band" id="sec-invest">
+  <div class="prose">
+    <div class="sec-no">§11 · 公司深研</div>
+    <h2>六家公司，位于供应链的收费关口</h2>
+    <p class="dek">六家公司不在同一条赛道上，而在同一条供应链的六个收费关口上；本节不提供评级，也不提供目标价。</p>
+    <p>筛选逻辑来自 A1 的判定：既然利润池位于关口而非云端，值得深研的就是扼守关口的公司。六家——Broadcom、Marvell、MediaTek、GUC（创意电子）、Alchip（世芯电子）、VeriSilicon（芯原股份），覆盖定制 ASIC 的两种商业模式：平台型（自带 IP 与系统能力的 XPU 厂商）与设计服务型（按 NRE 与量产分成的定制芯片服务商）。</p>
+    <p>两类商业模式决定了两类周期敏感度：平台型（Broadcom、Marvell）赚"芯片收入加 IP 授权"，毛利率高，对单一项目的成败敏感；设计服务型（GUC、Alchip、VeriSilicon，以及 MediaTek 的 ASIC 部门）赚"NRE 加量产分成"，毛利率较低，但对项目总量而非单一成败敏感。周期下行时，前者先跌价，后者先跌量——触发器表因此对两类公司分别布置了观察点。</p>
+    <p>Broadcom 是平台型龙头：XPU 定制加速器业务由少数超大客户支撑，已披露 6 家合格 XPU 客户加 2 家爬坡、AI 积压订单（backlog）约 730 亿美元以上，FY26 AI 收入约 560 亿美元、FY27 AI 收入超 1,000 亿美元（2026-06-03）<button type="button" class="src-dot" data-source="K23" aria-label="查看来源"></button>，并与 OpenAI 达成 10 GW 定制加速器合作（2025-10-13）。它的关口位置在 SerDes IP、先进封装协同与 turnkey 交付能力。风险同样清楚：客户高度集中；市场上流传的"Google 约占其 AI 收入 70%"一说缺乏一手来源，本报告不采用。</p>
+    <p>Marvell 处于相似关口、体量次之：定制硅（custom silicon）收入正在爬坡，数据中心业务已成为其最大分部（右侧面板的迷你图即 Marvell 数据中心业务收入）；光电 DSP 与定制计算双线受益。观察点是定制业务能否在 2026–2027 年从"第二增长曲线"变成主引擎。</p>
+    <p>MediaTek 的 ASIC 服务是第二主业：与 Google TPU 项目的合作（媒体与研究口径）使它成为观察 ASIC 放量的前哨——本报告把"MediaTek 2026 年第四季度指引"列为触发器之首。手机主业提供现金流对冲，也让它的 ASIC 敞口更清晰地体现在增量指引里。</p>
+    <p>GUC 与 Alchip 是台系设计服务双雄。GUC 深度绑定 TSMC 生态，先进制程项目管线稳定；Alchip 带着挖矿锯齿的历史（见插曲），其 3nm AI 项目进展被列为触发器之三。两家公司对单一芯片的成败不敏感，对项目总量敏感——收的是"过路费"。</p>
+    <p>VeriSilicon（芯原股份）是大陆设计服务与半导体 IP 的代表：AI ASIC 本土化趋势的受益者，商业模式同样是 NRE 加量产分成；观察点是盈利质量与经营现金流，而非收入增速。</p>
+    <p>六家公司的共同点是关口位置：平台商与设计服务商都按"项目"收费，周期下行时先被砍的是项目数量，其次才是价格——这就是为什么 §10 的触发器里，设计服务商的指引与项目进展占了三席。再次说明：本节不提供评级与目标价；所有事实以公司披露为准，券商研究口径仅作并列参考。</p>
+    <aside class="analyst-note"><p>编辑注：本节为产业位置分析，而非证券研究；六家公司的纳入与排序均不构成推荐，也不暗示任何仓位观点。</p></aside>
+  </div>
+  <div class="wide xl">
+    <figure class="chart-frame" id="invest-chart" data-chart="invest" data-chart-height="710">
+      <h4 class="chart-title">六家公司深研：关口位置、事实与风险</h4>
+      <p class="chart-sub">Broadcom · Marvell · MediaTek · GUC · Alchip · VeriSilicon · 无评级 · 无目标价</p>
+      <div class="chart-body table-scroll" role="img" aria-label="六家供应链关口公司深研卡片：Broadcom、Marvell、MediaTek、GUC、Alchip、VeriSilicon"></div>
+      <figcaption class="chart-src">来源：<span class="src-tag src-tag--company">公司披露</span> 六家公司财报与法说会（2025–2026）；<span class="src-tag src-tag--broker">券商研究</span> 并列参考；不提供评级与目标价 · 数据截至 2026-07-18</figcaption>
+    </figure>
+  </div>
+  <div class="prose">
+    <p>从六家公司回到全报告：四十二年里，出清的语法从未改变——并购而非破产；利润的位置从未改变——关卡而非云端；周期的机制从未改变——点火、假设失效、重复下单、产能到达、出清。改变的只有约束的坐标：它从晶圆厂出发，经过 HBM 与先进封装，抵达电网。这一次不一样的地方真实存在，但它改变的是节奏，不是语法。</p>
+  </div>
+</section>
+
+</main>
+
+<footer id="appendix">
+  <div class="prose">
+    <div class="sec-no">附录</div>
+    <h2>附录 · 来源与方法</h2>
+    <p class="dek">方法、缺口与来源</p>
+    <p>本站是四十二年周期重建与 ASIC 行业深研的交互式中文版。所有结论都可以通过图表图注，追溯到带来源类别与日期的出处；方法与缺口声明如下。</p>
+    <ul>
+      <li>本站是四十二年周期重建与 ASIC 行业深研的交互式中文版。</li>
+      <li>每个窗口尽量基于当时可观察的信息重建，避免用今天的知识粉饰当年的判断。</li>
+      <li>后见之明明确标记：凡使用披露时点之后信息的判断，均在正文或图注中注明。</li>
+      <li>来源分为四类：<span class="src-tag src-tag--company">公司披露</span>、<span class="src-tag src-tag--broker">券商研究</span>、<span class="src-tag src-tag--official">行业与官方</span>、<span class="src-tag src-tag--synth">研究综合</span>，每条来源均带日期。</li>
+      <li>聚合与转载来源只作背景，不进入情景计算。</li>
+      <li>情景乘法只使用美元口径；单位口径与 CoWoS 口径仅作并列展示，互不混用。</li>
+      <li>TPU 等外部估计并列展示，不强行统一；区间与误差带（如 GW→单位 ±40%）如实呈现。</li>
+      <li>CoWoS 与 HBM 的估计可能存在 ±10–20% 差异；CoWoS 产能路径采用 75–80kwpm（2025 年末）→ 120–130kwpm（2026 年末目标，第三方估计）；capex/OCF 0.45–0.56 → 0.80 → ≈1.21（区间 1.18–1.24）为核心压力指标（K29，OCF 为 working estimate）；不使用无一手来源的"Google 约占 Broadcom AI 收入 70%"结论。</li>
+      <li>缺失数据一律标「未披露」，不做插值。</li>
+      <li>Base：≈2.5x（2025→2028E，区间 2.0–4.7x）；Conservative：≈2.0x（band 1.9–2.1x）；Contraction：−15% 至 −35%。</li>
+      <li>Kill switch：Top-4 2027 年资本开支同比增速低于 +14% 时，切换至 Contraction 路径。</li>
+      <li>本报告不提供买入、卖出或持有评级，不提供目标价。</li>
+    </ul>
+    <h3>关键量化事实表 · K1–K41</h3>
+    <p>全报告引用的 41 项关键量化事实注册表（K27 保留），与 js/data.js 的 K 表一致；正文关键数字旁的 ◆ 按钮可点出对应出处卡。</p>
+  </div>
+  <div class="wide xl">
+    <div class="table-scroll">
+      <table class="k-table">
+        <thead><tr><th>K 编号</th><th>事实</th><th>数值</th><th>口径</th><th>来源日期</th></tr></thead>
+        <tbody>
+          <tr><td class="k-id">K1</td><td>Base case</td><td>≈2.5x（区间 2.0–4.7x）</td><td>美元口径 · 2025→2028E</td><td>2026-07-18</td></tr>
+          <tr><td class="k-id">K2</td><td>Conservative case</td><td>≈2.0x（band 1.9–2.1x）</td><td>美元口径 · 2025→2028E</td><td>2026-07-18</td></tr>
+          <tr><td class="k-id">K3</td><td>Contraction case</td><td>−15% ~ −35%</td><td>美元口径 · 三年</td><td>2026-07-18</td></tr>
+          <tr><td class="k-id">K4</td><td>Kill switch</td><td>+14%</td><td>Top-4 2027 capex 增速阈值</td><td>2026-07-18</td></tr>
+          <tr><td class="k-id">K5</td><td>Top-4 capex</td><td>≈410–413（编制估计）</td><td>US$B · 2025 · 公司报告</td><td>2026-07-18</td></tr>
+          <tr><td class="k-id">K6</td><td>Unit penetration</td><td>2024 ≈30% → 2027F ≈50%（券商口径）</td><td>单位口径 · TrendForce 27.8% 为 2026 AI 服务器口径</td><td>2026-07-18</td></tr>
+          <tr><td class="k-id">K7</td><td>CoWoS allocation</td><td>≈30%</td><td>CoWoS 分配口径 · 2026E</td><td>2026-07-18</td></tr>
+          <tr><td class="k-id">K8</td><td>Dollar penetration</td><td>≈20%</td><td>美元口径 · 2027E · Series A 8/12/16/20%</td><td>2026-07-18</td></tr>
+          <tr><td class="k-id">K9</td><td>Custom ASIC TAM</td><td>60–90</td><td>US$B · 2027E SAM</td><td>2024-12-12</td></tr>
+          <tr><td class="k-id">K10</td><td>NVIDIA data-center revenue</td><td>≈17.6x（$4.28B → $75.2B）</td><td>Q1 FY2024→Q1 FY2027 · 12 个季度间隔 / 13 个观测值 · 美元口径</td><td>2026-07-18</td></tr>
+          <tr><td class="k-id">K11</td><td>CoWoS demand</td><td>未披露单点</td><td>万片/月</td><td>2026-07-18</td></tr>
+          <tr><td class="k-id">K12</td><td>CoWoS capacity</td><td>约 7–8（2025）→ 12–13（2026E）</td><td>万片/月 · 研究口径</td><td>2026-07-18</td></tr>
+          <tr><td class="k-id">K13</td><td>HBM capacity share</td><td>8%（2023）→ 41%（2027F）；2026E 33%</td><td>DRAM 收入占比 · 位元占比远低于收入占比</td><td>2026-07-18</td></tr>
+          <tr><td class="k-id">K14</td><td>HBM gap</td><td>方向确认 · 幅度未披露</td><td>—</td><td>2026-07-18</td></tr>
+          <tr><td class="k-id">K15</td><td>HBM pricing</td><td>未披露单点</td><td>—</td><td>2026-07-18</td></tr>
+          <tr><td class="k-id">K16</td><td>HBM parity</td><td>3 家供应</td><td>SK hynix / Samsung / Micron</td><td>2026-07-18</td></tr>
+          <tr><td class="k-id">K17</td><td>2001 bust</td><td>行业 −32% · 双寡头 ≈−39%</td><td>YoY · 2001 · 美元口径</td><td>2002-03-31</td></tr>
+          <tr><td class="k-id">K18</td><td>Equipment sales</td><td>未披露单点</td><td>—</td><td>2002-03-31</td></tr>
+          <tr><td class="k-id">K19</td><td>TPU estimates</td><td>8.0–8.4</td><td>百万颗 · 2027E · 50% 单位份额所需量（非区间中值）</td><td>2026-07-18</td></tr>
+          <tr><td class="k-id">K20</td><td>Trainium 2</td><td>12 个月 140 万颗 · 环比 ≈10x</td><td>公司披露 · re:Invent 2024</td><td>2026-07-18</td></tr>
+          <tr><td class="k-id">K21</td><td>TSMC revenue/GW</td><td>≈2.1（派生值）</td><td>US$B/GW · derived</td><td>2026-07-18</td></tr>
+          <tr><td class="k-id">K22</td><td>Cost/token</td><td>前沿推理价格 ≈10x/年下降</td><td>估计</td><td>2026-07-18</td></tr>
+          <tr><td class="k-id">K23</td><td>Broadcom backlog/customers</td><td>6 家合格客户 + 2 家爬坡 · AI backlog ≈$73B+</td><td>FY26 AI ≈$56B · FY27 AI &gt;$100B</td><td>2026-06-03</td></tr>
+          <tr><td class="k-id">K24</td><td>Broadcom share</td><td>≈70%</td><td>定制 ASIC 设计份额 · 研究口径</td><td>2026-07-18</td></tr>
+          <tr><td class="k-id">K25</td><td>Marvell custom silicon</td><td>未披露（未单列）</td><td>—</td><td>2026-07-18</td></tr>
+          <tr><td class="k-id">K26</td><td>Electricity</td><td>415 → 945</td><td>TWh · 2024 → 2030E</td><td>2026-07-18</td></tr>
+          <tr><td class="k-id">K27</td><td>Reserved（保留，不得重定义）</td><td>—</td><td>—</td><td>—</td></tr>
+          <tr><td class="k-id">K28</td><td>TPU 8t/8i</td><td>≈9 PFLOPS FP4（估计）</td><td>2026-04-22 发布 · 2026 晚些 GA</td><td>2026-07-18</td></tr>
+          <tr><td class="k-id">K29</td><td>Capex/OCF</td><td>0.45–0.56（2021–24）→ 0.80（2025）→ ≈1.21（2026E，区间 1.18–1.24）</td><td>倍 · OCF≈$587B 为 working estimate</td><td>2026-07-18</td></tr>
+          <tr><td class="k-id">K30</td><td>2027 capex estimates</td><td>520 / 568 / 591（三家券商测算，均对应 &gt;+14% 增速）</td><td>US$B · 2027E</td><td>2026-07-18</td></tr>
+          <tr><td class="k-id">K31</td><td>TPU range</td><td>6.5–15（中值 10.75）</td><td>百万颗 · 2026E · 研究区间</td><td>2026-07-18</td></tr>
+          <tr><td class="k-id">K32</td><td>Anthropic TPU GW</td><td>≈100 万颗 · &gt;1 GW（2026）</td><td>—</td><td>2025-10-23</td></tr>
+          <tr><td class="k-id">K33</td><td>Value crossover</td><td>未交叉</td><td>美元口径 · 2027E</td><td>2026-07-18</td></tr>
+          <tr><td class="k-id">K34</td><td>External arbiters</td><td>TPU 数量收敛 + 云厂披露</td><td>—</td><td>2026-07-18</td></tr>
+          <tr><td class="k-id">K35</td><td>Unadjudicable verdict</td><td>无法判定</td><td>—</td><td>2026-07-18</td></tr>
+          <tr><td class="k-id">K36</td><td>NVIDIA crypto hits</td><td>2 次（2019 · 2022）</td><td>库存冲击</td><td>2026-07-18</td></tr>
+          <tr><td class="k-id">K37</td><td>Alchip sawtooth</td><td>锯齿形收入：6.9 → 5.24 → 3.87（NT$B，2017–2019）</td><td>定性 + 序列</td><td>2026-07-18</td></tr>
+          <tr><td class="k-id">K38</td><td>GUC crypto mix</td><td>锯齿形收入：10.8 / 14.5 / 21.3 / 27.6 / 25.5 / 24.9（NT$B，2019–2024）</td><td>定性 + 序列</td><td>2026-07-18</td></tr>
+          <tr><td class="k-id">K39</td><td>NVLink Fusion</td><td>2025-05 发布</td><td>—</td><td>2025-05-19</td></tr>
+          <tr><td class="k-id">K40</td><td>No confirmed NVIDIA-designed custom die</td><td>确认：无</td><td>—</td><td>2026-07-18</td></tr>
+          <tr><td class="k-id">K41</td><td>NVIDIA-inside ASIC path</td><td>许可 / 平台路径</td><td>—</td><td>2026-07-18</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <h3>已退役数字</h3>
+    <p class="retired-line"><del>Base 情景 4–7× 区间</del>——退役原因：区间过宽且缺乏口径锚定，已由 ≈2.5x（K1，区间 2.0–4.7x）取代。<span class="retired-tag">已退役</span></p>
+    <p class="retired-line"><del>Base 情景 3.0–4.3x（中点≈3.6x）</del>——退役原因：分母不兼容（总 capex×美元份额），原版已标 do not cite，已由 ≈2.5x（K1，2025→2028E，区间 2.0–4.7x）取代。<span class="retired-tag">已退役</span></p>
+    <p class="retired-line"><del>CoWoS 75→110 万片扩产路径</del>——退役原因：未获一手出处证实，改用第三方估计 75–80kwpm（2025 末）→120–130kwpm（2026 末目标）（K11 / K12）。<span class="retired-tag">已退役</span></p>
+    <h3>全量来源条目</h3>
+    <p>按四类口径分组，每条带日期；聚合与转载来源不进入情景计算。</p>
+    <h4><span class="src-tag src-tag--company">公司披露</span></h4>
+    <ul class="src-list">
+        <li>NVIDIA 季度财报与电话会：数据中心分部收入序列（$4.28B Q1 FY2024 → $75.2B Q1 FY2027） <span class="src-date">2023-05 – 2026-05</span></li>
+        <li>Microsoft / Alphabet / Amazon / Meta 财报与 2026 年资本开支指引 <span class="src-date">2026-01 – 2026-02</span></li>
+        <li>Google 官方博客：首次披露 TPU <span class="src-date">2016-05-18</span></li>
+        <li>Jouppi 等：TPU ISCA 论文（能效高出一个数量级） <span class="src-date">2017-04</span></li>
+        <li>Google：Ironwood（TPU v7）发布 <span class="src-date">2025-04</span></li>
+        <li>Google Cloud Next：TPU 8t/8i 发布（≈9 PFLOPS FP4，估计） <span class="src-date">2026-04-22</span></li>
+        <li>AWS re:Invent 2024：Trainium 2 十二个月 140 万颗、环比 ≈10x <span class="src-date">2024-12</span></li>
+        <li>AWS re:Invent：Trainium 3 发布 <span class="src-date">2025-12</span></li>
+        <li>Intel：167 亿美元现金收购 Altera <span class="src-date">2015-06-01</span></li>
+        <li>Intel：将 Altera 51% 股权售予 Silver Lake <span class="src-date">2025-09-16</span></li>
+        <li>AMD：全股票收购 Xilinx（报价约 350 亿美元；2022-02 交割约 490 亿美元） <span class="src-date">2020-10-27</span></li>
+        <li>Broadcom 财报：6 家合格 XPU 客户 + 2 家爬坡、AI backlog ≈$73B+、FY26 AI ≈$56B、FY27 AI &gt;$100B <span class="src-date">2026-06-03</span></li>
+        <li>Hock Tan：XPU SAM $60–90B（Q4 FY2024 财报电话会） <span class="src-date">2024-12-12</span></li>
+        <li>Broadcom × OpenAI：10 GW 定制加速器合作 <span class="src-date">2025-10-13</span></li>
+        <li>Anthropic × Google：最多 100 万颗 TPU、&gt;1 GW 协议 <span class="src-date">2025-10-23</span></li>
+        <li>NVIDIA Computex：NVLink Fusion 发布 <span class="src-date">2025-05-19</span></li>
+        <li>Cerebras：IPO 完成（Nasdaq: CBRS，定价 $185，募资 ≈$5.5B） <span class="src-date">2026-05</span></li>
+        <li>NVIDIA × Groq：非独占许可（≈$20B，CNBC 报道、未获确认） <span class="src-date">2025-12-24</span></li>
+        <li>GlobalFoundries：收购 MIPS（原 Wave Computing） <span class="src-date">2025-08</span></li>
+    </ul>
+    <h4><span class="src-tag src-tag--broker">券商研究</span></h4>
+    <ul class="src-list">
+        <li>三家券商 2027E capex 测算：$520B / $568B / $591B（均对应 &gt;+14% 增速） <span class="src-date">2026</span></li>
+        <li>TPU 2026 年出货估计区间 650–1,500 万颗（已发表估计） <span class="src-date">2026</span></li>
+        <li>HBM 占 DRAM 收入比重 8%→41%（2023→2027F；2026E 约 33%） <span class="src-date">2026</span></li>
+        <li>CoWoS 供需测算（产能与缺口）：75–80kwpm（2025 末）→120–130kwpm（2026 末目标） <span class="src-date">2026</span></li>
+        <li>ASIC 渗透率三种口径：单位（2024 ≈30% → 2027F ≈50%）/ CoWoS / 美元（Series A 8/12/16/20%） <span class="src-date">2026-05</span></li>
+        <li>TrendForce：AI 服务器口径 ASIC 占比 27.8%（2026，非 2027 交叉口径） <span class="src-date">2026</span></li>
+    </ul>
+    <h4><span class="src-tag src-tag--official">行业与官方</span></h4>
+    <ul class="src-list">
+        <li>IEA：数据中心用电展望（415→945 TWh） <span class="src-date">2025-04</span></li>
+        <li>WSTS / SIA：2001 年半导体行业收入 −32% <span class="src-date">2002-03</span></li>
+        <li>JEDEC：HBM4 标准与各厂公开路线图 <span class="src-date">2024 – 2026</span></li>
+        <li>美国对华先进计算出口管制新规 <span class="src-date">2022-10-07</span></li>
+        <li>以太坊合并：PoW → PoS 切换 <span class="src-date">2022-09-15</span></li>
+    </ul>
+    <h4><span class="src-tag src-tag--synth">研究综合</span></h4>
+    <ul class="src-list">
+        <li>本报告 13 事件库（1985–2026） <span class="src-date">2026-07-18</span></li>
+        <li>本报告 14 家公司生存者样本（1975–2026） <span class="src-date">2026-07-18</span></li>
+        <li>情景算术与 kill switch（Base ≈2.5x / +14%） <span class="src-date">2026-07</span></li>
+        <li>八个证伪触发器与读数（point-in-time register） <span class="src-date">2026-07-18</span></li>
+    </ul>
+  </div>
+  <div class="prose">
+    <p class="appendix-meta">数据日期：2026-07-18（研究截止）</p>
+    <p class="appendix-meta">仅供信息参考，不构成投资建议</p>
+  </div>
+</footer>
+
+<aside id="dash-rail" aria-label="数据面板">
+  <canvas id="dash-canvas" aria-label="随章节更新的正射投影点阵地球与章节数据面板"></canvas>
+  <div id="dash-html"></div>
+</aside>
+
+<div id="tooltip" role="tooltip" hidden></div>
+<div id="drill-overlay" hidden>
+  <div id="drill-card" role="dialog" aria-modal="true" aria-labelledby="drill-title">
+    <button id="drill-close" type="button" aria-label="关闭详情卡片">×</button>
+    <h3 id="drill-title"></h3>
+    <div id="drill-body"></div>
+    <p id="drill-src"></p>
+  </div>
+</div>
+
+<script src="vendor/d3.min.js"></script>
+<script src="vendor/topojson-client.min.js"></script>
+<script src="js/data.js"></script>
+<script src="js/sources.js"></script>
+<script src="js/utils.js"></script>
+<script src="js/charts/assumptions.js"></script>
+<script src="js/charts/capex3d.js"></script>
+<script src="js/charts/capex_stairs.js"></script>
+<script src="js/charts/clearing.js"></script>
+<script src="js/charts/conflow.js"></script>
+<script src="js/charts/cowos.js"></script>
+<script src="js/charts/deepdive.js"></script>
+<script src="js/charts/gates.js"></script>
+<script src="js/charts/hbm.js"></script>
+<script src="js/charts/hbmgen.js"></script>
+<script src="js/charts/matrix.js"></script>
+<script src="js/charts/mechanism.js"></script>
+<script src="js/charts/mining.js"></script>
+<script src="js/charts/partition.js"></script>
+<script src="js/charts/penetration.js"></script>
+<script src="js/charts/pergw.js"></script>
+<script src="js/charts/revenue_split.js"></script>
+<script src="js/charts/sawtooth.js"></script>
+<script src="js/charts/scenario_chain.js"></script>
+<script src="js/charts/signals.js"></script>
+<script src="js/charts/stamps.js"></script>
+<script src="js/charts/submarine.js"></script>
+<script src="js/charts/timeline42.js"></script>
+<script src="js/charts/tpu.js"></script>
+<script src="js/charts/verdict_tree.js"></script>
+<script src="js/cover.js"></script>
+<script src="js/cover-exploded.js"></script>
+<script src="js/cover-wire.js"></script>
+<script src="js/dashboard.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>
