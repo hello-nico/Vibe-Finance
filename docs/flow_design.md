@@ -270,7 +270,7 @@ Vibe-Finance 的核心价值，是主动聚合行情、财务和行业数据，�
 - 长期有价值的假设、修正和待验证问题进入对象 Memory，完整聊天不进入；
 - 所有确认后的知识修改形成一条变更记录和一个本地 checkpoint，用户看到的是“变更记录”和“恢复”，不是 hash、分支或 Wiki 版本。
 
-对象知识目录、Schema 演化规则、证据合同、Memory 和 Git 生命周期的完整定义见 `knowledge-design/wiki.md`；资料 CRUD、数据通道和配置界面见 `data-design/`。
+对象知识目录三层、Schema 演化规则、证据锚点、判断层和 Git 生命周期的完整定义见 `knowledge-design/wiki.md`；存储分层与事务边界见 `architecture/architecture.md`；资料 CRUD、数据通道和配置界面见 `data-design/`。
 
 ## 9. 助手与结构化动作
 
@@ -324,13 +324,14 @@ Agent 不直接模拟点击，也不绕过确认修改持久状态。执行结�
 | 行情总览标准 | [`market-design/market_overview_standard.md`](market-design/market_overview_standard.md) | Dashboard 信息架构、刷新和行情状态 |
 | 研究 | [`research-design/research_design.md`](research-design/research_design.md) | 关注列表、对象页、状态、复核节奏、报告、助手行为 |
 | 分析方法 | [`research-design/analysis_frameworks.md`](research-design/analysis_frameworks.md) | 通用方法、动态发现规则、案例参考 |
-| Wiki / Evidence | [`knowledge-design/wiki.md`](knowledge-design/wiki.md) | Purpose、Schema、Raw、Wiki、Memory、证据、日志与恢复 |
-| 数据 | [`data-design/data_design.md`](data-design/data_design.md) | 数据源、主动摄取调度、研究资料、配置及 CRUD |
+| 知识与证据 | [`knowledge-design/wiki.md`](knowledge-design/wiki.md) | 对象目录三层：Purpose、Schema、Raw、Wiki、判断层、证据锚点、日志与恢复 |
+| 数据 | [`data-design/data_design.md`](data-design/data_design.md) | 数据源、主动摄取调度、研究资料、配置、SQLite 投影及 CRUD |
+| 架构 | [`architecture/architecture.md`](architecture/architecture.md) | 判断权边界、存储分层、知识事务与并发、运行形态、组件职责 |
 | UI | [`ui-design/DESIGN.md`](ui-design/DESIGN.md) | 壳、视觉、组件和交互纪律 |
 
 模块之间使用稳定业务事件和确定性领域命令连接，不通过页面内部状态互相控制。详细事件名、表字段和工具 Schema 在实施 Task 中定义，但不得改变本文的用户反馈和失败语义。
 
-运行时、能力复用和持久化边界见 [`README.md`](../README.md) 的 Capability boundaries、`data-design/` 的本地元数据边界和 `knowledge-design/wiki.md` 的仓库生命周期，本文不重复。
+运行时、能力复用和持久化边界见 [`README.md`](../README.md) 的 Capability boundaries、`architecture/architecture.md` 的存储分层与事务模型、`data-design/` 的本地元数据边界和 `knowledge-design/wiki.md` 的仓库生命周期，本文不重复。
 
 ## 12. 原型实施范围
 
