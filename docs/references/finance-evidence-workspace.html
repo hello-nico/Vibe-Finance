@@ -1,0 +1,1497 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>可审计金融研究工作台｜业务架构与完整流程</title>
+  <link rel="icon" href="data:,">
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f4f6f3;
+      --paper: #ffffff;
+      --ink: #17221d;
+      --muted: #647069;
+      --line: #d9dfda;
+      --green: #0f6548;
+      --green-2: #21845f;
+      --green-soft: #e6f2ec;
+      --gold: #9a6a17;
+      --gold-soft: #f7edda;
+      --blue: #326b93;
+      --blue-soft: #e8f1f7;
+      --red: #99483f;
+      --red-soft: #f7e8e5;
+      --shadow: 0 22px 60px rgba(27, 48, 38, 0.09);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 8% 0%, rgba(33, 132, 95, 0.12), transparent 27rem),
+        radial-gradient(circle at 96% 18%, rgba(50, 107, 147, 0.09), transparent 25rem),
+        var(--bg);
+      font-family:
+        Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+        "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei",
+        sans-serif;
+      line-height: 1.65;
+    }
+
+    a {
+      color: inherit;
+    }
+
+    .page {
+      width: min(1180px, calc(100% - 36px));
+      margin: 0 auto;
+      padding: 28px 0 72px;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+      margin-bottom: 72px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--green);
+      font-weight: 700;
+      letter-spacing: 0.08em;
+    }
+
+    .brand-mark {
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      background:
+        linear-gradient(90deg, transparent 46%, rgba(255,255,255,.72) 46% 54%, transparent 54%),
+        linear-gradient(0deg, transparent 46%, rgba(255,255,255,.72) 46% 54%, transparent 54%),
+        var(--green);
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.25);
+    }
+
+    .topbar-note {
+      text-align: right;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.15fr) minmax(360px, .85fr);
+      align-items: center;
+      gap: 64px;
+      margin-bottom: 96px;
+    }
+
+    .eyebrow {
+      margin: 0 0 16px;
+      color: var(--green);
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+    }
+
+    h1,
+    h2,
+    h3,
+    p {
+      margin-top: 0;
+    }
+
+    h1 {
+      max-width: 760px;
+      margin-bottom: 24px;
+      font-size: clamp(38px, 6vw, 70px);
+      line-height: 1.05;
+      letter-spacing: -0.055em;
+      font-weight: 680;
+    }
+
+    .hero-lead {
+      max-width: 680px;
+      margin-bottom: 28px;
+      color: var(--muted);
+      font-size: clamp(17px, 2vw, 21px);
+      line-height: 1.75;
+    }
+
+    .hero-points {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .pill {
+      padding: 7px 12px;
+      border: 1px solid rgba(15, 101, 72, .2);
+      border-radius: 999px;
+      background: rgba(255,255,255,.72);
+      color: var(--green);
+      font-size: 13px;
+      font-weight: 650;
+    }
+
+    .hero-visual {
+      position: relative;
+      min-height: 440px;
+    }
+
+    .hero-ring {
+      position: absolute;
+      inset: 20px;
+      border: 1px solid rgba(15, 101, 72, .2);
+      border-radius: 50%;
+    }
+
+    .hero-ring::before,
+    .hero-ring::after {
+      content: "";
+      position: absolute;
+      border: 1px solid rgba(15, 101, 72, .12);
+      border-radius: 50%;
+    }
+
+    .hero-ring::before {
+      inset: 38px;
+    }
+
+    .hero-ring::after {
+      inset: 76px;
+    }
+
+    .evidence-core {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      display: grid;
+      width: 180px;
+      height: 180px;
+      place-items: center;
+      padding: 24px;
+      transform: translate(-50%, -50%);
+      border-radius: 50%;
+      background: var(--green);
+      color: #fff;
+      box-shadow: 0 24px 56px rgba(15, 101, 72, .28);
+      text-align: center;
+      font-size: 18px;
+      font-weight: 700;
+      line-height: 1.35;
+    }
+
+    .orbit {
+      position: absolute;
+      width: 126px;
+      padding: 13px 10px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: rgba(255,255,255,.94);
+      box-shadow: 0 12px 30px rgba(27, 48, 38, .08);
+      text-align: center;
+      font-size: 14px;
+      font-weight: 650;
+    }
+
+    .orbit small {
+      display: block;
+      margin-top: 3px;
+      color: var(--muted);
+      font-weight: 500;
+    }
+
+    .orbit.o1 { top: 0; left: calc(50% - 63px); }
+    .orbit.o2 { top: 116px; right: 0; }
+    .orbit.o3 { right: 42px; bottom: 14px; }
+    .orbit.o4 { bottom: 14px; left: 42px; }
+    .orbit.o5 { top: 116px; left: 0; }
+
+    section {
+      margin-top: 96px;
+      scroll-margin-top: 24px;
+    }
+
+    .section-heading {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(280px, 460px);
+      align-items: end;
+      gap: 48px;
+      margin-bottom: 34px;
+    }
+
+    .section-kicker {
+      margin-bottom: 10px;
+      color: var(--green);
+      font-size: 12px;
+      font-weight: 750;
+      letter-spacing: .15em;
+    }
+
+    h2 {
+      margin-bottom: 0;
+      font-size: clamp(28px, 4vw, 44px);
+      line-height: 1.15;
+      letter-spacing: -.035em;
+      font-weight: 680;
+    }
+
+    .section-intro {
+      margin-bottom: 0;
+      color: var(--muted);
+      font-size: 16px;
+    }
+
+    .capability-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 14px;
+    }
+
+    .capability {
+      min-height: 220px;
+      padding: 24px 20px;
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      background: rgba(255,255,255,.78);
+    }
+
+    .capability-no {
+      display: grid;
+      width: 34px;
+      height: 34px;
+      margin-bottom: 28px;
+      place-items: center;
+      border-radius: 10px;
+      background: var(--green-soft);
+      color: var(--green);
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .capability h3 {
+      margin-bottom: 9px;
+      font-size: 18px;
+      line-height: 1.35;
+    }
+
+    .capability p {
+      margin-bottom: 0;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .architecture {
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 28px;
+      background: var(--paper);
+      box-shadow: var(--shadow);
+    }
+
+    .architecture-main {
+      display: grid;
+      grid-template-columns: 1fr 80px 1.3fr 80px 1fr;
+      align-items: stretch;
+      padding: 36px;
+    }
+
+    .lane {
+      padding: 26px;
+      border-radius: 20px;
+    }
+
+    .lane.input {
+      background: var(--blue-soft);
+    }
+
+    .lane.center {
+      background: var(--green-soft);
+    }
+
+    .lane.output {
+      background: var(--gold-soft);
+    }
+
+    .lane-label {
+      display: inline-flex;
+      margin-bottom: 20px;
+      padding: 5px 9px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.72);
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 750;
+      letter-spacing: .12em;
+    }
+
+    .lane h3 {
+      margin-bottom: 18px;
+      font-size: 22px;
+    }
+
+    .lane-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .lane-item {
+      padding: 12px 14px;
+      border: 1px solid rgba(23,34,29,.09);
+      border-radius: 12px;
+      background: rgba(255,255,255,.7);
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .lane-item span {
+      display: block;
+      margin-top: 3px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    .big-arrow {
+      display: grid;
+      place-items: center;
+      color: var(--green);
+      font-size: 36px;
+      font-weight: 300;
+    }
+
+    .human-bar {
+      display: grid;
+      grid-template-columns: 190px 1fr;
+      gap: 26px;
+      padding: 26px 36px;
+      border-top: 1px solid var(--line);
+      background: #172a21;
+      color: #fff;
+    }
+
+    .human-bar strong {
+      font-size: 17px;
+    }
+
+    .human-actions {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+    }
+
+    .human-action {
+      padding: 10px 12px;
+      border: 1px solid rgba(255,255,255,.18);
+      border-radius: 10px;
+      color: rgba(255,255,255,.86);
+      font-size: 13px;
+    }
+
+    .journey {
+      display: grid;
+      gap: 0;
+      counter-reset: step;
+    }
+
+    .journey-step {
+      position: relative;
+      display: grid;
+      grid-template-columns: 96px 1fr 320px;
+      gap: 24px;
+      min-height: 148px;
+      padding: 26px 0;
+      border-top: 1px solid var(--line);
+      counter-increment: step;
+    }
+
+    .journey-step:last-child {
+      border-bottom: 1px solid var(--line);
+    }
+
+    .step-number::before {
+      content: counter(step, decimal-leading-zero);
+      display: grid;
+      width: 52px;
+      height: 52px;
+      place-items: center;
+      border-radius: 50%;
+      background: var(--green);
+      color: #fff;
+      font-size: 15px;
+      font-weight: 750;
+      box-shadow: 0 8px 20px rgba(15,101,72,.18);
+    }
+
+    .step-main h3 {
+      margin-bottom: 8px;
+      font-size: 22px;
+    }
+
+    .step-main p,
+    .step-result p {
+      margin-bottom: 0;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .step-result {
+      align-self: center;
+      padding: 16px 18px;
+      border-radius: 14px;
+      background: var(--paper);
+      box-shadow: inset 0 0 0 1px var(--line);
+    }
+
+    .step-result strong {
+      display: block;
+      margin-bottom: 4px;
+      color: var(--green);
+      font-size: 13px;
+    }
+
+    .evidence-chain {
+      padding: 36px;
+      border: 1px solid var(--line);
+      border-radius: 28px;
+      background: #16271f;
+      color: #fff;
+      box-shadow: var(--shadow);
+    }
+
+    .chain-title {
+      max-width: 660px;
+      margin-bottom: 32px;
+      font-size: 20px;
+      color: rgba(255,255,255,.84);
+    }
+
+    .chain {
+      display: grid;
+      grid-template-columns: 1fr 36px 1fr 36px 1fr 36px 1fr 36px 1fr;
+      align-items: center;
+    }
+
+    .chain-node {
+      min-height: 150px;
+      padding: 20px;
+      border: 1px solid rgba(255,255,255,.15);
+      border-radius: 16px;
+      background: rgba(255,255,255,.07);
+    }
+
+    .chain-node em {
+      display: block;
+      margin-bottom: 20px;
+      color: #8fd5b7;
+      font-size: 12px;
+      font-style: normal;
+      font-weight: 700;
+      letter-spacing: .1em;
+    }
+
+    .chain-node strong {
+      display: block;
+      margin-bottom: 7px;
+      font-size: 17px;
+    }
+
+    .chain-node span {
+      color: rgba(255,255,255,.63);
+      font-size: 13px;
+    }
+
+    .chain-arrow {
+      text-align: center;
+      color: rgba(255,255,255,.5);
+      font-size: 24px;
+    }
+
+    .chain-footer {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 24px;
+    }
+
+    .chain-check {
+      padding: 8px 11px;
+      border-radius: 999px;
+      background: rgba(143,213,183,.12);
+      color: #b8e4d1;
+      font-size: 12px;
+    }
+
+    .example {
+      display: grid;
+      grid-template-columns: .8fr 1.2fr;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 28px;
+      background: var(--paper);
+      box-shadow: var(--shadow);
+    }
+
+    .example-aside {
+      padding: 38px;
+      background:
+        linear-gradient(145deg, rgba(15,101,72,.97), rgba(28,94,77,.9)),
+        var(--green);
+      color: #fff;
+    }
+
+    .stock-code {
+      display: inline-block;
+      margin-bottom: 70px;
+      padding: 6px 10px;
+      border: 1px solid rgba(255,255,255,.25);
+      border-radius: 999px;
+      color: rgba(255,255,255,.85);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .example-aside h3 {
+      max-width: 340px;
+      margin-bottom: 14px;
+      font-size: 32px;
+      line-height: 1.2;
+    }
+
+    .example-aside p {
+      margin-bottom: 0;
+      color: rgba(255,255,255,.72);
+    }
+
+    .example-flow {
+      display: grid;
+      gap: 0;
+      padding: 24px 36px;
+    }
+
+    .example-row {
+      display: grid;
+      grid-template-columns: 34px 150px 1fr;
+      align-items: center;
+      gap: 16px;
+      min-height: 78px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .example-row:last-child {
+      border-bottom: 0;
+    }
+
+    .example-dot {
+      display: grid;
+      width: 28px;
+      height: 28px;
+      place-items: center;
+      border-radius: 50%;
+      background: var(--green-soft);
+      color: var(--green);
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .example-row strong {
+      font-size: 14px;
+    }
+
+    .example-row span {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .workspace {
+      display: grid;
+      grid-template-columns: 220px 1fr 290px;
+      min-height: 560px;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 28px;
+      background: var(--paper);
+      box-shadow: var(--shadow);
+    }
+
+    .workspace > div {
+      padding: 26px;
+    }
+
+    .workspace-rail {
+      border-right: 1px solid var(--line);
+      background: #f8faf8;
+    }
+
+    .workspace-main {
+      min-width: 0;
+    }
+
+    .workspace-evidence {
+      border-left: 1px solid var(--line);
+      background: var(--green-soft);
+    }
+
+    .workspace-label {
+      margin-bottom: 22px;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 750;
+      letter-spacing: .12em;
+    }
+
+    .resource {
+      margin-bottom: 8px;
+      padding: 10px 11px;
+      border-radius: 10px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .resource.active {
+      background: var(--green-soft);
+      color: var(--green);
+      font-weight: 700;
+    }
+
+    .report-title {
+      margin-bottom: 8px;
+      font-size: 25px;
+    }
+
+    .report-meta {
+      margin-bottom: 30px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .report-block {
+      margin-bottom: 14px;
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+    }
+
+    .report-block.selected {
+      border-color: var(--green-2);
+      background: var(--green-soft);
+    }
+
+    .report-block strong {
+      display: block;
+      margin-bottom: 5px;
+      font-size: 14px;
+    }
+
+    .report-block p {
+      margin-bottom: 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .evidence-quote {
+      margin: 18px 0;
+      padding: 16px 0 16px 16px;
+      border-left: 3px solid var(--green);
+      font-size: 13px;
+    }
+
+    .evidence-meta {
+      display: grid;
+      gap: 10px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .evidence-meta strong {
+      color: var(--ink);
+    }
+
+    .open-source {
+      display: block;
+      width: 100%;
+      margin-top: 24px;
+      padding: 11px 14px;
+      border: 0;
+      border-radius: 10px;
+      background: var(--green);
+      color: #fff;
+      text-align: center;
+      font: inherit;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .guardrails {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 14px;
+    }
+
+    .guardrail {
+      display: grid;
+      grid-template-columns: 46px 1fr;
+      gap: 16px;
+      padding: 24px;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: rgba(255,255,255,.76);
+    }
+
+    .guardrail-mark {
+      display: grid;
+      width: 42px;
+      height: 42px;
+      place-items: center;
+      border-radius: 12px;
+      background: var(--red-soft);
+      color: var(--red);
+      font-size: 17px;
+      font-weight: 800;
+    }
+
+    .guardrail h3 {
+      margin-bottom: 4px;
+      font-size: 16px;
+    }
+
+    .guardrail p {
+      margin-bottom: 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .closing {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: center;
+      gap: 36px;
+      padding: 42px;
+      border-radius: 28px;
+      background: var(--gold-soft);
+    }
+
+    .closing h2 {
+      max-width: 680px;
+      margin-bottom: 12px;
+      font-size: clamp(28px, 4vw, 42px);
+    }
+
+    .closing p {
+      max-width: 700px;
+      margin-bottom: 0;
+      color: var(--muted);
+    }
+
+    .closing-mark {
+      display: grid;
+      width: 104px;
+      height: 104px;
+      place-items: center;
+      border: 1px solid rgba(154,106,23,.28);
+      border-radius: 50%;
+      color: var(--gold);
+      font-size: 42px;
+    }
+
+    footer {
+      margin-top: 32px;
+      color: var(--muted);
+      font-size: 12px;
+      text-align: center;
+    }
+
+    @media (max-width: 980px) {
+      .hero,
+      .section-heading,
+      .example {
+        grid-template-columns: 1fr;
+      }
+
+      .hero-visual {
+        width: min(520px, 100%);
+        margin: 0 auto;
+      }
+
+      .capability-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .capability:last-child {
+        grid-column: 1 / -1;
+      }
+
+      .architecture-main {
+        grid-template-columns: 1fr;
+        gap: 12px;
+      }
+
+      .big-arrow {
+        transform: rotate(90deg);
+      }
+
+      .human-bar,
+      .journey-step {
+        grid-template-columns: 1fr;
+      }
+
+      .human-actions {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .journey-step {
+        gap: 12px;
+      }
+
+      .step-result {
+        margin-left: 76px;
+      }
+
+      .chain {
+        grid-template-columns: 1fr;
+        gap: 8px;
+      }
+
+      .chain-arrow {
+        transform: rotate(90deg);
+      }
+
+      .chain-node {
+        min-height: 0;
+      }
+
+      .stock-code {
+        margin-bottom: 32px;
+      }
+
+      .workspace {
+        grid-template-columns: 180px 1fr;
+      }
+
+      .workspace-evidence {
+        grid-column: 1 / -1;
+        border-top: 1px solid var(--line);
+        border-left: 0;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .page {
+        width: min(100% - 24px, 1180px);
+        padding-top: 18px;
+      }
+
+      .topbar {
+        align-items: flex-start;
+        margin-bottom: 48px;
+      }
+
+      .topbar-note {
+        max-width: 150px;
+      }
+
+      .hero {
+        gap: 34px;
+        margin-bottom: 70px;
+      }
+
+      .hero-visual {
+        min-height: 380px;
+      }
+
+      .hero-ring {
+        inset: 24px 0;
+      }
+
+      .orbit {
+        width: 104px;
+        font-size: 12px;
+      }
+
+      .orbit.o2 { right: -4px; }
+      .orbit.o3 { right: 8px; }
+      .orbit.o4 { left: 8px; }
+      .orbit.o5 { left: -4px; }
+
+      section {
+        margin-top: 72px;
+      }
+
+      .capability-grid,
+      .guardrails,
+      .human-actions {
+        grid-template-columns: 1fr;
+      }
+
+      .capability:last-child {
+        grid-column: auto;
+      }
+
+      .architecture-main,
+      .evidence-chain,
+      .example-aside,
+      .example-flow {
+        padding: 22px;
+      }
+
+      .human-bar {
+        padding: 22px;
+      }
+
+      .step-result {
+        margin-left: 0;
+      }
+
+      .example-row {
+        grid-template-columns: 30px 1fr;
+        padding: 12px 0;
+      }
+
+      .example-row span {
+        grid-column: 2;
+      }
+
+      .workspace {
+        grid-template-columns: 1fr;
+      }
+
+      .workspace-rail {
+        border-right: 0;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .workspace > div {
+        padding: 22px;
+      }
+
+      .closing {
+        grid-template-columns: 1fr;
+        padding: 28px;
+      }
+
+      .closing-mark {
+        width: 76px;
+        height: 76px;
+      }
+    }
+
+    @media print {
+      body {
+        background: #fff;
+      }
+
+      .page {
+        width: 100%;
+        padding: 0;
+      }
+
+      .hero,
+      section {
+        break-inside: avoid;
+      }
+
+      .architecture,
+      .evidence-chain,
+      .example,
+      .workspace {
+        box-shadow: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <div class="topbar">
+      <div class="brand">
+        <span class="brand-mark" aria-hidden="true"></span>
+        EVIDENCE WORKSPACE
+      </div>
+      <div class="topbar-note">面向 A 股上市公司的可审计研究工作台</div>
+    </div>
+
+    <header class="hero">
+      <div>
+        <p class="eyebrow">可审计金融研究工作台</p>
+        <h1>从一堆资料，走到一项可以验证的投资判断</h1>
+        <p class="hero-lead">
+          把公司研究、行业分析、估值、报告和持续跟踪放进同一个研究项目。
+          每个重要结论都能回到原始资料，缺口与冲突不会被隐藏，最终采用权始终在用户手中。
+        </p>
+        <div class="hero-points" aria-label="核心价值">
+          <span class="pill">证据可回溯</span>
+          <span class="pill">估值可复算</span>
+          <span class="pill">缺口可见</span>
+          <span class="pill">变化可追踪</span>
+          <span class="pill">用户最终确认</span>
+        </div>
+      </div>
+
+      <div class="hero-visual" aria-label="Evidence Workspace 连接五项金融研究能力">
+        <div class="hero-ring" aria-hidden="true"></div>
+        <div class="evidence-core">Evidence<br>Workspace<br>证据工作区</div>
+        <div class="orbit o1">公司研究<small>业务与经营</small></div>
+        <div class="orbit o2">行业分析<small>价值链与竞争</small></div>
+        <div class="orbit o3">估值模型<small>情景与敏感性</small></div>
+        <div class="orbit o4">研究报告<small>判断与风险</small></div>
+        <div class="orbit o5">持续跟踪<small>变化与证伪</small></div>
+      </div>
+    </header>
+
+    <section aria-labelledby="capability-title">
+      <div class="section-heading">
+        <div>
+          <p class="section-kicker">用户获得什么</p>
+          <h2 id="capability-title">五项能力组成一条研究闭环</h2>
+        </div>
+        <p class="section-intro">
+          不是分别生成几份孤立文档，而是让后一步继承前一步已经确认的资料、判断和证据。
+        </p>
+      </div>
+
+      <div class="capability-grid">
+        <article class="capability">
+          <div class="capability-no">01</div>
+          <h3>建立研究项目</h3>
+          <p>明确公司、市场、币种、研究问题和交付物，让后续工作始终围绕同一目标。</p>
+        </article>
+        <article class="capability">
+          <div class="capability-no">02</div>
+          <h3>建立可信资料库</h3>
+          <p>优先发现交易所和公司官方资料；候选资料经用户确认后才进入正式研究。</p>
+        </article>
+        <article class="capability">
+          <div class="capability-no">03</div>
+          <h3>完成研究与估值</h3>
+          <p>形成公司档案、行业图谱、估值模型和研究报告，并明确事实、假设与判断。</p>
+        </article>
+        <article class="capability">
+          <div class="capability-no">04</div>
+          <h3>逐项检查证据</h3>
+          <p>从报告段落或估值数字直接回到原始资料的位置，确认引用、口径和时点。</p>
+        </article>
+        <article class="capability">
+          <div class="capability-no">05</div>
+          <h3>持续跟踪变化</h3>
+          <p>以已接受的研究为基线，跟踪关键变量、证伪条件和新信息带来的影响。</p>
+        </article>
+      </div>
+    </section>
+
+    <section aria-labelledby="architecture-title">
+      <div class="section-heading">
+        <div>
+          <p class="section-kicker">业务架构</p>
+          <h2 id="architecture-title">Evidence Workspace 是整项研究的中枢</h2>
+        </div>
+        <p class="section-intro">
+          所有材料先进入证据工作区，再支持研究成果；用户确认贯穿整个过程，而不是只在最后看一份报告。
+        </p>
+      </div>
+
+      <div class="architecture">
+        <div class="architecture-main">
+          <div class="lane input">
+            <span class="lane-label">研究输入</span>
+            <h3>可信材料</h3>
+            <div class="lane-list">
+              <div class="lane-item">交易所披露<span>公告、定期报告、临时报告</span></div>
+              <div class="lane-item">公司官方资料<span>经营数据、投资者交流、治理信息</span></div>
+              <div class="lane-item">行业公开资料<span>政策、价格、供需与可比公司信息</span></div>
+            </div>
+          </div>
+
+          <div class="big-arrow" aria-hidden="true">→</div>
+
+          <div class="lane center">
+            <span class="lane-label">证据工作区</span>
+            <h3>把资料变成可检查的研究依据</h3>
+            <div class="lane-list">
+              <div class="lane-item">正式资料库<span>保留来源、日期、原文和获取记录</span></div>
+              <div class="lane-item">结论证据链<span>把段落、数字和图表连回原文位置</span></div>
+              <div class="lane-item">缺口与冲突<span>明确还缺什么、哪里不一致、影响什么</span></div>
+              <div class="lane-item">审阅与版本<span>记录接受、拒绝、过期和更新后的历史</span></div>
+            </div>
+          </div>
+
+          <div class="big-arrow" aria-hidden="true">→</div>
+
+          <div class="lane output">
+            <span class="lane-label">研究成果</span>
+            <h3>可以验证的输出</h3>
+            <div class="lane-list">
+              <div class="lane-item">公司与行业研究<span>业务结构、竞争位置和关键驱动因素</span></div>
+              <div class="lane-item">估值与研究报告<span>情景、敏感性、风险与证伪条件</span></div>
+              <div class="lane-item">持续跟踪更新<span>新信息、变化幅度及对原判断的影响</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="human-bar">
+          <strong>用户始终拥有最终决定权</strong>
+          <div class="human-actions">
+            <div class="human-action">确认研究方向</div>
+            <div class="human-action">选择正式资料</div>
+            <div class="human-action">接受或拒绝成果</div>
+            <div class="human-action">决定是否启动更新</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section aria-labelledby="journey-title">
+      <div class="section-heading">
+        <div>
+          <p class="section-kicker">完整业务流程</p>
+          <h2 id="journey-title">一次金融研究如何完成</h2>
+        </div>
+        <p class="section-intro">
+          每一步都有清晰的用户动作和可见结果。没有用户授权，不会自动进入下一阶段。
+        </p>
+      </div>
+
+      <div class="journey">
+        <article class="journey-step">
+          <div class="step-number" aria-hidden="true"></div>
+          <div class="step-main">
+            <h3>确定研究任务</h3>
+            <p>选择公司、市场和币种，说明希望回答的问题、研究边界以及最终需要哪些成果。</p>
+          </div>
+          <div class="step-result">
+            <strong>用户看到</strong>
+            <p>一份可修改、可确认的研究路线，而不是立即开始一段不可控的自动流程。</p>
+          </div>
+        </article>
+
+        <article class="journey-step">
+          <div class="step-number" aria-hidden="true"></div>
+          <div class="step-main">
+            <h3>收集并筛选资料</h3>
+            <p>优先发现公司和交易所官方资料，再补充行业公开信息。搜索摘要只帮助发现，不直接充当证据。</p>
+          </div>
+          <div class="step-result">
+            <strong>用户决定</strong>
+            <p>哪些候选资料可以进入正式资料库；未确认的材料不会被当成研究事实。</p>
+          </div>
+        </article>
+
+        <article class="journey-step">
+          <div class="step-number" aria-hidden="true"></div>
+          <div class="step-main">
+            <h3>建立公司与行业基础</h3>
+            <p>梳理业务结构、经营历史、治理、价值链、竞争格局和公司在行业中的位置。</p>
+          </div>
+          <div class="step-result">
+            <strong>形成成果</strong>
+            <p>公司档案、行业分析和关系图，共同支撑后续估值与研究判断。</p>
+          </div>
+        </article>
+
+        <article class="journey-step">
+          <div class="step-number" aria-hidden="true"></div>
+          <div class="step-main">
+            <h3>完成估值与研究报告</h3>
+            <p>明确输入口径和时点，计算不同情景下的价值区间，并区分事实、假设、判断和风险。</p>
+          </div>
+          <div class="step-result">
+            <strong>质量门槛</strong>
+            <p>关键输入缺失、币种错误或资料无法追溯时，明确停止并提示缺口，不自动补数。</p>
+          </div>
+        </article>
+
+        <article class="journey-step">
+          <div class="step-number" aria-hidden="true"></div>
+          <div class="step-main">
+            <h3>检查证据并接受成果</h3>
+            <p>点击报告结论或估值数字，核对原文、位置、日期和计算依据，再接受或拒绝研究成果。</p>
+          </div>
+          <div class="step-result">
+            <strong>进入下一阶段的条件</strong>
+            <p>只有用户接受的估值模型和研究报告，才能成为持续跟踪的正式基线。</p>
+          </div>
+        </article>
+
+        <article class="journey-step">
+          <div class="step-number" aria-hidden="true"></div>
+          <div class="step-main">
+            <h3>制定跟踪策略</h3>
+            <p>从已接受的研究中提取关键变量、阈值、披露周期、风险信号和证伪条件。</p>
+          </div>
+          <div class="step-result">
+            <strong>用户确认</strong>
+            <p>选择要持续使用的研究基线，并接受跟踪策略后，更新功能才会开放。</p>
+          </div>
+        </article>
+
+        <article class="journey-step">
+          <div class="step-number" aria-hidden="true"></div>
+          <div class="step-main">
+            <h3>收到到期建议</h3>
+            <p>再次打开项目时，工作台根据披露周期和上次更新时间提示哪些内容值得复查。</p>
+          </div>
+          <div class="step-result">
+            <strong>不会发生</strong>
+            <p>提示本身不联网、不抓取资料，也不会在后台自动启动研究。</p>
+          </div>
+        </article>
+
+        <article class="journey-step">
+          <div class="step-number" aria-hidden="true"></div>
+          <div class="step-main">
+            <h3>显式启动更新</h3>
+            <p>用户决定更新后，新资料再次经过选择和确认，再与原基线比较，形成变化、影响和替代解释。</p>
+          </div>
+          <div class="step-result">
+            <strong>形成新闭环</strong>
+            <p>新的跟踪报告保留新旧证据，历史版本不被覆盖，用户可以继续审阅和追踪。</p>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section aria-labelledby="evidence-title">
+      <div class="section-heading">
+        <div>
+          <p class="section-kicker">重 Evidence Workspace</p>
+          <h2 id="evidence-title">任何重要结论，都能沿原路查回去</h2>
+        </div>
+        <p class="section-intro">
+          证据不是报告末尾的一串链接，而是连接原始资料、研究判断、估值结果和用户决策的完整路径。
+        </p>
+      </div>
+
+      <div class="evidence-chain">
+        <p class="chain-title">用户点击一个结论或数字时，工作台展示的是一条完整证据链：</p>
+        <div class="chain">
+          <div class="chain-node">
+            <em>01 原始材料</em>
+            <strong>正式披露</strong>
+            <span>保留原文、来源、日期和完整内容</span>
+          </div>
+          <div class="chain-arrow" aria-hidden="true">→</div>
+          <div class="chain-node">
+            <em>02 精确位置</em>
+            <strong>页、段、表格</strong>
+            <span>不是只打开文件，而是定位到真正支持结论的位置</span>
+          </div>
+          <div class="chain-arrow" aria-hidden="true">→</div>
+          <div class="chain-node">
+            <em>03 研究使用</em>
+            <strong>事实或输入</strong>
+            <span>说明这段资料支持了哪个事实、假设或估值输入</span>
+          </div>
+          <div class="chain-arrow" aria-hidden="true">→</div>
+          <div class="chain-node">
+            <em>04 研究成果</em>
+            <strong>报告与估值</strong>
+            <span>在段落、表格单元格和关键数字上直接检查证据</span>
+          </div>
+          <div class="chain-arrow" aria-hidden="true">→</div>
+          <div class="chain-node">
+            <em>05 用户判断</em>
+            <strong>接受或拒绝</strong>
+            <span>用户在理解依据后决定是否采用，不由系统代替判断</span>
+          </div>
+        </div>
+        <div class="chain-footer" aria-label="证据质量检查">
+          <span class="chain-check">来源是否可信</span>
+          <span class="chain-check">口径是否一致</span>
+          <span class="chain-check">时点是否正确</span>
+          <span class="chain-check">是否存在冲突</span>
+          <span class="chain-check">是否仍然有效</span>
+        </div>
+      </div>
+    </section>
+
+    <section aria-labelledby="example-title">
+      <div class="section-heading">
+        <div>
+          <p class="section-kicker">代表性业务场景</p>
+          <h2 id="example-title">以华能国际为例</h2>
+        </div>
+        <p class="section-intro">
+          A 股、人民币口径，从官方资料开始，形成估值、报告和持续跟踪的一条真实研究路线。
+        </p>
+      </div>
+
+      <div class="example">
+        <div class="example-aside">
+          <span class="stock-code">600011.SH · A股 · CNY</span>
+          <h3>华能国际完整研究项目</h3>
+          <p>研究不会止于一次估值，而是持续观察影响价值判断的一阶变量。</p>
+        </div>
+        <div class="example-flow">
+          <div class="example-row">
+            <div class="example-dot">1</div>
+            <strong>正式资料</strong>
+            <span>上交所公告、公司定期报告、经营数据和政策资料</span>
+          </div>
+          <div class="example-row">
+            <div class="example-dot">2</div>
+            <strong>公司与行业</strong>
+            <span>火电与新能源业务、行业价值链、竞争位置和盈利驱动</span>
+          </div>
+          <div class="example-row">
+            <div class="example-dot">3</div>
+            <strong>估值与报告</strong>
+            <span>现金流估值为主，股息和市场倍数交叉验证，提供三种情景</span>
+          </div>
+          <div class="example-row">
+            <div class="example-dot">4</div>
+            <strong>用户审阅</strong>
+            <span>检查关键输入、原始证据、风险和证伪条件后接受研究基线</span>
+          </div>
+          <div class="example-row">
+            <div class="example-dot">5</div>
+            <strong>持续跟踪</strong>
+            <span>燃料、电价电量、利用小时、现金流、资本开支、债务与分红</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section aria-labelledby="workspace-title">
+      <div class="section-heading">
+        <div>
+          <p class="section-kicker">用户工作台</p>
+          <h2 id="workspace-title">阅读研究的同时检查证据</h2>
+        </div>
+        <p class="section-intro">
+          资料、研究成果和证据检查处于同一工作区，用户不需要在文件夹、聊天记录和网页之间来回拼接。
+        </p>
+      </div>
+
+      <div class="workspace" aria-label="Evidence Workspace 页面布局示意">
+        <div class="workspace-rail">
+          <div class="workspace-label">项目资料</div>
+          <div class="resource">正式资料</div>
+          <div class="resource">公司档案</div>
+          <div class="resource">行业分析</div>
+          <div class="resource">估值模型</div>
+          <div class="resource active">研究报告</div>
+          <div class="resource">跟踪策略</div>
+          <div class="resource">更新记录</div>
+        </div>
+
+        <div class="workspace-main">
+          <div class="workspace-label">研究阅读区</div>
+          <h3 class="report-title">华能国际研究报告</h3>
+          <div class="report-meta">人民币口径 · 基准情景 · 关键结论均可检查证据</div>
+          <div class="report-block">
+            <strong>业务结构与盈利驱动</strong>
+            <p>火电盈利受燃料成本、电价与利用小时共同影响，新能源贡献持续提升。</p>
+          </div>
+          <div class="report-block selected">
+            <strong>基准情景判断</strong>
+            <p>当前选中的结论已打开右侧证据，可继续查看原始资料。</p>
+          </div>
+          <div class="report-block">
+            <strong>主要风险与证伪条件</strong>
+            <p>煤价反弹、电量不及预期、资本开支与现金流错配需要持续跟踪。</p>
+          </div>
+        </div>
+
+        <aside class="workspace-evidence">
+          <div class="workspace-label">证据检查</div>
+          <strong>支持当前结论的原文</strong>
+          <div class="evidence-quote">
+            这里展示与当前结论直接相关的原文片段，而不是只给出资料名称。
+          </div>
+          <div class="evidence-meta">
+            <div><strong>来源</strong><br>公司正式披露文件</div>
+            <div><strong>位置</strong><br>具体页码、段落或表格</div>
+            <div><strong>使用方式</strong><br>支持报告事实与估值输入</div>
+            <div><strong>状态</strong><br>资料有效，未发现断链</div>
+          </div>
+          <span class="open-source">打开原始资料并定位</span>
+        </aside>
+      </div>
+    </section>
+
+    <section aria-labelledby="guardrail-title">
+      <div class="section-heading">
+        <div>
+          <p class="section-kicker">业务保护</p>
+          <h2 id="guardrail-title">系统不会替用户越过这些边界</h2>
+        </div>
+        <p class="section-intro">
+          工作台负责提高研究效率和可验证性，但不会把生成速度误当成投资判断质量。
+        </p>
+      </div>
+
+      <div class="guardrails">
+        <article class="guardrail">
+          <div class="guardrail-mark">×</div>
+          <div>
+            <h3>不把搜索摘要当证据</h3>
+            <p>必须取得可阅读的正式资料，才能支持报告结论和估值数字。</p>
+          </div>
+        </article>
+        <article class="guardrail">
+          <div class="guardrail-mark">×</div>
+          <div>
+            <h3>不为关键缺口自动补数</h3>
+            <p>关键估值输入缺失时停止并说明影响，不制造看似精确的结果。</p>
+          </div>
+        </article>
+        <article class="guardrail">
+          <div class="guardrail-mark">×</div>
+          <div>
+            <h3>不自动接受研究成果</h3>
+            <p>报告、估值和跟踪策略都由用户审阅，系统不能替用户确认。</p>
+          </div>
+        </article>
+        <article class="guardrail">
+          <div class="guardrail-mark">×</div>
+          <div>
+            <h3>不自动联网或更新</h3>
+            <p>到期只提供建议；只有用户明确启动，才会收集新资料并形成更新。</p>
+          </div>
+        </article>
+        <article class="guardrail">
+          <div class="guardrail-mark">×</div>
+          <div>
+            <h3>不覆盖历史研究</h3>
+            <p>新信息形成新版本，旧结论、当时证据和审阅记录仍然保留。</p>
+          </div>
+        </article>
+        <article class="guardrail">
+          <div class="guardrail-mark">×</div>
+          <div>
+            <h3>不执行投资交易</h3>
+            <p>工作台提供研究、估值和跟踪支持，最终投资决策与执行属于用户。</p>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="closing" aria-label="最终业务价值">
+      <div>
+        <h2>真正交付的不是一份报告，而是一条可以持续验证的研究链</h2>
+        <p>
+          用户能看懂结论、检查依据、理解缺口、复算估值，并在新信息出现时知道原判断是否仍然成立。
+        </p>
+      </div>
+      <div class="closing-mark" aria-hidden="true">✓</div>
+    </section>
+
+    <footer>
+      Finance Evidence Workspace · 业务架构与完整流程
+    </footer>
+  </main>
+</body>
+</html>
