@@ -7,20 +7,19 @@
 <link rel="stylesheet" href="shared.css?v=10">
 <script src="theme.js?v=3"></script>
 <style>
+/* 数据页 v2：对齐 wiki Schema
+   数据源 = Source 登记与提取证据
+   知识   = Wiki（公司/行业）管理视图（非研究浏览）
+   配置   = Schema / Skill / 标签 / 时效规则 */
 .shell.data.agent-open .data-view { max-width: none; }
-
 .data-view { display: none; max-width: 980px; }
 .data-view.show { display: block; }
+
 .page-kicker { font: 10px var(--font-num); letter-spacing: .12em; color: var(--accent-ink); margin-bottom: 5px; }
 .page-title { font-size: 22px; font-weight: 700; line-height: 1.3; }
 .page-dek { font-size: 12.5px; color: var(--fg-2); line-height: 1.65; margin-top: 6px; max-width: 760px; }
 .page-meta { display: flex; flex-wrap: wrap; gap: 9px 16px; padding: 10px 0 12px; border-bottom: 1px solid var(--border); font-size: 10.5px; color: var(--fg-4); }
 .page-meta strong { color: var(--fg-3); font-weight: 500; font-family: var(--font-num); }
-
-.summary-line { display: grid; grid-template-columns: 1.4fr 1fr 1fr; gap: 14px; padding: 14px 0; border-bottom: 1px solid var(--border); }
-.summary-block .k { font-size: 9px; color: var(--fg-4); letter-spacing: .05em; }
-.summary-block .v { font-size: 13px; font-weight: 600; margin-top: 3px; }
-.summary-block .s { font-size: 10.5px; color: var(--fg-3); margin-top: 3px; line-height: 1.4; }
 
 .section { padding: 18px 0 4px; border-bottom: 1px solid var(--border); }
 .section:last-child { border-bottom: none; }
@@ -30,48 +29,27 @@
 .analyze { color: var(--accent-ink); cursor: pointer; margin-left: 7px; }
 .analyze:hover { text-decoration: underline; }
 
-/* Wiki 关系 */
-.relation-flow { display: grid; grid-template-columns: 1fr 24px 1.15fr 24px 1fr; gap: 5px; align-items: stretch; }
-.rel-node { padding: 9px 10px; border: 1px solid var(--border); border-radius: var(--radius); cursor: pointer; background: var(--surface); min-height: 74px; }
-.rel-node:hover, .rel-node.on { border-color: var(--accent); background: color-mix(in oklch, var(--accent) 6%, var(--surface)); }
-.rel-node .r { font-size: 9px; color: var(--fg-4); }
-.rel-node .n { font-size: 11px; font-weight: 600; margin-top: 3px; }
-.rel-node .d { font-size: 9.5px; color: var(--fg-3); margin-top: 4px; line-height: 1.35; }
-.rel-arrow { display: grid; place-items: center; color: var(--fg-4); }
+/* 通道 Dashboard */
+.channel-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+@media (max-width: 1050px) { .channel-grid { grid-template-columns: 1fr 1fr; } }
+.ch-card {
+  padding: 11px 12px; border: 1px solid var(--border); border-radius: var(--radius);
+  background: var(--surface); cursor: pointer; text-align: left; font: inherit;
+}
+.ch-card:hover, .ch-card.on { border-color: var(--accent); background: color-mix(in oklch, var(--accent) 6%, var(--surface)); }
+.ch-card .n { font-size: 12px; font-weight: 650; }
+.ch-card .m { font-size: 10px; color: var(--fg-3); margin-top: 4px; line-height: 1.4; }
+.ch-card .st { font: 9px var(--font-num); margin-top: 7px; color: var(--fg-4); }
+.ch-card .st.ok { color: var(--ok); }
+.ch-card .st.warn { color: var(--warn); }
 
-.claim-table, .source-table { width: 100%; border-collapse: collapse; font-size: 11px; }
-.claim-table th, .source-table th { text-align: left; font-size: 9px; color: var(--fg-4); font-weight: 600; padding: 5px 7px; border-bottom: 1px solid var(--border); }
-.claim-table td, .source-table td { padding: 8px 7px; border-bottom: 1px solid var(--border); vertical-align: top; color: var(--fg-2); }
-.claim-table tr, .source-table tr { cursor: pointer; }
-.claim-table tr:hover td, .source-table tr:hover td { background: var(--hover); }
-.claim-table .claim { color: var(--fg); font-weight: 500; }
-.mono { font-family: var(--font-num); }
-.state { font-size: 9.5px; white-space: nowrap; }
-.state.ok { color: var(--ok); }
-.state.warn { color: var(--warn); }
-.state.gap { color: var(--err); }
-
-.coverage { display: grid; grid-template-columns: 125px 1fr 42px; gap: 9px; align-items: center; margin: 7px 0; font-size: 10.5px; }
-.coverage .bar { height: 7px; background: var(--sunken); overflow: hidden; border-radius: 2px; }
-.coverage .bar i { display: block; height: 100%; background: var(--accent); }
-.coverage .val { font: 10px var(--font-num); color: var(--fg-3); text-align: right; }
-
-.used-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
-.used-card { padding: 9px; border: 1px solid var(--border); border-radius: var(--radius); cursor: pointer; }
-.used-card:hover { border-color: var(--border-strong); background: var(--hover); }
-.used-card .t { font-size: 10.5px; font-weight: 600; }
-.used-card .p { font-size: 9.5px; color: var(--fg-4); margin-top: 3px; }
-
-/* Source 详情 */
-.source-origin { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+.origin-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
 .origin-cell { padding: 8px 9px; border-left: 2px solid var(--border-strong); background: var(--sunken); }
 .origin-cell .k { font-size: 9px; color: var(--fg-4); }
 .origin-cell .v { font-size: 11px; font-weight: 500; margin-top: 3px; }
-.locator { font: 9.5px var(--font-num); color: var(--fg-3); }
-.quote { font-size: 10.5px; color: var(--fg-2); line-height: 1.45; }
 
 .lineage { display: flex; align-items: center; gap: 0; overflow-x: auto; padding: 4px 0 7px; }
-.lineage-node { min-width: 138px; padding: 8px 9px; border: 1px solid var(--border); border-radius: var(--radius); cursor: pointer; background: var(--surface); }
+.lineage-node { min-width: 130px; padding: 8px 9px; border: 1px solid var(--border); border-radius: var(--radius); cursor: pointer; background: var(--surface); }
 .lineage-node:hover, .lineage-node.on { border-color: var(--accent); }
 .lineage-node + .lineage-node { margin-left: 24px; position: relative; }
 .lineage-node + .lineage-node::before { content: "→"; position: absolute; left: -17px; top: 36%; color: var(--fg-4); }
@@ -79,7 +57,67 @@
 .lineage-node .v { font-size: 10.5px; font-weight: 600; margin-top: 3px; }
 .lineage-node .s { font-size: 9.5px; color: var(--fg-3); margin-top: 3px; }
 
-.selection-readout { min-height: 27px; margin-top: 8px; padding: 6px 8px; border-left: 2px solid var(--accent); background: var(--sunken); font-size: 10px; color: var(--fg-3); }
+.tbl { width: 100%; border-collapse: collapse; font-size: 11px; }
+.tbl th { text-align: left; font-size: 9px; color: var(--fg-4); font-weight: 600; padding: 5px 7px; border-bottom: 1px solid var(--border); }
+.tbl td { padding: 8px 7px; border-bottom: 1px solid var(--border); vertical-align: top; color: var(--fg-2); }
+.tbl tr { cursor: pointer; }
+.tbl tr:hover td { background: var(--hover); }
+.tbl .claim { color: var(--fg); font-weight: 500; }
+.mono { font-family: var(--font-num); }
+.locator { font: 9.5px var(--font-num); color: var(--fg-3); }
+.state { font-size: 9.5px; white-space: nowrap; }
+.state.ok { color: var(--ok); }
+.state.warn { color: var(--warn); }
+.state.gap { color: var(--err); }
+
+.fc {
+  display: inline-grid; place-items: center;
+  min-width: 14px; height: 14px; padding: 0 3px;
+  border-radius: 4px; font-family: var(--font-num); font-size: 9px; font-weight: 700;
+  vertical-align: 1px; margin-right: 4px;
+}
+.fc-f { color: #fff; background: hsl(var(--primary)); }
+.fc-c { color: hsl(var(--success)); background: hsl(var(--success) / 0.15); }
+.fc-i { color: hsl(220 60% 55%); background: hsl(220 60% 55% / 0.14); }
+.fc-s { color: var(--fg-3); background: hsl(var(--muted)); }
+.fc-u { color: hsl(var(--destructive)); background: hsl(var(--destructive) / 0.12); }
+
+.chip-row { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { font-size: 11px; padding: 5px 10px; border-radius: 8px; background: hsl(var(--muted) / 0.45); color: var(--fg-2); }
+.chip.lnk { color: hsl(var(--primary)); background: hsl(var(--primary) / 0.10); cursor: pointer; text-decoration: none; }
+.chip.lnk:hover { background: hsl(var(--primary) / 0.18); }
+
+.summary-line { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 10px; padding: 14px 0; border-bottom: 1px solid var(--border); }
+@media (max-width: 900px) { .summary-line { grid-template-columns: 1fr 1fr; } }
+.summary-block .k { font-size: 9px; color: var(--fg-4); letter-spacing: .05em; }
+.summary-block .v { font-size: 13px; font-weight: 600; margin-top: 3px; }
+.summary-block .s { font-size: 10.5px; color: var(--fg-3); margin-top: 3px; line-height: 1.4; }
+
+.coverage { display: grid; grid-template-columns: 110px 1fr 42px; gap: 9px; align-items: center; margin: 7px 0; font-size: 10.5px; }
+.coverage .bar { height: 7px; background: var(--sunken); overflow: hidden; border-radius: 2px; }
+.coverage .bar i { display: block; height: 100%; background: var(--accent); }
+.coverage .val { font: 10px var(--font-num); color: var(--fg-3); text-align: right; }
+
+/* 配置卡片 */
+.cfg-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 14px; }
+@media (max-width: 900px) { .cfg-grid { grid-template-columns: 1fr; } }
+.cfg-card {
+  padding: 14px 14px 12px; border: 1px solid var(--border); border-radius: var(--radius-lg);
+  background: var(--surface); cursor: pointer; text-align: left; font: inherit;
+}
+.cfg-card:hover { border-color: var(--border-strong); background: var(--hover); }
+.cfg-card .kicker { font: 9px var(--font-num); letter-spacing: .08em; color: var(--accent-ink); }
+.cfg-card .t { font-size: 14px; font-weight: 700; margin-top: 4px; }
+.cfg-card .d { font-size: 11px; color: var(--fg-3); margin-top: 6px; line-height: 1.5; }
+.cfg-card .meta { font: 10px var(--font-num); color: var(--fg-4); margin-top: 10px; }
+
+.toolbar { display: flex; gap: 8px; margin: 12px 0 4px; }
+.toolbar button {
+  font: inherit; font-size: 11px; font-weight: 600; cursor: pointer;
+  padding: 6px 12px; border-radius: 8px;
+  border: 1px solid var(--border); background: hsl(var(--muted) / 0.35); color: var(--fg-2);
+}
+.toolbar button.pri { color: hsl(var(--primary)); background: hsl(var(--primary) / 0.12); border-color: hsl(var(--primary) / 0.3); }
 
 .agent-msg { margin-bottom: 12px; font-size: 11.5px; color: var(--fg-2); line-height: 1.55; }
 .agent-msg .who { font-size: 9px; color: var(--fg-4); margin-bottom: 2px; }
@@ -91,10 +129,8 @@
 }
 .agent-suggest button:hover { background: var(--hover); }
 
-@media (max-width: 1050px) {
-  .summary-line, .source-origin { grid-template-columns: 1fr 1fr; }
-  .used-grid { grid-template-columns: 1fr; }
-}
+.data-list { display: none; }
+.data-list.show { display: block; }
 </style>
 </head>
 <body>
@@ -106,189 +142,406 @@
 
   <nav class="rail">
     <a class="rail-btn" href="01-market.html"><svg class="rail-ico" viewBox="0 0 24 24"><path d="M3 18h18"/><path d="M5 14l4-5 3.5 3L17 6"/><path d="M14 6h3v3"/></svg><span>行情</span></a>
-    <a class="rail-btn" href="02-research.html"><svg class="rail-ico" viewBox="0 0 24 24"><path d="M7 4h8l4 4v12H7V4z"/><path d="M15 4v4h4M9 12h6M9 16h4"/></svg><span>研究</span></a>
+    <a class="rail-btn" href="08-research-v4.html"><svg class="rail-ico" viewBox="0 0 24 24"><path d="M7 4h8l4 4v12H7V4z"/><path d="M15 4v4h4M9 12h6M9 16h4"/></svg><span>研究</span></a>
     <a class="rail-btn active" href="03-data.html"><svg class="rail-ico" viewBox="0 0 24 24"><path d="M5 5h14v14H5z"/><path d="M5 9h14M5 13h14M5 17h14M10 5v14M15 5v14"/></svg><span>数据</span></a>
     <div class="rail-spacer"></div><div class="rail-avatar">陈</div>
   </nav>
 
   <aside class="data-nav">
-    <div class="mkt-tabs"><div class="mkt-tab on" data-mode="wiki">Wiki</div><div class="mkt-tab" data-mode="source">数据源</div></div>
-    <input class="sidebar-search sidebar-search--standalone" type="search" id="search" placeholder="搜索 Wiki、来源或变量…">
+    <div class="mkt-tabs">
+      <div class="mkt-tab on" data-mode="source">数据源</div>
+      <div class="mkt-tab" data-mode="wiki">知识</div>
+      <div class="mkt-tab" data-mode="config">配置</div>
+    </div>
+    <input class="sidebar-search sidebar-search--standalone" type="search" id="search" placeholder="搜索资料、Wiki 或配置…">
 
-    <div class="data-list sidebar-list show" id="list-wiki">
-      <div class="sidebar-section-label">行业与机制</div>
-      <div class="mkt-sub-item on" data-view="wiki-capacity"><span class="sidebar-list-status">今日</span><div class="n">煤电容量电价</div><div class="m">机制 · 政策 · 现金流</div></div>
-      <div class="mkt-sub-item"><span class="sidebar-list-status">3 天</span><div class="n">航运周期</div><div class="m">集运 / 干散 / 油运</div></div>
-      <div class="mkt-sub-item"><span class="sidebar-list-status">今日</span><div class="n">推理芯片约束迁移</div><div class="m">HBM · CoWoS · 电网</div></div>
-      <div class="sidebar-section-label">公司</div>
-      <div class="mkt-sub-item"><span class="sidebar-list-status">今日</span><div class="n">华能国际</div><div class="m">煤电底盘 · 新能源期权</div></div>
-      <div class="mkt-sub-item"><span class="sidebar-list-status">今日</span><div class="n">长江电力</div><div class="m">水电现金流 · 折旧</div></div>
-      <div class="mkt-sub-item"><span class="sidebar-list-status">7 天</span><div class="n">中远海控</div><div class="m">集运运营 · 运价暴露</div></div>
-      <div class="sidebar-section-label">方法</div>
-      <div class="mkt-sub-item"><div class="n">财报阅读核心逻辑</div><div class="m">业务模型 → 变量 → 财报验证</div></div>
+    <!-- 数据源列表：通道分组 + 具体资料 -->
+    <div class="data-list sidebar-list show" id="list-source">
+      <div class="sidebar-section-label">信息通道</div>
+      <div class="mkt-sub-item on" data-view="source-dash"><span class="sidebar-list-status">总览</span><div class="n">全部通道</div><div class="m">官方 · 研报 · 资讯 · 用户资料…</div></div>
+      <div class="sidebar-section-label">近期资料</div>
+      <div class="mkt-sub-item" data-view="source-report"><span class="sidebar-list-status state ok">已提取</span><div class="n">中远海控 2026 一季报</div><div class="m">官方披露 · 2026-04-29</div></div>
+      <div class="mkt-sub-item" data-view="source-report"><span class="sidebar-list-status state ok">已提取</span><div class="n">Alphaliner 订单簿月报</div><div class="m">研究报告 · 2026-06-24</div></div>
+      <div class="mkt-sub-item" data-view="source-report"><span class="sidebar-list-status state warn">部分提取</span><div class="n">渠道纪要 · 美线长约</div><div class="m">调研纪要 · 用户上传</div></div>
+      <div class="mkt-sub-item" data-view="source-report"><span class="sidebar-list-status state ok">已登记</span><div class="n">航运三周期报告（回灌）</div><div class="m">报告回灌 · 2026-07-24</div></div>
+      <div class="sidebar-section-label">用户资料</div>
+      <div class="mkt-sub-item" data-view="source-report"><span class="sidebar-list-status state ok">已解析</span><div class="n">航运订单簿.xlsx</div><div class="m">用户资料 · 8 个时点</div></div>
+      <div class="mkt-sub-item" data-view="source-dash"><span class="sidebar-list-status state gap">缺口驱动</span><div class="n">欧线现货—长协价差</div><div class="m">尚无连续公开序列</div></div>
     </div>
 
-    <div class="data-list sidebar-list" id="list-source">
-      <div class="sidebar-section-label">官方与公司披露</div>
-      <div class="mkt-sub-item on" data-view="source-report"><span class="sidebar-list-status state ok">可用</span><div class="n">华能国际 2025 年报</div><div class="m">上交所 · PDF · 2026-03-25</div></div>
-      <div class="mkt-sub-item"><span class="sidebar-list-status state ok">可用</span><div class="n">发改价格〔2026〕114号</div><div class="m">国家发改委 · 政策原文</div></div>
-      <div class="mkt-sub-item"><span class="sidebar-list-status state warn">待更新</span><div class="n">SCFI 历史序列</div><div class="m">披露点 · 2009–2026</div></div>
-      <div class="sidebar-section-label">Provider</div>
-      <div class="mkt-sub-item"><span class="sidebar-list-status state ok">已配置</span><div class="n">Tushare Pro</div><div class="m">A股行情 · 财务三表</div></div>
-      <div class="mkt-sub-item"><span class="sidebar-list-status">未配置</span><div class="n">FactSet</div><div class="m">一致预期 · Transcript</div></div>
-      <div class="sidebar-section-label">用户文件</div>
-      <div class="mkt-sub-item"><span class="sidebar-list-status state ok">已解析</span><div class="n">航运订单簿.xlsx</div><div class="m">手工整理 · 8 个时点</div></div>
-      <div class="mkt-sub-item"><span class="sidebar-list-status state gap">缺口</span><div class="n">欧线现货—长协价差</div><div class="m">尚无连续公开序列</div></div>
+    <!-- 知识列表：公司 / 行业 Wiki 管理 -->
+    <div class="data-list sidebar-list" id="list-wiki">
+      <div class="sidebar-section-label">行业</div>
+      <div class="mkt-sub-item on" data-view="wiki-industry"><span class="sidebar-list-status state ok">已就绪</span><div class="n">航运</div><div class="m">23 事实 · 3 缺口 · as_of 07-24</div></div>
+      <div class="mkt-sub-item" data-view="wiki-industry"><span class="sidebar-list-status state warn">整理中</span><div class="n">推理芯片</div><div class="m">12 事实 · 5 缺口</div></div>
+      <div class="sidebar-section-label">公司</div>
+      <div class="mkt-sub-item" data-view="wiki-company"><span class="sidebar-list-status state ok">已就绪</span><div class="n">中远海控</div><div class="m">19 事实 · 2 缺口 · 601919.SH</div></div>
+      <div class="mkt-sub-item" data-view="wiki-company"><span class="sidebar-list-status state ok">已就绪</span><div class="n">寒武纪</div><div class="m">16 事实 · 2 缺口 · 688256.SH</div></div>
+      <div class="mkt-sub-item" data-view="wiki-company"><span class="sidebar-list-status state warn">整理中</span><div class="n">三花智控</div><div class="m">9 事实 · 3 缺口</div></div>
+    </div>
+
+    <!-- 配置列表 -->
+    <div class="data-list sidebar-list" id="list-config">
+      <div class="sidebar-section-label">知识结构</div>
+      <div class="mkt-sub-item on" data-view="cfg-dash"><span class="sidebar-list-status">总览</span><div class="n">全部配置</div><div class="m">Schema · Skill · 标签 · 时效</div></div>
+      <div class="mkt-sub-item" data-view="cfg-schema"><div class="n">公司 / 行业 Schema</div><div class="m">默认分区 · 关系类型 · FCISU</div></div>
+      <div class="mkt-sub-item" data-view="cfg-skill"><div class="n">研究 Skills</div><div class="m">4 个 SOP · 按 desc 推荐</div></div>
+      <div class="sidebar-section-label">聚合与时效</div>
+      <div class="mkt-sub-item" data-view="cfg-tags"><div class="n">标签</div><div class="m">周期 / AI算力 / 人形机器人…</div></div>
+      <div class="mkt-sub-item" data-view="cfg-fresh"><div class="n">时效衰减窗口</div><div class="m">高频周级 · 财务报告期 · 结构年级</div></div>
     </div>
   </aside>
 
   <main class="data-main">
     <div class="content-with-agent">
     <div class="page-body" id="data-body">
-    <div class="data-view show" id="view-wiki-capacity">
-      <div class="page-kicker">WIKI · 行业机制</div>
-      <h1 class="page-title">煤电容量电价</h1>
-      <p class="page-dek">为煤电提供固定成本回收，降低纯电量电价对利润的支配，但不消除煤价、电价与利用小时的周期影响。</p>
-      <div class="page-meta"><span>更新 <strong>2026-07-30</strong></span><span>数据截至 <strong>2026-06-30</strong></span><span>状态 <strong>部分验证</strong></span><span>引用 <strong>12 sources</strong></span></div>
 
-      <div class="summary-line">
-        <div class="summary-block"><div class="k">当前判断</div><div class="v">固定成本回收增强，利润仍取决于价差</div><div class="s">容量费提供底线，不应被解释成火电利润完全公用事业化。</div></div>
-        <div class="summary-block"><div class="k">核心变量</div><div class="v">回收比例 ≥50%</div><div class="s">各省执行细则与实际到账节奏。</div></div>
-        <div class="summary-block"><div class="k">主要缺口</div><div class="v state warn">省级执行数据</div><div class="s">公开口径分散，尚无统一季度序列。</div></div>
+      <!-- ═══ 数据源总览 ═══ -->
+      <div class="data-view show" id="view-source-dash">
+        <div class="page-kicker">SOURCE · 资料层</div>
+        <h1 class="page-title">数据源</h1>
+        <p class="page-dek">外部通道与用户资料统一登记为不可变资料（Source）。登记时补齐三时间字段与统一 ID；提取后进入证据层，再采信进 Wiki。</p>
+        <div class="page-meta">
+          <span>资料 <strong>47</strong></span>
+          <span>已提取证据 <strong>186</strong></span>
+          <span>待处理 <strong>5</strong></span>
+          <span>缺口驱动 <strong>3</strong></span>
+        </div>
+
+        <div class="toolbar">
+          <button class="pri" type="button">＋ 上传资料</button>
+          <button type="button">从通道拉取</button>
+        </div>
+
+        <section class="section">
+          <div class="section-head"><div class="section-title">信息通道</div><div class="section-note">业务来源，不是支撑项目名</div></div>
+          <div class="channel-grid">
+            <button class="ch-card on" type="button"><div class="n">官方披露</div><div class="m">年报 · 公告 · 互动易</div><div class="st ok">12 份 · 已连接</div></button>
+            <button class="ch-card" type="button"><div class="n">研究报告</div><div class="m">券商 / 行业数据库</div><div class="st ok">18 份 · 已连接</div></button>
+            <button class="ch-card" type="button"><div class="n">资讯舆情</div><div class="m">新闻 · RSS · 快讯</div><div class="st ok">自动增量</div></button>
+            <button class="ch-card" type="button"><div class="n">量化数据</div><div class="m">运价 · 财务序列</div><div class="st warn">SCFI 待更新</div></button>
+            <button class="ch-card" type="button"><div class="n">调研纪要</div><div class="m">电话会 · 渠道笔记</div><div class="st">用户上传为主</div></button>
+            <button class="ch-card" type="button"><div class="n">市场传闻</div><div class="m">默认 U 级登记</div><div class="st">谨慎采信</div></button>
+            <button class="ch-card" type="button"><div class="n">用户资料</div><div class="m">表格 · PDF · 笔记</div><div class="st ok">6 份</div></button>
+            <button class="ch-card" type="button"><div class="n">报告回灌</div><div class="m">研究页导出再输入</div><div class="st ok">2 份</div></button>
+          </div>
+        </section>
+
+        <section class="section">
+          <div class="section-head"><div class="section-title">近期资料</div><div class="section-note">点击进入详情</div></div>
+          <table class="tbl">
+            <thead><tr><th>资料</th><th>通道</th><th>发布</th><th>数据截至</th><th>抓取/上传</th><th>状态</th></tr></thead>
+            <tbody>
+              <tr data-open="source-report"><td class="claim">中远海控 2026 一季报</td><td>官方披露</td><td class="mono">04-29</td><td class="mono">03-31</td><td class="mono">04-29</td><td class="state ok">已提取 8</td></tr>
+              <tr data-open="source-report"><td class="claim">Alphaliner 订单簿月报</td><td>研究报告</td><td class="mono">06-24</td><td class="mono">06-24</td><td class="mono">06-25</td><td class="state ok">已提取 5</td></tr>
+              <tr data-open="source-report"><td class="claim">渠道纪要 · 美线长约</td><td>调研纪要</td><td class="mono">07-08</td><td class="mono">07-08</td><td class="mono">07-08</td><td class="state warn">部分提取</td></tr>
+              <tr data-open="source-report"><td class="claim">航运三周期报告（回灌）</td><td>报告回灌</td><td class="mono">07-24</td><td class="mono">07-24</td><td class="mono">07-24</td><td class="state ok">已登记</td></tr>
+            </tbody>
+          </table>
+        </section>
       </div>
 
-      <section class="section">
-        <div class="section-head"><div class="section-title">关系与传导 <span class="analyze" data-agent="煤电容量电价关系图">继续分析</span></div><div class="section-note">点击节点查看它如何进入研究</div></div>
-        <div class="relation-flow" data-select-group>
-          <div class="rel-node" data-select="政策输入" data-note="114号文与各省执行细则决定固定成本回收比例。"><div class="r">政策输入</div><div class="n">容量电价</div><div class="d">固定成本回收比例</div></div>
-          <div class="rel-arrow">→</div>
-          <div class="rel-node on" data-select="行业机制" data-note="容量收入与电量电价共同决定煤电经营现金流。"><div class="r">行业机制</div><div class="n">煤电利润结构</div><div class="d">容量收入 + 电量价差</div></div>
-          <div class="rel-arrow">→</div>
-          <div class="rel-node" data-select="公司暴露" data-note="华能与国电受益程度取决于煤电占比和省份结构。"><div class="r">公司暴露</div><div class="n">华能 / 国电</div><div class="d">煤电占比 · 省份结构</div></div>
+      <!-- ═══ 资料详情 ═══ -->
+      <div class="data-view" id="view-source-report">
+        <div class="page-kicker">SOURCE · 官方披露</div>
+        <h1 class="page-title">中远海控 2026 年第一季度报告</h1>
+        <p class="page-dek">公司正式披露。用于验证船队、货量、单箱成本、净现金与分红回购等公司 Wiki 事实。</p>
+        <div class="page-meta">
+          <span>ID <strong>src_cosco_2026q1</strong></span>
+          <span>发布 <strong>2026-04-29</strong></span>
+          <span>数据截至 <strong>2026-03-31</strong></span>
+          <span>抓取 <strong>2026-04-29</strong></span>
+          <span>出处 <strong>上交所</strong></span>
         </div>
-        <div class="selection-readout">已选：行业机制 · 容量收入与电量价差共同决定煤电经营现金流。</div>
-      </section>
 
-      <section class="section">
-        <div class="section-head"><div class="section-title">知识结论</div><div class="section-note">结论必须对应来源与可验证状态</div></div>
-        <table class="claim-table">
-          <thead><tr><th>结论</th><th>当前证据</th><th>状态</th><th>更新</th></tr></thead>
+        <section class="section">
+          <div class="section-head"><div class="section-title">资料身份</div><div class="section-note">Source 契约三时间字段</div></div>
+          <div class="origin-grid">
+            <div class="origin-cell"><div class="k">通道</div><div class="v">官方披露</div></div>
+            <div class="origin-cell"><div class="k">原文</div><div class="v">PDF · 上交所</div></div>
+            <div class="origin-cell"><div class="k">覆盖对象</div><div class="v">中远海控 · 航运</div></div>
+            <div class="origin-cell"><div class="k">published_at</div><div class="v mono">2026-04-29</div></div>
+            <div class="origin-cell"><div class="k">data_as_of</div><div class="v mono">2026-03-31</div></div>
+            <div class="origin-cell"><div class="k">fetched_at</div><div class="v mono">2026-04-29</div></div>
+          </div>
+        </section>
+
+        <section class="section">
+          <div class="section-head"><div class="section-title">数据血缘</div><div class="section-note">SOURCE → EVIDENCE → WIKI → REPORT</div></div>
+          <div class="lineage">
+            <div class="lineage-node on"><div class="k">SOURCE</div><div class="v">2026Q1 报告</div><div class="s">不可变原文</div></div>
+            <div class="lineage-node"><div class="k">EVIDENCE</div><div class="v">8 条已提取</div><div class="s">FCISU + 定位</div></div>
+            <div class="lineage-node"><div class="k">WIKI</div><div class="v">公司事实采信</div><div class="s">中远海控</div></div>
+            <div class="lineage-node"><div class="k">REPORT</div><div class="v">航运三周期</div><div class="s">可反向追溯</div></div>
+          </div>
+        </section>
+
+        <section class="section">
+          <div class="section-head"><div class="section-title">已提取证据</div><div class="section-note">陈述级 · 可打开锚点</div></div>
+          <table class="tbl">
+            <thead><tr><th>陈述</th><th>FCISU</th><th>原文定位</th><th>时效</th><th>服务于</th></tr></thead>
+            <tbody>
+              <tr><td class="claim">自营船队 502 艘 / 约 310 万 TEU</td><td><span class="fc fc-c">C</span></td><td class="locator">经营数据 · 船队</td><td class="state ok">新鲜→趋旧</td><td>中远海控</td></tr>
+              <tr><td class="claim">净现金约 1,480 亿元</td><td><span class="fc fc-c">C</span></td><td class="locator">资产负债表</td><td class="state ok">报告期</td><td>中远海控</td></tr>
+              <tr><td class="claim">2026Q1 归母净利同比 -58%</td><td><span class="fc fc-f">F</span></td><td class="locator">主要会计数据</td><td class="state ok">报告期</td><td>中远海控</td></tr>
+              <tr><td class="claim">各省容量回收比例</td><td><span class="fc fc-u">U</span></td><td class="locator">—</td><td class="state gap">未披露</td><td>—</td></tr>
+            </tbody>
+          </table>
+        </section>
+
+        <section class="section">
+          <div class="section-head"><div class="section-title">覆盖与限制</div></div>
+          <div class="chip-row" style="margin-bottom:10px">
+            <a class="chip lnk" href="08-research-v4.html#company">中远海控 Wiki ↗</a>
+            <a class="chip lnk" href="08-research-v4.html#industry">航运 Wiki ↗</a>
+          </div>
+          <table class="tbl">
+            <tbody>
+              <tr><td class="claim">长约重谈比例</td><td>年报/季报未单独披露，不能从本资料推出。</td><td class="state gap">需纪要或公告</td></tr>
+              <tr><td class="claim">即期运价弹性</td><td>财务数为季度滞后，需外部 SCFI 序列。</td><td class="state warn">降级使用</td></tr>
+            </tbody>
+          </table>
+        </section>
+      </div>
+
+      <!-- ═══ 知识 · 行业 Wiki 管理 ═══ -->
+      <div class="data-view" id="view-wiki-industry">
+        <div class="page-kicker">知识 · 行业 Wiki</div>
+        <h1 class="page-title">航运</h1>
+        <p class="page-dek">管理视图：查看事实覆盖、缺口驱动与支撑资料。深度浏览与分析在研究页。</p>
+        <div class="page-meta">
+          <span>状态 <strong>已就绪</strong></span>
+          <span>as_of <strong>2026-07-24</strong></span>
+          <span>事实 <strong>23</strong></span>
+          <span>缺口 <strong>3</strong></span>
+          <span>标签 <strong>#周期/三桶金</strong></span>
+        </div>
+
+        <div class="summary-line">
+          <div class="summary-block"><div class="k">关键变量</div><div class="v">SCFI · 订单簿</div><div class="s">指向口径类事实</div></div>
+          <div class="summary-block"><div class="k">关系边</div><div class="v">11</div><div class="s">均挂证据</div></div>
+          <div class="summary-block"><div class="k">支撑资料</div><div class="v">23</div><div class="s">官方 6 · 研报 12 · 其他 5</div></div>
+          <div class="summary-block"><div class="k">研究使用</div><div class="v">1 份报告</div><div class="s">航运三周期</div></div>
+        </div>
+
+        <section class="section">
+          <div class="section-head">
+            <div class="section-title">分区覆盖</div>
+            <div class="section-note"><a class="analyze" href="08-research-v4.html#industry">在研究页打开 ↗</a></div>
+          </div>
+          <div class="coverage"><span>边界与口径</span><div class="bar"><i style="width:100%"></i></div><span class="val">3/3</span></div>
+          <div class="coverage"><span>需求与供给</span><div class="bar"><i style="width:85%"></i></div><span class="val">6/7</span></div>
+          <div class="coverage"><span>机制与周期</span><div class="bar"><i style="width:80%"></i></div><span class="val">4/5</span></div>
+          <div class="coverage"><span>格局与玩家</span><div class="bar"><i style="width:60%"></i></div><span class="val">3/5</span></div>
+          <div class="coverage"><span>政策与监管</span><div class="bar"><i style="width:50%"></i></div><span class="val">2/4</span></div>
+          <div class="coverage"><span>事件与风险</span><div class="bar"><i style="width:40%"></i></div><span class="val">3/8</span></div>
+        </section>
+
+        <section class="section">
+          <div class="section-head"><div class="section-title">缺口（采集驱动）</div><div class="section-note">待补项驱动通道拉取与深度检索</div></div>
+          <table class="tbl">
+            <thead><tr><th>问题</th><th>原因</th><th>状态</th></tr></thead>
+            <tbody>
+              <tr><td class="claim">订单簿是否回落进 30% 出清带</td><td>证据缺失</td><td class="state gap">待补</td></tr>
+              <tr><td class="claim">红海复航进度冲突</td><td>事实冲突待解</td><td class="state warn">待解</td></tr>
+              <tr><td class="claim">船厂排期与拆船对冲</td><td>报告盲区回写</td><td class="state gap">待补</td></tr>
+            </tbody>
+          </table>
+        </section>
+
+        <section class="section">
+          <div class="section-head"><div class="section-title">支撑资料</div></div>
+          <div class="chip-row">
+            <span class="chip lnk" data-open="source-report">Alphaliner 订单簿月报</span>
+            <span class="chip lnk" data-open="source-report">SCFI 周报</span>
+            <span class="chip lnk" data-open="source-report">航运三周期（回灌）</span>
+          </div>
+        </section>
+      </div>
+
+      <!-- ═══ 知识 · 公司 Wiki 管理 ═══ -->
+      <div class="data-view" id="view-wiki-company">
+        <div class="page-kicker">知识 · 公司 Wiki</div>
+        <h1 class="page-title">中远海控</h1>
+        <p class="page-dek">管理视图：事实分区覆盖、缺口与资料血缘。不重复行情数字面板。</p>
+        <div class="page-meta">
+          <span>代码 <strong>601919.SH</strong></span>
+          <span>状态 <strong>已就绪</strong></span>
+          <span>as_of <strong>2026-07-24</strong></span>
+          <span>事实 <strong>19</strong></span>
+          <span>缺口 <strong>2</strong></span>
+        </div>
+
+        <div class="summary-line">
+          <div class="summary-block"><div class="k">关键变量</div><div class="v">长约占比 · 单箱成本</div><div class="s">口径类事实</div></div>
+          <div class="summary-block"><div class="k">主行业</div><div class="v">航运 · 集运</div><div class="s">主营暴露约 96%</div></div>
+          <div class="summary-block"><div class="k">存疑事实</div><div class="v">1</div><div class="s">美线长约价 · I 级</div></div>
+          <div class="summary-block"><div class="k">研究使用</div><div class="v">1 份报告</div><div class="s"><a class="analyze" href="08-research-v4.html#report">打开 ↗</a></div></div>
+        </div>
+
+        <section class="section">
+          <div class="section-head">
+            <div class="section-title">分区覆盖</div>
+            <div class="section-note"><a class="analyze" href="08-research-v4.html#company">在研究页打开 ↗</a></div>
+          </div>
+          <div class="coverage"><span>业务与模式</span><div class="bar"><i style="width:90%"></i></div><span class="val">3/3</span></div>
+          <div class="coverage"><span>经营与订单</span><div class="bar"><i style="width:55%"></i></div><span class="val">3/5</span></div>
+          <div class="coverage"><span>财务与资本</span><div class="bar"><i style="width:80%"></i></div><span class="val">3/4</span></div>
+          <div class="coverage"><span>格局与竞争</span><div class="bar"><i style="width:50%"></i></div><span class="val">2/4</span></div>
+          <div class="coverage"><span>治理与股东</span><div class="bar"><i style="width:70%"></i></div><span class="val">2/3</span></div>
+          <div class="coverage"><span>事件与风险</span><div class="bar"><i style="width:40%"></i></div><span class="val">3/7</span></div>
+        </section>
+
+        <section class="section">
+          <div class="section-head"><div class="section-title">缺口</div></div>
+          <table class="tbl">
+            <thead><tr><th>问题</th><th>原因</th><th>状态</th></tr></thead>
+            <tbody>
+              <tr><td class="claim">2026 美线长约重谈比例缺直接披露</td><td>证据缺失</td><td class="state gap">待补</td></tr>
+              <tr><td class="claim">Q3 即期价弹性是否兑现单箱利润</td><td>报告盲区回写</td><td class="state gap">待补</td></tr>
+            </tbody>
+          </table>
+        </section>
+      </div>
+
+      <!-- ═══ 配置总览 ═══ -->
+      <div class="data-view" id="view-cfg-dash">
+        <div class="page-kicker">CONFIG</div>
+        <h1 class="page-title">配置</h1>
+        <p class="page-dek">Schema 定义 Wiki 怎么装事实；Skill 是研究方法 SOP；标签用于动态聚合。三者均不引入版本。</p>
+
+        <div class="cfg-grid">
+          <button class="cfg-card" type="button" data-open="cfg-schema">
+            <div class="kicker">SCHEMA</div>
+            <div class="t">公司 / 行业 Schema</div>
+            <div class="d">默认六分区、关系类型、FCISU 判定规则。系统默认 + 用户可配。</div>
+            <div class="meta">2 套默认 · 可扩展</div>
+          </button>
+          <button class="cfg-card" type="button" data-open="cfg-skill">
+            <div class="kicker">SKILL</div>
+            <div class="t">研究 Skills</div>
+            <div class="d">研究方法 SOP（name / desc / instructions）。推荐只依据 desc 与聚合上下文。</div>
+            <div class="meta">4 个已启用</div>
+          </button>
+          <button class="cfg-card" type="button" data-open="cfg-tags">
+            <div class="kicker">TAGS</div>
+            <div class="t">标签</div>
+            <div class="d">Wiki 档案上的轻量属性。单选或多选 = 一次查询，不建研究池。</div>
+            <div class="meta">5 个标签</div>
+          </button>
+          <button class="cfg-card" type="button" data-open="cfg-fresh">
+            <div class="kicker">FRESHNESS</div>
+            <div class="t">时效衰减窗口</div>
+            <div class="d">由 data_as_of + 数据性质推导新鲜 / 趋旧 / 过时，不人工维护。</div>
+            <div class="meta">5 档默认</div>
+          </button>
+        </div>
+      </div>
+
+      <div class="data-view" id="view-cfg-schema">
+        <div class="page-kicker">CONFIG · SCHEMA</div>
+        <h1 class="page-title">公司 / 行业 Schema</h1>
+        <p class="page-dek">规则层：档案字段、事实分区、关系类型、FCISU 与时效规则。不决定研究页卡片布局。</p>
+        <div class="page-meta"><span>默认套件 <strong>v2 候选</strong></span><span>用户覆盖 <strong>0</strong></span></div>
+        <section class="section">
+          <div class="section-head"><div class="section-title">公司事实分区</div></div>
+          <table class="tbl">
+            <thead><tr><th>分区</th><th>承载</th><th>主要 Raw 通道</th></tr></thead>
+            <tbody>
+              <tr><td class="claim">业务与模式</td><td>业务拆分、商业模式、产业链角色</td><td>年报 / F10、招股书</td></tr>
+              <tr><td class="claim">经营与订单</td><td>产能、订单客户、量价</td><td>公告、纪要、互动易</td></tr>
+              <tr><td class="claim">财务与资本</td><td>资本结构、现金、分红回购</td><td>定期报告</td></tr>
+              <tr><td class="claim">格局与竞争</td><td>份额、对手、优劣势</td><td>研报、行业数据</td></tr>
+              <tr><td class="claim">治理与股东</td><td>管理层、股权、激励</td><td>公告、F10</td></tr>
+              <tr><td class="claim">事件与风险</td><td>催化、风险、传闻</td><td>新闻、公告、传闻</td></tr>
+            </tbody>
+          </table>
+        </section>
+        <section class="section">
+          <div class="section-head"><div class="section-title">行业事实分区</div></div>
+          <table class="tbl">
+            <thead><tr><th>分区</th><th>承载</th><th>主要 Raw 通道</th></tr></thead>
+            <tbody>
+              <tr><td class="claim">边界与口径</td><td>定义、子行业、指标口径</td><td>行业研报、自建</td></tr>
+              <tr><td class="claim">需求与供给</td><td>需求驱动、产能、库存</td><td>研报、行业数据</td></tr>
+              <tr><td class="claim">机制与周期</td><td>传导链、周期相位</td><td>研报、报告回灌</td></tr>
+              <tr><td class="claim">格局与玩家</td><td>集中度、联盟、角色</td><td>研报、公告</td></tr>
+              <tr><td class="claim">政策与监管</td><td>法规、补贴、贸易政策</td><td>官方披露、新闻</td></tr>
+              <tr><td class="claim">事件与风险</td><td>事件、风险、传闻</td><td>新闻、RSS</td></tr>
+            </tbody>
+          </table>
+        </section>
+      </div>
+
+      <div class="data-view" id="view-cfg-skill">
+        <div class="page-kicker">CONFIG · SKILL</div>
+        <h1 class="page-title">研究 Skills</h1>
+        <p class="page-dek">研究方法 SOP。与 Wiki 结构零耦合；生成报告时按 desc 与聚合上下文即时推荐。</p>
+        <div class="toolbar"><button class="pri" type="button">＋ 新建 Skill</button></div>
+        <table class="tbl">
+          <thead><tr><th>名称</th><th>desc（推荐依据）</th><th>适用范围</th><th>状态</th></tr></thead>
           <tbody>
-            <tr data-select="固定成本回收"><td class="claim">固定成本回收比例提高至不低于 50%</td><td>114号文原文</td><td class="state ok">已确认</td><td class="mono">2026-01</td></tr>
-            <tr data-select="利润传导"><td class="claim">容量收入改善火电利润下限</td><td>政策原文 + 公司披露</td><td class="state warn">部分验证</td><td class="mono">2026Q1</td></tr>
-            <tr data-select="省级执行"><td class="claim">各省实际回收进度达到政策目标</td><td>缺统一季度序列</td><td class="state gap">证据缺口</td><td class="mono">待补</td></tr>
+            <tr><td class="claim">周期与景气跟踪</td><td>多子行业周期相位错位与证伪信号</td><td>行业 + 多家公司</td><td class="state ok">启用</td></tr>
+            <tr><td class="claim">产业链拆解</td><td>上下游传导与最先兑现利润的环节</td><td>行业机制 + 暴露公司</td><td class="state ok">启用</td></tr>
+            <tr><td class="claim">竞争格局分析</td><td>份额、壁垒与结构性优劣势</td><td>同行公司集合</td><td class="state ok">启用</td></tr>
+            <tr><td class="claim">多公司横向比较</td><td>同一关键变量上的对照</td><td>2+ 公司</td><td class="state ok">启用</td></tr>
           </tbody>
         </table>
-      </section>
+      </div>
 
-      <section class="section">
-        <div class="section-head"><div class="section-title">证据覆盖</div><div class="section-note">不是综合评分，而是覆盖范围</div></div>
-        <div class="coverage"><span>政策机制</span><div class="bar"><i style="width:100%"></i></div><span class="val">4/4</span></div>
-        <div class="coverage"><span>公司财报验证</span><div class="bar"><i style="width:72%"></i></div><span class="val">5/7</span></div>
-        <div class="coverage"><span>省级执行细则</span><div class="bar"><i style="width:38%"></i></div><span class="val">6/16</span></div>
-        <div class="coverage"><span>季度实际到账</span><div class="bar"><i style="width:20%"></i></div><span class="val">2/10</span></div>
-      </section>
-
-      <section class="section">
-        <div class="section-head"><div class="section-title">支撑来源 <span class="analyze" data-agent="Wiki 支撑来源">查看来源关系</span></div><div class="section-note">支持、反对和缺口并列</div></div>
-        <table class="source-table">
-          <thead><tr><th>来源</th><th>贡献</th><th>定位</th><th>关系</th></tr></thead>
+      <div class="data-view" id="view-cfg-tags">
+        <div class="page-kicker">CONFIG · TAGS</div>
+        <h1 class="page-title">标签</h1>
+        <p class="page-dek">只存在于 Wiki 档案。选择标签 = 查询聚合，成员变化不形成版本。</p>
+        <div class="toolbar"><button class="pri" type="button">＋ 新建标签</button></div>
+        <table class="tbl">
+          <thead><tr><th>标签</th><th>行业</th><th>公司</th><th>最近报告</th></tr></thead>
           <tbody>
-            <tr data-open-source><td>发改价格〔2026〕114号</td><td>定义固定成本回收比例</td><td class="locator">第 2 条</td><td class="state ok">支持</td></tr>
-            <tr data-open-source><td>华能国际 2025 年报</td><td>煤电利润与容量收益披露</td><td class="locator">经营讨论</td><td class="state warn">部分支持</td></tr>
-            <tr><td>省级容量电价执行汇总</td><td>验证实际执行比例</td><td class="locator">未形成</td><td class="state gap">缺口</td></tr>
+            <tr><td class="claim">周期 / 三桶金</td><td class="mono">2</td><td class="mono">1</td><td>航运三周期</td></tr>
+            <tr><td class="claim">AI算力</td><td class="mono">1</td><td class="mono">1</td><td>芯片→服务器传导链</td></tr>
+            <tr><td class="claim">国产替代</td><td class="mono">1</td><td class="mono">0</td><td>—</td></tr>
+            <tr><td class="claim">人形机器人</td><td class="mono">0</td><td class="mono">3</td><td>执行器三家对比</td></tr>
           </tbody>
         </table>
-      </section>
+      </div>
 
-      <section class="section">
-        <div class="section-head"><div class="section-title">被研究使用</div><div class="section-note">Wiki 不是终点</div></div>
-        <div class="used-grid">
-          <div class="used-card"><div class="t">电力行业 · 利润池</div><div class="p">行业机制 → 火电固定成本</div></div>
-          <div class="used-card"><div class="t">华能国际 · 利润生成</div><div class="p">容量收入 → 一阶/二阶变量</div></div>
-          <div class="used-card"><div class="t">国电电力 · 估值情景</div><div class="p">执行比例 → 公用事业化假设</div></div>
-        </div>
-      </section>
-    </div>
-
-    <div class="data-view" id="view-source-report">
-      <div class="page-kicker">SOURCE · 公司披露</div>
-      <h1 class="page-title">华能国际 2025 年年度报告</h1>
-      <p class="page-dek">公司正式披露文件。用于验证装机、电量、煤价、利润结构、现金流、资本开支和容量收益等 Wiki 结论。</p>
-      <div class="page-meta"><span>发布 <strong>2026-03-25</strong></span><span>来源 <strong>上交所</strong></span><span>格式 <strong>PDF · 438页</strong></span><span>状态 <strong>已解析</strong></span></div>
-
-      <section class="section">
-        <div class="section-head"><div class="section-title">来源身份</div><div class="section-note">原文与解析结果分开记录</div></div>
-        <div class="source-origin">
-          <div class="origin-cell"><div class="k">级别</div><div class="v">L1 · 官方披露</div></div>
-          <div class="origin-cell"><div class="k">覆盖期间</div><div class="v">2025A</div></div>
-          <div class="origin-cell"><div class="k">解析</div><div class="v">PDF → 结构化文本</div></div>
-          <div class="origin-cell"><div class="k">完整性</div><div class="v state ok">438 / 438 页</div></div>
-        </div>
-      </section>
-
-      <section class="section">
-        <div class="section-head"><div class="section-title">数据血缘 <span class="analyze" data-agent="年报数据血缘">继续分析</span></div><div class="section-note">从原文到研究结论</div></div>
-        <div class="lineage" data-select-group>
-          <div class="lineage-node on" data-select="原始来源" data-note="上交所发布的公司正式 PDF。"><div class="k">SOURCE</div><div class="v">2025 年报 PDF</div><div class="s">上交所原文</div></div>
-          <div class="lineage-node" data-select="证据片段" data-note="定位到经营讨论、分部数据和现金流量表。"><div class="k">EVIDENCE</div><div class="v">段落 / 表格 / 数值</div><div class="s">页码与表格定位</div></div>
-          <div class="lineage-node" data-select="Wiki 结论" data-note="更新华能国际和煤电容量电价 Wiki。"><div class="k">WIKI</div><div class="v">公司与机制知识</div><div class="s">结论 + 关系</div></div>
-          <div class="lineage-node" data-select="研究使用" data-note="进入利润生成、现金留存与估值情景。"><div class="k">RESEARCH</div><div class="v">图表与判断</div><div class="s">可反向追溯</div></div>
-        </div>
-        <div class="selection-readout">已选：原始来源 · 上交所发布的公司正式 PDF。</div>
-      </section>
-
-      <section class="section">
-        <div class="section-head"><div class="section-title">已提取证据</div><div class="section-note">点击片段可定位原文</div></div>
-        <table class="source-table">
-          <thead><tr><th>证据片段</th><th>值/摘要</th><th>原文定位</th><th>状态</th></tr></thead>
+      <div class="data-view" id="view-cfg-fresh">
+        <div class="page-kicker">CONFIG · FRESHNESS</div>
+        <h1 class="page-title">时效衰减窗口</h1>
+        <p class="page-dek">freshness 由 data_as_of + 数据性质推导。报告引用趋旧/过时证据时，锚点卡必须显示状态。</p>
+        <table class="tbl">
+          <thead><tr><th>数据性质</th><th>示例</th><th>默认窗口</th></tr></thead>
           <tbody>
-            <tr data-select="归母净利润"><td class="claim">2025 归母净利润</td><td class="mono">144.10 亿元</td><td class="locator">P18 · 主要会计数据</td><td class="state ok">已核对</td></tr>
-            <tr data-select="经营现金流"><td class="claim">经营活动现金流</td><td class="mono">公司披露值</td><td class="locator">P126 · 现金流量表</td><td class="state ok">已核对</td></tr>
-            <tr data-select="容量收益"><td class="claim">容量电价收益</td><td>未单独完整拆分</td><td class="locator">P42 · 经营讨论</td><td class="state warn">部分披露</td></tr>
-            <tr data-select="省级执行"><td class="claim">各省实际回收比例</td><td>年报未提供统一表</td><td class="locator">—</td><td class="state gap">缺口</td></tr>
+            <tr><td class="claim">高频市场类</td><td>运价、批价、库存周报</td><td>周级</td></tr>
+            <tr><td class="claim">定期财务类</td><td>财报事实</td><td>一个报告期</td></tr>
+            <tr><td class="claim">结构类</td><td>商业模式、产业链角色</td><td>年级</td></tr>
+            <tr><td class="claim">政策类</td><td>法规、补贴</td><td>直到被新政策替代</td></tr>
+            <tr><td class="claim">事件类</td><td>公告、传闻</td><td>按事件生命周期</td></tr>
           </tbody>
         </table>
-      </section>
+      </div>
 
-      <section class="section">
-        <div class="section-head"><div class="section-title">覆盖对象</div><div class="section-note">本来源可以更新什么</div></div>
-        <div class="used-grid">
-          <div class="used-card"><div class="t">华能国际 Wiki</div><div class="p">主营结构 · 利润变量 · 现金流</div></div>
-          <div class="used-card"><div class="t">煤电容量电价</div><div class="p">公司层实际验证</div></div>
-          <div class="used-card"><div class="t">电力行业研究</div><div class="p">利润池 · 关联公司 · 证伪</div></div>
-        </div>
-      </section>
-
-      <section class="section">
-        <div class="section-head"><div class="section-title">口径与限制</div><div class="section-note">不能从该来源推出的结论</div></div>
-        <table class="claim-table"><tbody>
-          <tr><td class="claim">容量收益</td><td>没有按省、按季度完整拆分，不能单独形成连续趋势。</td><td class="state warn">降级使用</td></tr>
-          <tr><td class="claim">煤价实时变化</td><td>年报为历史口径，需要外部煤价序列替换滞后值。</td><td class="state gap">需外部源</td></tr>
-        </tbody></table>
-      </section>
-    </div>
     </div><!-- /.page-body -->
 
     <aside class="agent-drawer" id="agent" aria-hidden="true">
       <div class="agent-hd">
         <div class="info">
-          <div class="t" id="agent-title">煤电容量电价</div>
-          <div class="s" id="agent-context">Wiki · 当前判断</div>
+          <div class="t" id="agent-title">数据源</div>
+          <div class="s" id="agent-context">资料 · 通道总览</div>
         </div>
         <button type="button" class="agent-close" id="agent-close" aria-label="关闭">×</button>
       </div>
       <div class="agent-body">
-        <div class="agent-msg"><div class="who">助手</div>当前会话继承所选 Wiki、来源、证据片段与数据血缘。</div>
+        <div class="agent-msg"><div class="who">助手</div>可协助登记资料、核对证据提取、按缺口驱动拉取，或调整 Schema / Skill。</div>
         <div class="agent-suggest">
-          <button type="button">哪些结论仍缺少省级执行数据？</button>
-          <button type="button">从年报中定位容量收益相关原文</button>
-          <button type="button">这个来源被哪些研究图表使用？</button>
+          <button type="button">把这份资料提取进中远海控 Wiki</button>
+          <button type="button">列出航运 Wiki 仍待补的缺口</button>
+          <button type="button">为「周期跟踪」补一条 Skill 说明</button>
         </div>
       </div>
-      <div class="agent-ft"><input placeholder="继续分析…"><button type="button">发送</button></div>
+      <div class="agent-ft"><input placeholder="继续…"><button type="button">发送</button></div>
     </aside>
-    </div><!-- /.content-with-agent -->
+    </div>
   </main>
 </div>
 
@@ -296,15 +549,34 @@
 (() => {
   const shell = document.getElementById('shell');
   const tabs = document.querySelectorAll('.mkt-tab');
-  const lists = { wiki: document.getElementById('list-wiki'), source: document.getElementById('list-source') };
+  const lists = {
+    source: document.getElementById('list-source'),
+    wiki: document.getElementById('list-wiki'),
+    config: document.getElementById('list-config')
+  };
   const search = document.getElementById('search');
-  const views = { wiki: document.getElementById('view-wiki-capacity'), source: document.getElementById('view-source-report') };
   const agent = document.getElementById('agent');
   const btnAgent = document.getElementById('agent-open');
   const title = document.getElementById('agent-title');
   const context = document.getElementById('agent-context');
-  let mode = 'wiki';
-  let selected = '当前判断';
+
+  const MODE_DEFAULT = {
+    source: 'source-dash',
+    wiki: 'wiki-industry',
+    config: 'cfg-dash'
+  };
+  const MODE_LABEL = {
+    source: ['数据源', '资料 · 通道总览'],
+    wiki: ['知识', 'Wiki · 管理'],
+    config: ['配置', 'Schema · Skill · 标签']
+  };
+
+  let mode = 'source';
+
+  function showView(id) {
+    document.querySelectorAll('.data-view').forEach(v => v.classList.toggle('show', v.id === 'view-' + id));
+    document.getElementById('data-body').scrollTop = 0;
+  }
 
   function openAgent() {
     shell.classList.add('agent-open');
@@ -317,16 +589,20 @@
     btnAgent.classList.remove('on');
   }
 
+  function syncAgent() {
+    const lab = MODE_LABEL[mode];
+    title.textContent = lab[0];
+    context.textContent = lab[1];
+  }
+
   function switchMode(next) {
     mode = next;
     tabs.forEach(t => t.classList.toggle('on', t.dataset.mode === next));
     Object.entries(lists).forEach(([key, el]) => el.classList.toggle('show', key === next));
-    Object.entries(views).forEach(([key, el]) => el.classList.toggle('show', key === next));
     document.querySelectorAll(`#list-${next} .mkt-sub-item`).forEach((item, i) => item.classList.toggle('on', i === 0));
+    showView(MODE_DEFAULT[next]);
     applyListSearch();
-    selected = next === 'wiki' ? '当前判断' : '来源身份';
     syncAgent();
-    document.getElementById('data-body').scrollTop = 0;
   }
 
   function applyListSearch() {
@@ -349,47 +625,44 @@
     });
   }
 
-  function syncAgent() {
-    title.textContent = mode === 'wiki' ? '煤电容量电价' : '华能国际 2025 年报';
-    context.textContent = `${mode === 'wiki' ? 'Wiki' : '数据源'} · ${selected}`;
-  }
-
   tabs.forEach(tab => tab.addEventListener('click', () => switchMode(tab.dataset.mode)));
   search.addEventListener('input', applyListSearch);
-  document.querySelectorAll('.mkt-sub-item').forEach(item => item.addEventListener('click', () => {
-    item.closest('.data-list').querySelectorAll('.mkt-sub-item').forEach(x => x.classList.remove('on'));
-    item.classList.add('on');
-  }));
 
-  document.addEventListener('click', event => {
-    const mark = event.target.closest('[data-select]');
-    if (!mark) return;
-    const group = mark.closest('[data-select-group]');
-    group?.querySelectorAll('[data-select].on').forEach(x => x.classList.remove('on'));
-    mark.classList.add('on');
-    selected = mark.dataset.select;
-    const readout = mark.closest('.section')?.querySelector('.selection-readout');
-    if (readout) readout.textContent = `已选：${selected} · ${mark.dataset.note || '可查看来源和下游使用。'}`;
-    syncAgent();
+  document.querySelectorAll('.mkt-sub-item[data-view]').forEach(item => {
+    item.addEventListener('click', () => {
+      item.closest('.data-list').querySelectorAll('.mkt-sub-item').forEach(x => x.classList.remove('on'));
+      item.classList.add('on');
+      showView(item.dataset.view);
+    });
   });
 
-  document.querySelectorAll('[data-open-source]').forEach(row => row.addEventListener('click', () => switchMode('source')));
-  document.querySelectorAll('[data-agent]').forEach(el => el.addEventListener('click', () => {
-    selected = el.dataset.agent;
-    syncAgent();
-    openAgent();
-  }));
+  document.querySelectorAll('[data-open]').forEach(el => {
+    el.addEventListener('click', () => {
+      const id = el.getAttribute('data-open');
+      if (id.startsWith('source')) switchMode('source');
+      else if (id.startsWith('wiki')) switchMode('wiki');
+      else if (id.startsWith('cfg')) switchMode('config');
+      showView(id);
+      const listKey = id.startsWith('source') ? 'source' : id.startsWith('wiki') ? 'wiki' : 'config';
+      const hit = document.querySelector(`#list-${listKey} [data-view="${id}"]`);
+      if (hit) {
+        hit.closest('.data-list').querySelectorAll('.mkt-sub-item').forEach(x => x.classList.remove('on'));
+        hit.classList.add('on');
+      }
+    });
+  });
+
   btnAgent.addEventListener('click', () => {
     if (shell.classList.contains('agent-open')) closeAgent();
     else openAgent();
-  });
-  agent.addEventListener('click', () => {
-    if (!shell.classList.contains('agent-open')) openAgent();
   });
   document.getElementById('agent-close').addEventListener('click', e => {
     e.stopPropagation();
     closeAgent();
   });
+
+  const hash = location.hash.replace('#', '');
+  if (hash === 'wiki' || hash === 'config' || hash === 'source') switchMode(hash);
 })();
 </script>
 <script src="nav-collapse.js?v=10"></script>
