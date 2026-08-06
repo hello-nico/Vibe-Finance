@@ -1,6 +1,6 @@
 # 数据模块合同
 
-> 本文拥有“数据源 / 研究资料 / 配置”三个页面的用户职责、主动摄取调度、操作生命周期和失败语义。Source、Evidence、Wiki、Memory、日志与恢复的内部合同以 [`../knowledge-design/wiki.md`](../knowledge-design/wiki.md) 为准；资料到位之后的复核节奏以 [`../research-design/research_design.md`](../research-design/research_design.md) 为准。
+> 本文拥有“数据源 / 研究资料 / 配置”三个页面的用户职责、主动摄取调度、操作生命周期、SQLite 投影边界和失败语义。Source、Evidence、Wiki、判断层、日志与恢复的内部合同以 [`../knowledge-design/wiki.md`](../knowledge-design/wiki.md) 为准；存储分层与事务模型以 [`../architecture/architecture.md`](../architecture/architecture.md) 为准；资料到位之后的复核节奏以 [`../research-design/research_design.md`](../research-design/research_design.md) 为准。
 
 ## 1. Responsibility
 
@@ -146,6 +146,8 @@ Schema 配置默认折叠并标为高级能力。用户可以查看和调整：
 
 Schema 用于约束 Agent 怎样维护知识，不预先枚举各行业必填字段。对象身份、来源、原文定位、FCISU 和数据时间等证据底线不可删除。
 
+**这里编辑的是仓库级的个股与行业两份全局 Schema，不是逐对象配置。** 因此界面必须说明修改会影响后续所有对象的维护方式，并展示当前已存在的对象级偏离。全局 Schema 的演化规则见 [`../knowledge-design/wiki.md`](../knowledge-design/wiki.md) §5。
+
 Agent 在正常摄取和分析中新增可复用页面类型或维护规则时，可以随知识更新一并演化 Schema，记录原因并形成 checkpoint，不逐次打断用户。用户主动编辑 Schema，或删除、重命名、迁移已有结构等可能重算现有知识的变更，必须通过影响预览和二次确认。
 
 ### 5.2 Research Skills
@@ -190,17 +192,19 @@ Agent 在正常摄取和分析中新增可复用页面类型或维护规则时�
 
 ## 7. Local metadata boundary
 
+**知识仓库是唯一权威，SQLite 是可随时丢弃重建的投影层。** 删除整个数据库后，重新扫描知识仓库必须能完全恢复用户可见的列表、状态和时间。
+
 客户端 SQLite 至少保存：
 
 - 个股、行业、关注关系及其“关注 / 跟踪 / 持有”标签元数据；
 - 数据源连接和状态元数据；
 - 用户上传资料索引；
 - 初始化、复核和失败恢复事件；
-- 前端查询所需的派生状态。
+- 从判断层投影的列表页查询字段：研究状态、最近更新时间、待复核标记和上次轻复核时间。
 
-Purpose、Schema、Raw、Wiki、Memory、稳定的通用 Skills 和 `wiki/log.md` 等确定性知识文件进入本地知识仓库并由 Git 管理。接口缓存、tick 和临时解析产物不进入知识仓库。
+Purpose、Schema、Raw、Wiki、判断层（`verdict.md`、`report.md`、`memory.md`）、稳定的通用 Skills 和 `wiki/log.md` 等确定性知识文件进入本地知识仓库并由 Git 管理。接口缓存、tick 和临时解析产物既不进入知识仓库，也不需要长期保留在 SQLite。
 
-具体表、字段、migration 和命令 payload 由实施 Task 定义；不得将同一事实同时交给 SQLite 和文件仓库作为权威写入者。
+具体表、字段、migration 和命令 payload 由实施 Task 定义。约束是：**不得将同一事实同时交给 SQLite 和文件仓库作为权威写入者**——投影字段只能由确定性 Command 在知识事务提交后写入，任何界面或 Agent 路径都不得绕过知识仓库直接改写投影。分层依据与事务边界见 [`../architecture/architecture.md`](../architecture/architecture.md) §3 与 §4。
 
 ## 8. Capability reuse
 
@@ -252,5 +256,6 @@ Purpose、Schema、Raw、Wiki、Memory、稳定的通用 Skills 和 `wiki/log.md
 - 编辑和删除前能够看到影响并二次确认；
 - 事务失败不会留下资料与研究知识不一致的半成品；
 - 用户能从配置页的“变更记录”恢复已经删除的研究档案或资料，但无需理解 Git；
+- 删除 SQLite 后重新扫描知识仓库，关注列表、研究状态和更新时间可以完全重建；
 - Schema 高级配置保护证据底线并允许对象结构逐步演化；
 - Pi Skills 可以导入、启停和声明适用范围；没有行业专用 Skill 也能使用默认主线和通用方法。
