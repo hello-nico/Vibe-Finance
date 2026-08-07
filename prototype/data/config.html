@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>投研助手 · 数据 · 配置</title>
+<link rel="stylesheet" href="../shared.css?v=10">
+<link rel="stylesheet" href="data.css?v=1">
+<script src="../theme.js?v=3"></script>
+<script src="data.js?v=1"></script>
+<style>body > main.main-area { display: none; }</style>
+</head>
+<body>
+<div id="shell-root" data-view="config"></div>
+
+<main class="main-area">
+  <div class="content-with-agent">
+    <div class="page-body">
+
+      <div class="ov-head">
+        <div>
+          <h1>配置</h1>
+          <p class="sub">高级规则与全局恢复入口；普通使用不需要动这里</p>
+        </div>
+      </div>
+
+      <div class="dat-sec">
+        <div class="dat-sec-h">
+          <div class="dat-sec-t">规则</div>
+          <div class="dat-sec-note">Schema 是高级能力，默认折叠</div>
+        </div>
+        <div class="cfg-grid">
+          <div class="cfg-card" id="cfg-schema">
+            <div class="t">Schema <span class="cfg-adv">高级</span></div>
+            <div class="d">档案的页面类型、分析框架与证据底线。修改会影响后续所有对象的维护方式。</div>
+            <div class="cfg-body">
+              <ul class="dlg-list">
+                <li>页面类型与组织约定：保持现状，不建议修改</li>
+                <li>分析框架与核心问题：默认主线 + 通用方法</li>
+                <li>冲突处理：并存标记存疑，不单边覆盖</li>
+                <li>时效窗口与待复核阈值：按数据性质默认</li>
+              </ul>
+              <div class="dlg-note">证据底线（身份、来源、原文定位、事实分级、数据时间）不可删除。此处为全局规则，不是逐对象配置；当前没有对象级偏离。</div>
+            </div>
+          </div>
+
+          <div class="cfg-card" id="cfg-skills">
+            <div class="t">研究 Skills</div>
+            <div class="d">查看、导入、启停和声明适用范围；不要求按行业预建。</div>
+            <div class="cfg-body" id="skills-body"></div>
+          </div>
+
+          <div class="cfg-card" id="cfg-tags">
+            <div class="t">标签</div>
+            <div class="d">普通标签用于列表筛选与临时定位；「关注 / 跟踪 / 持有」是加入时直接选择的内置标签，不在这里管理。</div>
+          </div>
+
+          <div class="cfg-card" id="cfg-fresh">
+            <div class="t">时效规则</div>
+            <div class="d">按数据性质的新鲜窗口；调整后重新推导新鲜、趋旧和过时。</div>
+            <div class="cfg-body" id="fresh-body"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="dat-sec" id="sec-changes">
+        <div class="dat-sec-h">
+          <div class="dat-sec-t">变更记录</div>
+          <div class="dat-sec-note">全局恢复入口 · 按业务时间线</div>
+        </div>
+        <div id="changes-body"></div>
+      </div>
+
+    </div>
+  </div>
+</main>
+
+<div class="toast" id="toast"></div>
+<div id="dlg-root"></div>
+
+<script src="shell.js?v=1"></script>
+<script src="agent.js?v=1"></script>
+<script src="../nav-collapse.js?v=10"></script>
+<script src="components.js?v=1"></script>
+<script>
+(function () {
+  var D = window.DATA_MOCK;
+  var C = window.DataComponents;
+
+  window.DATA_AGENT_CTX = {
+    title: '配置',
+    sub: '数据 · 助手',
+    body: '会带上当前页的规则与变更记录；恢复动作会先预览影响并二次确认。',
+    ph: '问配置…',
+    suggest: ['Schema 能改什么、不能改什么？', '删除的研究档案怎么恢复？', '研究 Skills 现在启用了哪些？'],
+  };
+
+  function toast(text) {
+    var t = document.getElementById('toast');
+    t.textContent = text;
+    t.classList.add('show');
+    clearTimeout(t._t);
+    t._t = setTimeout(function () { t.classList.remove('show'); }, 2800);
+  }
+
+  document.getElementById('skills-body').innerHTML = C.renderSkills(D.skills);
+  document.getElementById('fresh-body').innerHTML = C.renderFreshness(D.freshness);
+  document.getElementById('changes-body').innerHTML = C.renderChanges(D.changes);
+
+  // 配置卡展开（标签卡无 body，点击提示即可）
+  ['cfg-schema', 'cfg-skills', 'cfg-fresh'].forEach(function (id) {
+    var card = document.getElementById(id);
+    card.addEventListener('click', function (ev) {
+      if (ev.target.closest('.skill-toggle')) return;
+      card.classList.toggle('open');
+    });
+  });
+  document.getElementById('cfg-tags').addEventListener('click', function () {
+    toast('普通标签只用于筛选列表；「关注 / 跟踪 / 持有」在加入或卡片上直接选择。');
+  });
+
+  document.querySelectorAll('.skill-toggle').forEach(function (el) {
+    el.addEventListener('click', function (ev) {
+      ev.stopPropagation();
+      el.classList.toggle('on');
+      var name = el.closest('.skill-row').querySelector('.skill-name').textContent;
+      toast('「' + name + '」已' + (el.classList.contains('on') ? '启用' : '停用') + '（演示）。');
+    });
+  });
+
+  // 恢复预览
+  document.querySelectorAll('.change-restore').forEach(function (el) {
+    el.addEventListener('click', function () {
+      var root = document.getElementById('dlg-root');
+      root.innerHTML = C.restoreDialog(el.getAttribute('data-restore'));
+      var mask = document.getElementById('dlg-mask');
+      requestAnimationFrame(function () { mask.classList.add('show'); });
+      document.getElementById('dlg-cancel').addEventListener('click', function () { mask.classList.remove('show'); });
+      document.getElementById('dlg-confirm').addEventListener('click', function () {
+        mask.classList.remove('show');
+        el.closest('.change-item').style.opacity = '.45';
+        el.remove();
+        toast('已恢复（演示）· 本次恢复已形成新的变更记录。');
+      });
+    });
+  });
+})();
+</script>
+</body>
+</html>

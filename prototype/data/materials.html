@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>投研助手 · 数据 · 研究资料</title>
+<link rel="stylesheet" href="../shared.css?v=10">
+<link rel="stylesheet" href="data.css?v=1">
+<script src="../theme.js?v=3"></script>
+<script src="data.js?v=1"></script>
+<style>body > main.main-area { display: none; }</style>
+</head>
+<body>
+<div id="shell-root" data-view="materials"></div>
+
+<main class="main-area">
+  <div class="content-with-agent">
+    <div class="page-body">
+
+      <div class="ov-head">
+        <div>
+          <h1>研究资料</h1>
+          <p class="sub">你上传的文件、链接和文本；改或删之前先看影响</p>
+        </div>
+      </div>
+
+      <div class="mat-actions-row">
+        <button type="button" class="mat-btn" id="btn-add">添加资料</button>
+        <button type="button" class="mat-btn plain" id="btn-batch">批量导入</button>
+      </div>
+
+      <div class="dat-sec">
+        <div class="dat-sec-h">
+          <div class="dat-sec-t">全部资料</div>
+          <div class="dat-sec-note">只包含你上传的内容 · 系统的研究档案不在这里</div>
+        </div>
+        <div id="materials-body"></div>
+      </div>
+
+    </div>
+  </div>
+</main>
+
+<div class="toast" id="toast"></div>
+<div id="dlg-root"></div>
+
+<script src="shell.js?v=1"></script>
+<script src="agent.js?v=1"></script>
+<script src="../nav-collapse.js?v=10"></script>
+<script src="components.js?v=1"></script>
+<script>
+(function () {
+  var D = window.DATA_MOCK;
+  var C = window.DataComponents;
+
+  window.DATA_AGENT_CTX = {
+    title: '研究资料',
+    sub: '数据 · 助手',
+    body: '会带上当前页的资料列表、解析状态与关联对象；删除或编辑前会先给你看影响。',
+    ph: '问研究资料…',
+    suggest: ['哪份资料解析失败了？', '删一份资料会影响什么？', '待选择对象是什么意思？'],
+  };
+
+  function toast(text) {
+    var t = document.getElementById('toast');
+    t.textContent = text;
+    t.classList.add('show');
+    clearTimeout(t._t);
+    t._t = setTimeout(function () { t.classList.remove('show'); }, 2800);
+  }
+
+  function openDlg(html) {
+    var root = document.getElementById('dlg-root');
+    root.innerHTML = html;
+    var mask = document.getElementById('dlg-mask');
+    requestAnimationFrame(function () { mask.classList.add('show'); });
+    var cancel = document.getElementById('dlg-cancel');
+    if (cancel) cancel.addEventListener('click', function () { mask.classList.remove('show'); });
+    return mask;
+  }
+
+  document.getElementById('materials-body').innerHTML = C.renderMaterials(D.materials);
+  bindMaterialActions();
+
+  // 侧边栏按状态筛选
+  document.querySelectorAll('[data-mat-filter]').forEach(function (el) {
+    el.addEventListener('click', function () {
+      document.querySelectorAll('[data-mat-filter]').forEach(function (x) { x.classList.remove('on'); });
+      el.classList.add('on');
+      var f = el.getAttribute('data-mat-filter');
+      var map = { ok: '已解析', fail: '解析失败', pending: '待选择对象' };
+      var list = f === 'all' ? D.materials : D.materials.filter(function (m) { return m.status === map[f]; });
+      document.getElementById('materials-body').innerHTML = C.renderMaterials(list);
+      bindMaterialActions();
+    });
+  });
+
+  document.getElementById('btn-add').addEventListener('click', function () { toast('添加资料：文件、URL 或粘贴文本（演示）。'); });
+  document.getElementById('btn-batch').addEventListener('click', function () {
+    var mask = openDlg(C.ambiguityDialog(D.ambiguity));
+    mask.querySelectorAll('.dlg-cand').forEach(function (el) {
+      el.addEventListener('click', function () {
+        mask.classList.remove('show');
+        toast('已关联到「' + el.getAttribute('data-cand') + '」，进入解析（演示）。');
+      });
+    });
+  });
+
+  function bindMaterialActions() {
+  document.querySelectorAll('.mat-item').forEach(function (item) {
+    item.querySelectorAll('.mat-act').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var act = btn.getAttribute('data-act');
+        if (act === 'view') toast('打开资料详情（演示）。');
+        if (act === 'retry') toast('已重新解析（演示）。');
+        if (act === 'edit') toast('编辑前会先展示影响范围（演示）。');
+        if (act === 'pick') {
+          var mask = openDlg(C.ambiguityDialog(D.ambiguity));
+          mask.querySelectorAll('.dlg-cand').forEach(function (el) {
+            el.addEventListener('click', function () {
+              mask.classList.remove('show');
+              toast('已关联到「' + el.getAttribute('data-cand') + '」（演示）。');
+            });
+          });
+        }
+        if (act === 'delete') {
+          var mask = openDlg(C.impactDialog(D.impact));
+          document.getElementById('dlg-confirm').addEventListener('click', function () {
+            mask.classList.remove('show');
+            toast('已删除（演示）· 受影响报告已标记待更新；可从「配置 → 变更记录」恢复。');
+          });
+        }
+      });
+    });
+  });
+  }
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>投研助手 · 研究 · 中远海控</title>
+<link rel="stylesheet" href="../shared.css?v=10">
+<link rel="stylesheet" href="research.css?v=1">
+<script src="../theme.js?v=3"></script>
+<script src="data.js?v=1"></script>
+<style>body > main.main-area { display: none; }</style>
+</head>
+<body>
+<div id="shell-root" data-view="object"></div>
+
+<main class="main-area">
+  <div class="content-with-agent">
+    <div class="page-body" id="page-body"></div>
+  </div>
+</main>
+
+<div class="toast" id="toast"></div>
+
+<script src="shell.js?v=1"></script>
+<script src="agent.js?v=1"></script>
+<script src="../nav-collapse.js?v=10"></script>
+<script src="components.js?v=1"></script>
+<script>
+(function () {
+  var D = window.RES_DATA;
+  var C = window.ResComponents;
+  var key = new URLSearchParams(location.search).get('key') || 'cosco';
+  var obj = D[key];
+  var body = document.getElementById('page-body');
+
+  function toast(text) {
+    var t = document.getElementById('toast');
+    t.textContent = text;
+    t.classList.add('show');
+    clearTimeout(t._t);
+    t._t = setTimeout(function () { t.classList.remove('show'); }, 2800);
+  }
+
+  // 未完成对象：提示"正在建立研究"
+  if (!obj || !obj.report) {
+    var stub = (D.stocks || []).find(function (s) { return s.key === key; });
+    body.innerHTML =
+      '<div class="obj-head"><h1>' + (stub ? stub.name : '对象') + '</h1>' +
+      (stub && stub.code ? '<span class="code">' + stub.code + '</span>' : '') + '</div>' +
+      '<div class="res-card" style="margin-top:14px">' +
+      '  <div class="obj-init"><span class="pulse"></span>正在建立研究…</div>' +
+      '  <div class="obj-note" style="margin-top:6px">建立完成后，健康评估、实时指标与当前报告会出现在这里；原型完整演示见「中远海控」。</div>' +
+      '</div>';
+    return;
+  }
+
+  window.RES_AGENT_CTX = {
+    title: obj.name,
+    sub: '研究对象 · 助手',
+    body: '已装载该对象的研究依据、长期记忆、所属行业与页面数据；关键判断会给依据、缺口和改变条件。',
+    ph: '问' + obj.name + '…',
+    suggest: ['为什么现在是绿？', '如果运价回落 20% 会怎样？', '这个结论有哪些证据缺口？'],
+  };
+
+  body.innerHTML =
+    '<div class="obj-head">' +
+    '  <h1>' + obj.name + '</h1>' +
+    '  <span class="code">' + obj.code + '</span>' +
+    '  <span class="tag">' + obj.tag + '</span>' +
+    '  <div class="obj-more">' +
+    '    <button type="button" class="obj-more-btn" id="btn-more">更多</button>' +
+    '    <div class="obj-menu" id="more-menu">' +
+    '      <button type="button" id="menu-export">导出当前报告</button>' +
+    '      <button type="button" class="danger" id="menu-delete">删除研究档案</button>' +
+    '    </div>' +
+    '  </div>' +
+    '</div>' +
+    '<p class="sub" style="color:var(--fg-3);font-size:12.5px;margin-bottom:16px">所属行业：' + obj.industry.name + ' · 研究状态、报告与依据随复核更新</p>' +
+
+    '<div class="res-sec" id="sec-health"><div class="res-sec-h"><div class="res-sec-t">健康评估</div>' +
+    '<div class="res-sec-note">四态 · 可展开</div></div>' + C.renderHealth(obj.health) + '</div>' +
+
+    '<div class="res-sec" id="sec-indicators"><div class="res-sec-h"><div class="res-sec-t">实时指标</div>' +
+    '<div class="res-sec-note">按需读取 · 标明口径与数据时间</div></div>' + C.renderIndicators(obj.indicators) + '</div>' +
+
+    '<div class="res-sec" id="sec-report">' + C.renderReport(obj) + C.renderScenario(obj.scenario) + '</div>' +
+
+    '<div class="res-sec" id="sec-evidence"><div class="res-sec-h"><div class="res-sec-t">研究依据</div>' +
+    '<div class="res-sec-note">档案 · 事实 · 关系 · 缺口</div></div>' + C.renderEvidence(obj.evidence) + '</div>' +
+
+    '<div class="res-sec" id="sec-relations"><div class="res-sec-h"><div class="res-sec-t">关系</div>' +
+    '<div class="res-sec-note">带证据的双向链接</div></div>' + C.renderRelations(obj) + '</div>' +
+
+    C.deleteDialogHtml(obj.name);
+
+  // 健康评估展开
+  var toggle = document.getElementById('health-toggle');
+  toggle.addEventListener('click', function () {
+    var d = document.getElementById('health-detail');
+    var open = d.classList.toggle('open');
+    toggle.textContent = open ? '收起 ↑' : '展开原因、证据与改变条件 ↓';
+  });
+
+  // 情景确认流
+  document.getElementById('btn-scenario').addEventListener('click', function () {
+    document.getElementById('scn-card').style.display = 'block';
+    this.style.display = 'none';
+  });
+  document.getElementById('scn-cancel').addEventListener('click', function () {
+    document.getElementById('scn-card').style.display = 'none';
+    document.getElementById('btn-scenario').style.display = '';
+  });
+  document.getElementById('scn-confirm').addEventListener('click', function () {
+    document.getElementById('scn-result').classList.add('show');
+    this.textContent = '已按公式重算';
+    this.disabled = true;
+  });
+
+  // 更多菜单与删除档案
+  var menu = document.getElementById('more-menu');
+  document.getElementById('btn-more').addEventListener('click', function (ev) {
+    ev.stopPropagation();
+    menu.classList.toggle('show');
+  });
+  document.addEventListener('click', function () { menu.classList.remove('show'); });
+  document.getElementById('menu-export').addEventListener('click', function () {
+    toast('当前报告已导出（演示）。');
+  });
+  document.getElementById('menu-delete').addEventListener('click', function () {
+    document.getElementById('dlg-mask').classList.add('show');
+  });
+  document.getElementById('dlg-cancel').addEventListener('click', function () {
+    document.getElementById('dlg-mask').classList.remove('show');
+  });
+  document.getElementById('dlg-confirm').addEventListener('click', function () {
+    document.getElementById('dlg-mask').classList.remove('show');
+    toast('研究档案已删除（演示）· 你上传的原始资料保留，可从「数据 → 配置 → 变更记录」恢复。');
+  });
+
+  // 助手建议里的情景问题 → 打开情景卡
+  setTimeout(function () {
+    document.querySelectorAll('#agent-suggest button').forEach(function (b) {
+      if (b.textContent.indexOf('运价回落') !== -1) {
+        b.addEventListener('click', function () {
+          document.getElementById('scn-card').style.display = 'block';
+          var scroller = document.querySelector('.page-body');
+          var target = document.getElementById('scn-card');
+          if (scroller && target) {
+            scroller.scrollBy({ top: target.getBoundingClientRect().top - scroller.getBoundingClientRect().top - 12, behavior: 'smooth' });
+          }
+        });
+      }
+    });
+  }, 0);
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>投研助手 · 研究 · 航运</title>
+<link rel="stylesheet" href="../shared.css?v=10">
+<link rel="stylesheet" href="research.css?v=1">
+<script src="../theme.js?v=3"></script>
+<script src="data.js?v=1"></script>
+<style>body > main.main-area { display: none; }</style>
+</head>
+<body>
+<div id="shell-root" data-view="object"></div>
+
+<main class="main-area">
+  <div class="content-with-agent">
+    <div class="page-body" id="page-body"></div>
+  </div>
+</main>
+
+<div class="toast" id="toast"></div>
+
+<script src="shell.js?v=1"></script>
+<script src="agent.js?v=1"></script>
+<script src="../nav-collapse.js?v=10"></script>
+<script src="components.js?v=1"></script>
+<script>
+(function () {
+  var D = window.RES_DATA;
+  var C = window.ResComponents;
+  var key = new URLSearchParams(location.search).get('key') || 'shipping';
+  var obj = D[key];
+  var body = document.getElementById('page-body');
+
+  function toast(text) {
+    var t = document.getElementById('toast');
+    t.textContent = text;
+    t.classList.add('show');
+    clearTimeout(t._t);
+    t._t = setTimeout(function () { t.classList.remove('show'); }, 2600);
+  }
+
+  if (!obj || !obj.report) {
+    var stub = (D.industries || []).find(function (s) { return s.key === key; });
+    body.innerHTML =
+      '<div class="obj-head"><h1>' + (stub ? stub.name : '行业') + '</h1></div>' +
+      '<div class="res-card" style="margin-top:14px">' +
+      '  <div class="obj-init"><span class="pulse"></span>正在建立研究…</div>' +
+      '  <div class="obj-note" style="margin-top:6px">建立完成后，健康评估、实时指标与当前报告会出现在这里；原型完整演示见「航运」。</div>' +
+      '</div>';
+    return;
+  }
+
+  window.RES_AGENT_CTX = {
+    title: obj.name + '（行业）',
+    sub: '研究对象 · 助手',
+    body: '已装载行业机制、先行指标与页面数据；关键判断会给依据、缺口和改变条件。',
+    ph: '问' + obj.name + '行业…',
+    suggest: ['三条船型为什么不能当一个周期看？', '明年的交付高峰有多严重？', '行业现在的主要缺口是什么？'],
+  };
+
+  body.innerHTML =
+    '<div class="obj-head">' +
+    '  <h1>' + obj.name + '</h1>' +
+    '  <span class="code">行业</span>' +
+    '</div>' +
+    '<p class="sub" style="color:var(--fg-3);font-size:12.5px;margin-bottom:16px">行业研究对象 · 关联重点个股 · 研究状态与报告随复核更新</p>' +
+
+    '<div class="res-sec" id="sec-health"><div class="res-sec-h"><div class="res-sec-t">健康评估</div>' +
+    '<div class="res-sec-note">行业层面 · 四态</div></div>' + C.renderHealth(obj.health) + '</div>' +
+
+    '<div class="res-sec" id="sec-indicators"><div class="res-sec-h"><div class="res-sec-t">实时指标</div>' +
+    '<div class="res-sec-note">价格 · 供需 · 订单</div></div>' + C.renderIndicators(obj.indicators) + '</div>' +
+
+    '<div class="res-sec" id="sec-report">' + C.renderReport(obj) + '</div>' +
+
+    '<div class="res-sec" id="sec-relations"><div class="res-sec-h"><div class="res-sec-t">关系</div>' +
+    '<div class="res-sec-note">关联重点个股</div></div>' + C.renderRelations(obj) + '</div>';
+
+  var toggle = document.getElementById('health-toggle');
+  toggle.addEventListener('click', function () {
+    var d = document.getElementById('health-detail');
+    var open = d.classList.toggle('open');
+    toggle.textContent = open ? '收起 ↑' : '展开原因、证据与改变条件 ↓';
+  });
+})();
+</script>
+</body>
+</html>
