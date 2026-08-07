@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>投研助手 · 行情 · 板块详情</title>
+<link rel="stylesheet" href="../shared.css?v=13">
+<script src="../theme.js?v=3"></script>
+<script src="data.js?v=3"></script>
+<style>body > main.main-area { display: none; }</style>
+</head>
+<body>
+<div id="shell-root" data-view="sectors"></div>
+
+<main class="main-area">
+  <div class="content-with-agent">
+    <div class="page-body" id="sector-detail-body"></div>
+  </div>
+</main>
+
+<script src="shell.js?v=13"></script>
+<script src="agent.js"></script>
+<script src="../nav-collapse.js?v=10"></script>
+<script src="components.js?v=3"></script>
+<script>
+(function () {
+  var D = window.MKT_DATA;
+  var mktBase = (window.MKT_PATHS && window.MKT_PATHS.mktBase) || '';
+  var key = new URLSearchParams(location.search).get('key')
+    || new URLSearchParams(location.search).get('focus');
+  var sector = (D.sectors || []).find(function (s) { return s.key === key; }) || null;
+
+  document.getElementById('sector-detail-body').innerHTML =
+    MarketComponents.renderSectorDetail(sector, mktBase);
+
+  if (sector) {
+    document.title = '投研助手 · 行情 · ' + sector.label;
+    var nodes = Array.isArray(sector.nodes) ? sector.nodes : [];
+    var nodeLine = nodes.length ? nodes.join('、') : '（环节梳理中）';
+    window.MKT_AGENT_CTX = {
+      title: sector.label,
+      sub: '左栏 · 板块详情',
+      body: '板块：' + sector.label + '\n定位：' + sector.tagline + '\n产业链环节：' + nodeLine +
+        '\n\n只有环节、不含标的。请按七维框架拆解，判断由你的模型给出。',
+      ph: '追问这个板块…',
+      suggest: ['按七维框架拆解', '这个板块的产业链地图', '哪个环节卡脖子', '有什么风险信号'],
+    };
+  } else {
+    window.MKT_AGENT_CTX = {
+      title: '板块详情',
+      sub: '左栏 · 板块',
+      body: '未找到对应板块。可从板块中心重新进入。',
+      ph: '追问…',
+    };
+  }
+
+  var aiBtn = document.getElementById('ai-sector');
+  if (aiBtn) {
+    aiBtn.addEventListener('click', function () {
+      window.MKT_AGENT.open(true);
+    });
+  }
+})();
+</script>
+</body>
+</html>

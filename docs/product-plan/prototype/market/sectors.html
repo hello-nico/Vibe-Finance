@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>投研助手 · 行情 · 板块中心</title>
+<link rel="stylesheet" href="../shared.css?v=13">
+<script src="../theme.js?v=3"></script>
+<script src="data.js?v=3"></script>
+<style>body > main.main-area { display: none; }</style>
+</head>
+<body>
+<div id="shell-root" data-view="sectors"></div>
+
+<main class="main-area">
+  <div class="content-with-agent">
+    <div class="page-body">
+
+      <div class="ov-head">
+        <div>
+          <h1>板块中心</h1>
+          <p class="sub" id="sector-sub">热门赛道的产业链 · 只有环节，不含标的</p>
+        </div>
+        <div class="ov-head-actions">
+          <button type="button" class="ov-cta" id="ai-board">
+            <svg class="ov-cta-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l1.5 4.5L18 9l-4.5 1.5L12 15l-1.5-4.5L6 9l4.5-1.5L12 3z"/><path d="M19 14l.8 2.2L22 17l-2.2.8L19 20l-.8-2.2L16 17l2.2-.8L19 14z"/></svg>
+            解读板块
+          </button>
+        </div>
+      </div>
+
+      <div class="sector-grid" id="sector-grid"></div>
+      <p class="sector-foot-note" id="sector-note"></p>
+
+    </div>
+  </div>
+</main>
+
+<script src="shell.js?v=13"></script>
+<script src="agent.js"></script>
+<script src="../nav-collapse.js?v=10"></script>
+<script src="components.js?v=3"></script>
+<script>
+(function () {
+  var D = window.MKT_DATA;
+  var mktBase = (window.MKT_PATHS && window.MKT_PATHS.mktBase) || '';
+  var hotCount = D.sectors.filter(function (s) { return s.hot; }).length;
+
+  document.getElementById('sector-sub').textContent =
+    D.sectors.length + ' 个热门赛道的产业链 · 只有环节，不含标的';
+  document.getElementById('sector-note').textContent =
+    '共 ' + D.sectors.length + ' 个板块，其中 ' + hotCount + ' 个热门 · 环节持续实时核实补全';
+  document.getElementById('sector-grid').innerHTML =
+    MarketComponents.renderSectorGrid(D.sectors, mktBase);
+
+  var focusedKey = new URLSearchParams(location.search).get('focus');
+  if (focusedKey) {
+    var focusedCard = document.querySelector('[data-sector-key="' + focusedKey + '"]');
+    if (focusedCard) focusedCard.classList.add('is-focus');
+  }
+
+  window.MKT_AGENT_CTX = {
+    title: '板块中心',
+    sub: '左栏 · 板块',
+    body: '会带上当前板块中心的热门赛道与环节；只有环节，不含标的。分析由你的模型完成。',
+    ph: '追问板块结构…',
+  };
+  document.getElementById('ai-board').addEventListener('click', function () {
+    window.MKT_AGENT.open(true);
+  });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>投研助手 · 数据 · 数据源</title>
+<link rel="stylesheet" href="shared.css?v=10">
+<link rel="stylesheet" href="data/data.css?v=1">
+<script src="theme.js?v=3"></script>
+<script src="data/data.js?v=1"></script>
+<style>body > main.main-area { display: none; }</style>
+</head>
+<body>
+<div id="shell-root" data-view="sources"></div>
+
+<main class="main-area">
+  <div class="content-with-agent">
+    <div class="page-body">
+
+      <div class="ov-head">
+        <div>
+          <h1>数据源</h1>
+          <p class="sub">信息通道的连接、状态与获取节奏</p>
+        </div>
+      </div>
+
+      <div class="dat-sec" id="sec-channels">
+        <div class="dat-sec-h">
+          <div class="dat-sec-t">数据通道</div>
+          <div class="dat-sec-note">单个通道失败不影响其他通道</div>
+        </div>
+        <div id="channels-body"></div>
+      </div>
+
+      <div class="dat-sec" id="sec-rhythm">
+        <div class="dat-sec-h">
+          <div class="dat-sec-t">主动获取节奏</div>
+          <div class="dat-sec-note">已加入研究的对象自动获取，未加入的不建任务</div>
+        </div>
+        <div id="rhythm-body"></div>
+      </div>
+
+    </div>
+  </div>
+</main>
+
+<div class="toast" id="toast"></div>
+
+<script src="data/shell.js?v=1"></script>
+<script src="data/agent.js?v=1"></script>
+<script src="nav-collapse.js?v=10"></script>
+<script src="data/components.js?v=1"></script>
+<script>
+(function () {
+  var D = window.DATA_MOCK;
+  var C = window.DataComponents;
+
+  window.DATA_AGENT_CTX = {
+    title: '数据源',
+    sub: '数据 · 助手',
+    body: '会带上当前页的通道状态与获取节奏；通道故障只影响对应数据块。',
+    ph: '问数据源…',
+    suggest: ['哪个通道现在有问题？', '定期报告是怎么获取的？', '神火股份缺的报告会怎样？'],
+  };
+
+  function toast(text) {
+    var t = document.getElementById('toast');
+    t.textContent = text;
+    t.classList.add('show');
+    clearTimeout(t._t);
+    t._t = setTimeout(function () { t.classList.remove('show'); }, 2600);
+  }
+
+  document.getElementById('channels-body').innerHTML = C.renderChannels(D.channels);
+  document.getElementById('rhythm-body').innerHTML = C.renderRhythm(D.disclosureWindow);
+
+  document.querySelectorAll('[data-ch-config]').forEach(function (el) {
+    el.addEventListener('click', function () { toast('打开「' + el.getAttribute('data-ch-config') + '」通道配置（演示）。'); });
+  });
+  document.querySelectorAll('[data-ch-retry]').forEach(function (el) {
+    el.addEventListener('click', function () { toast('已重试「' + el.getAttribute('data-ch-retry') + '」的失败来源（演示）。'); });
+  });
+})();
+</script>
+</body>
+</html>

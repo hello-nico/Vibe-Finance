@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>投研助手 · 研究</title>
+<link rel="stylesheet" href="shared.css?v=10">
+<link rel="stylesheet" href="research/research.css?v=1">
+<script src="theme.js?v=3"></script>
+<script src="research/data.js?v=1"></script>
+<style>body > main.main-area { display: none; }</style>
+</head>
+<body>
+<div id="shell-root" data-view="home"></div>
+
+<main class="main-area">
+  <div class="content-with-agent">
+    <div class="page-body">
+
+      <div class="ov-head">
+        <div>
+          <h1>研究</h1>
+          <p class="sub">你关注的，现在怎么样了：状态、更新与深入分析</p>
+        </div>
+      </div>
+
+      <div class="res-sec" id="sec-updates">
+        <div class="res-sec-h">
+          <div class="res-sec-t">最近更新</div>
+          <div class="res-sec-note">按完成时间 · 含"查过了，没变"</div>
+        </div>
+        <div id="updates-body"></div>
+      </div>
+
+      <div class="res-sec">
+        <div class="res-sec-h">
+          <div class="res-sec-t" id="list-title">关注股票</div>
+          <div class="res-sec-note">健康评估只反映最近一次完成的分析</div>
+        </div>
+        <div id="objects-body"></div>
+      </div>
+
+    </div>
+  </div>
+</main>
+
+<div class="toast" id="toast"></div>
+
+<script src="research/shell.js?v=1"></script>
+<script src="research/agent.js?v=1"></script>
+<script src="nav-collapse.js?v=10"></script>
+<script src="research/components.js?v=1"></script>
+<script>
+(function () {
+  var D = window.RES_DATA;
+  var C = window.ResComponents;
+  var tab = new URLSearchParams(location.search).get('tab') || 'stocks';
+  var filter = 'all';
+
+  window.RES_AGENT_CTX = {
+    title: '研究列表',
+    sub: '研究 · 助手',
+    body: '会带上当前列表的对象、健康评估和最近更新，问题问到哪就讲到哪。',
+    ph: '问研究列表…',
+    suggest: ['今天有哪些对象需要我处理？', '"查过了，没变"都检查了什么？', '神火股份为什么是灰的？'],
+  };
+
+  function toast(text) {
+    var t = document.getElementById('toast');
+    t.textContent = text;
+    t.classList.add('show');
+    clearTimeout(t._t);
+    t._t = setTimeout(function () { t.classList.remove('show'); }, 2600);
+  }
+
+  function visible(list) {
+    return list.filter(function (o) {
+      if (filter === 'pending') return o.pendingReview;
+      if (filter === 'unread') return o.unread;
+      return true;
+    });
+  }
+
+  function render() {
+    var isStock = tab === 'stocks';
+    document.getElementById('list-title').textContent = isStock ? '关注股票' : '关注行业';
+    var updates = D.updates.filter(function (u) { return isStock ? u.kind === 'stock' : u.kind === 'industry'; });
+    document.getElementById('updates-body').innerHTML = C.renderUpdates(updates);
+    var list = visible(isStock ? D.stocks : D.industries);
+    document.getElementById('objects-body').innerHTML = C.renderObjectCards(list, isStock ? 'stock' : 'industry');
+    bindCards();
+  }
+
+  function bindCards() {
+    document.querySelectorAll('.obj-card.building').forEach(function (el) {
+      el.addEventListener('click', function () { toast('「' + el.getAttribute('data-building') + '」正在建立研究，完成后即可进入。'); });
+    });
+    document.querySelectorAll('.obj-card.failed-init .obj-resume').forEach(function (el) {
+      el.addEventListener('click', function (ev) {
+        ev.stopPropagation();
+        var card = el.closest('.obj-card');
+        card.outerHTML =
+          '<div class="obj-card building"><div class="obj-top"><span class="obj-name">' + card.querySelector('.obj-name').textContent + '</span>' +
+          '<span class="obj-code">' + card.querySelector('.obj-code').textContent + '</span>' +
+          '<span class="obj-tag">关注</span></div>' +
+          '<div class="obj-init"><span class="pulse"></span>正在建立研究…</div>' +
+          '<div class="obj-note">沿用已形成的知识继续建立，不会创建重复对象。</div></div>';
+        toast('已恢复建立研究。');
+      });
+    });
+    document.querySelectorAll('.upd-item').forEach(function (el) {
+      el.addEventListener('click', function () {
+        var kind = el.getAttribute('data-kind');
+        var key = el.getAttribute('data-obj');
+        location.href = (kind === 'industry' ? 'research/object-industry.html?key=' : 'research/object-stock.html?key=') + encodeURIComponent(key);
+      });
+    });
+  }
+
+  document.querySelectorAll('[data-filter]').forEach(function (el) {
+    el.addEventListener('click', function () {
+      document.querySelectorAll('[data-filter]').forEach(function (x) { x.classList.remove('on'); });
+      el.classList.add('on');
+      filter = el.getAttribute('data-filter');
+      render();
+    });
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>

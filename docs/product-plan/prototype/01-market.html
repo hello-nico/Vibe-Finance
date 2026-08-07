@@ -1,0 +1,861 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>投研助手 · 行情</title>
+<link rel="stylesheet" href="shared.css?v=10">
+<script src="theme.js?v=3"></script>
+<script src="market/data.js?v=2"></script>
+<script src="market/components.js?v=2"></script>
+<style>body > main.main-area { display: none; }</style>
+</head>
+<body>
+<!-- 壳层挂载点：market/shell.js 注入 topbar / rail / mkt-nav(+二级列表) / agent dock -->
+<div id="shell-root" data-view="overview"></div>
+
+<main class="main-area">
+    <div class="content-with-agent">
+    <div class="page-body">
+
+    <!-- ===== 总览 ===== -->
+    <div class="mkt-pane on" id="pane-overview">
+
+    <!-- 页头 -->
+    <div class="ov-head" id="market-overview">
+      <div>
+        <h1>市场全景</h1>
+        <p class="sub">指数 / 情绪 / 资金一屏定位</p>
+      </div>
+      <div class="ov-head-actions">
+        <button type="button" id="ai-overview" class="ov-cta">
+          <svg class="ov-cta-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l1.5 4.5L18 9l-4.5 1.5L12 15l-1.5-4.5L6 9l4.5-1.5L12 3z"/><path d="M19 14l.8 2.2L22 17l-2.2.8L19 20l-.8-2.2L16 17l2.2-.8L19 14z"/></svg>
+          今日复盘
+        </button>
+      </div>
+    </div>
+
+    <!-- 检索：行情负责发现，复用现有对象识别与确认卡 -->
+    <div id="command-box" class="command-box">
+      <div class="command-input-row">
+        <input class="command-input" id="command-input" type="text" placeholder="研究公司、行业、投资话题等…" aria-label="检索公司、行业或投资话题">
+        <span class="command-hint">↵</span>
+      </div>
+      <div class="command-suggest" id="command-suggest"></div>
+      <div class="command-actions">
+        <button type="button" class="command-btn" id="btn-corp">个股研究</button>
+        <button type="button" class="command-btn" id="btn-ind">行业分析</button>
+        <button type="button" class="command-btn" id="btn-topic">热点剖析</button>
+      </div>
+      <div class="intent-card" id="intent-card"></div>
+    </div>
+
+    <!-- 指数 = 大盘指数 + 指数市盈率 -->
+    <section class="ov-sec" id="market-index">
+      <section class="dashboard-component" data-dashboard-component="index-quotes">
+        <div id="dashboard-index-quotes"></div>
+        <div class="ov-idx-groups" id="index-quotes-body"></div>
+      </section>
+      <section class="dashboard-component" data-dashboard-component="index-valuation">
+        <div id="dashboard-index-valuation"></div>
+        <div class="panel pe-dash">
+          <div class="pe-list">
+          <div class="pe-row"><span class="pe-name">上证指数</span><span class="pe-val">16.31</span><span class="pe-bar"><i class="lvl-mid" style="width:48%"></i></span><span class="pe-pct">48%</span></div>
+          <div class="pe-row"><span class="pe-name">沪深300</span><span class="pe-val">14.13</span><span class="pe-bar"><i class="lvl-mid" style="width:42%"></i></span><span class="pe-pct">42%</span></div>
+          <div class="pe-row"><span class="pe-name">上证50</span><span class="pe-val">12.28</span><span class="pe-bar"><i class="lvl-low" style="width:36%"></i></span><span class="pe-pct">36%</span></div>
+          <div class="pe-row"><span class="pe-name">中证500</span><span class="pe-val">20.01</span><span class="pe-bar"><i class="lvl-mid" style="width:39%"></i></span><span class="pe-pct">39%</span></div>
+          <div class="pe-row"><span class="pe-name">创业板综</span><span class="pe-val">50.56</span><span class="pe-bar"><i class="lvl-high" style="width:72%"></i></span><span class="pe-pct">72%</span></div>
+          <div class="pe-row"><span class="pe-name">恒生指数</span><span class="pe-val">14.33</span><span class="pe-bar"><i class="lvl-mid" style="width:45%"></i></span><span class="pe-pct">45%</span></div>
+          </div>
+        </div>
+      </section>
+    </section>
+
+    <!-- 情绪 = 双热力 + 市场情绪 + 短线情绪 -->
+    <div class="market-cluster" id="market-sentiment">
+    <section class="dashboard-component dashboard-component--heatmap" data-dashboard-component="heatmap">
+      <div id="dashboard-heatmap"></div>
+      <div class="hm-duo">
+        <div class="hm-panel">
+          <div class="hm-map" id="hm-industry"></div>
+        </div>
+        <div class="hm-panel">
+          <div class="hm-map" id="hm-stock"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 市场情绪 · 冻结 ds-dash -->
+    <section class="ov-sec ds-sec">
+      <div id="dashboard-market-breadth"></div>
+      <div class="ov-glass ds-card">
+        <div class="ov-emo-grid ds-tile-row">
+          <div class="ov-emo-hero ds-tile ds-tile-lg">
+            <div class="k">大盘宽度</div>
+            <div class="v">偏强</div>
+            <div class="h">冰点 / 偏弱 / 中性 / 偏强 / 普涨</div>
+          </div>
+          <div class="ov-emo-hero ds-tile ds-tile-lg">
+            <div class="k">题材投机</div>
+            <div class="v">活跃</div>
+            <div class="h">冰点 / 普通 / 活跃 / 亢奋</div>
+          </div>
+        </div>
+        <div class="ov-emo-stats ds-tile-grid">
+          <div class="ov-emo-stat ds-tile"><div class="k">上涨家数</div><div class="v up">2,840</div></div>
+          <div class="ov-emo-stat ds-tile"><div class="k">下跌家数</div><div class="v down">1,920</div></div>
+          <div class="ov-emo-stat ds-tile"><div class="k">平盘</div><div class="v">86</div></div>
+          <div class="ov-emo-stat ds-tile"><div class="k">涨停</div><div class="v up">68</div></div>
+          <div class="ov-emo-stat ds-tile"><div class="k">真实涨停</div><div class="v up">52</div></div>
+          <div class="ov-emo-stat ds-tile"><div class="k">跌停</div><div class="v down">11</div></div>
+          <div class="ov-emo-stat ds-tile"><div class="k">真实跌停</div><div class="v down">8</div></div>
+          <div class="ov-emo-stat ds-tile"><div class="k">活跃度</div><div class="v">71.2%</div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 短线情绪 · 冻结 ds-dash + ds-table -->
+    <section class="ov-sec ds-sec">
+      <div id="dashboard-short-term"></div>
+      <div class="ov-glass ds-card">
+        <div class="ov-emo-stats ds-tile-grid" style="margin-bottom:10px">
+          <div class="ov-emo-stat ds-tile"><div class="k">涨停</div><div class="v up">68</div></div>
+          <div class="ov-emo-stat ds-tile"><div class="k">跌停</div><div class="v down">11</div></div>
+          <div class="ov-emo-stat ds-tile"><div class="k">最高连板</div><div class="v accent">5 板</div></div>
+          <div class="ov-emo-stat ds-tile"><div class="k">连板 (2板+)</div><div class="v accent">14 家</div></div>
+        </div>
+        <div class="ov-emo-stats ds-tile-grid cols-3" style="margin-bottom:12px">
+          <div class="ov-emo-stat ds-tile"><div class="k">封板率</div><div class="v up">78.6%</div><div class="sub">封住 / 尝试涨停</div></div>
+          <div class="ov-emo-stat ds-tile"><div class="k">炸板率</div><div class="v down">21.4%</div><div class="sub">炸板 / 尝试涨停</div></div>
+          <div class="ov-emo-stat ds-tile"><div class="k">晋级率</div><div class="v up">19.8%</div><div class="sub">昨涨停今又停</div></div>
+        </div>
+        <p class="ov-table-note ds-table-note">连板股（2 板及以上连续涨停）· 客观公开榜单，非推荐 / 非预测</p>
+        <div class="ov-table-wrap flat ds-table-wrap is-flat">
+          <table class="ov-table ds-table">
+            <thead>
+              <tr>
+                <th>名称</th><th class="r">连板</th><th class="r">现价</th><th class="r">涨停%</th>
+                <th class="r">成交额</th><th class="r">流通市值</th><th>概念</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><span class="nm">示例连板A</span><span class="code">000001</span></td>
+                <td class="r mono accent-w">5 板</td>
+                <td class="r mono">12.80</td><td class="r mono up">+10.00%</td>
+                <td class="r mono muted">8.2 亿</td><td class="r mono muted">86 亿</td><td class="muted">人工智能</td>
+              </tr>
+              <tr>
+                <td><span class="nm">示例连板B</span><span class="code">002000</span></td>
+                <td class="r mono accent-w">4 板</td>
+                <td class="r mono">18.45</td><td class="r mono up">+10.02%</td>
+                <td class="r mono muted">12.1 亿</td><td class="r mono muted">120 亿</td><td class="muted">半导体</td>
+              </tr>
+              <tr>
+                <td><span class="nm">示例连板C</span><span class="code">300001</span></td>
+                <td class="r mono accent-w">3 板</td>
+                <td class="r mono">26.10</td><td class="r mono up">+19.98%</td>
+                <td class="r mono muted">15.6 亿</td><td class="r mono muted">95 亿</td><td class="muted">机器人</td>
+              </tr>
+              <tr>
+                <td><span class="nm">示例连板D</span><span class="code">600001</span></td>
+                <td class="r mono accent-w">2 板</td>
+                <td class="r mono">9.92</td><td class="r mono up">+10.01%</td>
+                <td class="r mono muted">6.4 亿</td><td class="r mono muted">48 亿</td><td class="muted">新能源</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    </div><!-- /#market-sentiment -->
+
+    <!-- 资金 = 全市场成交额 Top20 + 资金轮动 -->
+    <div class="market-cluster" id="market-funds">
+    <!-- 全市场成交额 Top20 · 冻结 ds-table -->
+    <section class="ov-sec ds-sec">
+      <div id="dashboard-turnover-top"></div>
+      <div class="ov-table-wrap ds-table-wrap">
+        <table class="ov-table ds-table">
+          <thead>
+            <tr>
+              <th class="r">排名</th><th>名称</th><th class="r">现价</th><th class="r">涨跌%</th>
+              <th class="r">成交额</th><th class="r">换手率</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td class="r mono muted">1</td><td><span class="nm">宁德时代</span><span class="code">300750</span></td><td class="r mono">236.80</td><td class="r mono down">−0.76%</td><td class="r mono">86.2 亿</td><td class="r mono">2.14%</td></tr>
+            <tr><td class="r mono muted">2</td><td><span class="nm">贵州茅台</span><span class="code">600519</span></td><td class="r mono">1,422.40</td><td class="r mono down">−1.83%</td><td class="r mono">74.8 亿</td><td class="r mono">0.62%</td></tr>
+            <tr><td class="r mono muted">3</td><td><span class="nm">中际旭创</span><span class="code">300308</span></td><td class="r mono">174.20</td><td class="r mono up">+8.51%</td><td class="r mono">68.5 亿</td><td class="r mono">7.34%</td></tr>
+            <tr><td class="r mono muted">4</td><td><span class="nm">中国平安</span><span class="code">601318</span></td><td class="r mono">55.06</td><td class="r mono down">−2.24%</td><td class="r mono">61.9 亿</td><td class="r mono">0.91%</td></tr>
+            <tr><td class="r mono muted">5</td><td><span class="nm">招商银行</span><span class="code">600036</span></td><td class="r mono">44.72</td><td class="r mono down">−2.91%</td><td class="r mono">59.6 亿</td><td class="r mono">0.72%</td></tr>
+            <tr><td class="r mono muted">6</td><td><span class="nm">长鑫科技</span><span class="code">688xxx</span></td><td class="r mono">82.30</td><td class="r mono up">+9.89%</td><td class="r mono">57.1 亿</td><td class="r mono">11.62%</td></tr>
+            <tr><td class="r mono muted">7</td><td><span class="nm">紫金矿业</span><span class="code">601899</span></td><td class="r mono">24.18</td><td class="r mono up">+1.16%</td><td class="r mono">52.4 亿</td><td class="r mono">1.48%</td></tr>
+            <tr><td class="r mono muted">8</td><td><span class="nm">中国神华</span><span class="code">601088</span></td><td class="r mono">39.58</td><td class="r mono down">−2.67%</td><td class="r mono">48.6 亿</td><td class="r mono">0.53%</td></tr>
+            <tr><td class="r mono muted">9</td><td><span class="nm">五粮液</span><span class="code">000858</span></td><td class="r mono">119.50</td><td class="r mono down">−0.34%</td><td class="r mono">44.2 亿</td><td class="r mono">0.87%</td></tr>
+            <tr><td class="r mono muted">10</td><td><span class="nm">中国海油</span><span class="code">600938</span></td><td class="r mono">28.66</td><td class="r mono down">−1.32%</td><td class="r mono">41.8 亿</td><td class="r mono">0.95%</td></tr>
+            <tr><td class="r mono muted">11</td><td><span class="nm">中国联通</span><span class="code">600050</span></td><td class="r mono">5.62</td><td class="r mono down">−1.12%</td><td class="r mono">39.7 亿</td><td class="r mono">1.24%</td></tr>
+            <tr><td class="r mono muted">12</td><td><span class="nm">东方财富</span><span class="code">300059</span></td><td class="r mono">21.46</td><td class="r mono up">+2.18%</td><td class="r mono">37.5 亿</td><td class="r mono">2.36%</td></tr>
+            <tr><td class="r mono muted">13</td><td><span class="nm">中芯国际</span><span class="code">688981</span></td><td class="r mono">92.16</td><td class="r mono up">+3.86%</td><td class="r mono">35.8 亿</td><td class="r mono">2.71%</td></tr>
+            <tr><td class="r mono muted">14</td><td><span class="nm">比亚迪</span><span class="code">002594</span></td><td class="r mono">278.30</td><td class="r mono up">+1.06%</td><td class="r mono">33.4 亿</td><td class="r mono">0.84%</td></tr>
+            <tr><td class="r mono muted">15</td><td><span class="nm">赛力斯</span><span class="code">601127</span></td><td class="r mono">121.72</td><td class="r mono up">+2.96%</td><td class="r mono">31.2 亿</td><td class="r mono">3.08%</td></tr>
+            <tr><td class="r mono muted">16</td><td><span class="nm">寒武纪</span><span class="code">688256</span></td><td class="r mono">685.50</td><td class="r mono up">+4.76%</td><td class="r mono">29.7 亿</td><td class="r mono">5.17%</td></tr>
+            <tr><td class="r mono muted">17</td><td><span class="nm">长江电力</span><span class="code">600900</span></td><td class="r mono">28.94</td><td class="r mono down">−2.85%</td><td class="r mono">28.6 亿</td><td class="r mono">0.46%</td></tr>
+            <tr><td class="r mono muted">18</td><td><span class="nm">北方华创</span><span class="code">002371</span></td><td class="r mono">412.60</td><td class="r mono up">+3.45%</td><td class="r mono">27.4 亿</td><td class="r mono">1.64%</td></tr>
+            <tr><td class="r mono muted">19</td><td><span class="nm">中信证券</span><span class="code">600030</span></td><td class="r mono">28.30</td><td class="r mono up">+0.85%</td><td class="r mono">26.1 亿</td><td class="r mono">0.76%</td></tr>
+            <tr><td class="r mono muted">20</td><td><span class="nm">工业富联</span><span class="code">601138</span></td><td class="r mono">26.98</td><td class="r mono up">+2.51%</td><td class="r mono">24.9 亿</td><td class="r mono">0.68%</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- 资金轮动 · 冻结 ds-card list -->
+    <section class="ov-sec ds-sec">
+      <div id="dashboard-rotation"></div>
+      <div class="ov-flow-duo ds-split">
+        <div class="ov-flow-card ds-card">
+          <h4 class="in">↗ 流入 Top</h4>
+          <div class="ov-flow-row"><span class="rk">1</span><span class="nm">半导体</span><span class="up mono">+7.29%</span><span class="up mono net">+32.1 亿</span></div>
+          <div class="ov-flow-row"><span class="rk">2</span><span class="nm">通信设备</span><span class="up mono">+5.15%</span><span class="up mono net">+21.4 亿</span></div>
+          <div class="ov-flow-row"><span class="rk">3</span><span class="nm">元件</span><span class="up mono">+7.08%</span><span class="up mono net">+12.6 亿</span></div>
+          <div class="ov-flow-row"><span class="rk">4</span><span class="nm">自动化设备</span><span class="up mono">+5.02%</span><span class="up mono net">+9.8 亿</span></div>
+          <div class="ov-flow-row"><span class="rk">5</span><span class="nm">软件开发</span><span class="up mono">+4.48%</span><span class="up mono net">+7.2 亿</span></div>
+          <div class="ov-flow-row"><span class="rk">6</span><span class="nm">消费电子</span><span class="up mono">+4.39%</span><span class="up mono net">+6.1 亿</span></div>
+        </div>
+        <div class="ov-flow-card ds-card">
+          <h4 class="out">↘ 流出 Top</h4>
+          <div class="ov-flow-row"><span class="rk">1</span><span class="nm">银行</span><span class="down mono">−2.13%</span><span class="down mono net">−18.5 亿</span></div>
+          <div class="ov-flow-row"><span class="rk">2</span><span class="nm">白酒</span><span class="down mono">−0.25%</span><span class="down mono net">−12.2 亿</span></div>
+          <div class="ov-flow-row"><span class="rk">3</span><span class="nm">保险</span><span class="down mono">−1.06%</span><span class="down mono net">−9.4 亿</span></div>
+          <div class="ov-flow-row"><span class="rk">4</span><span class="nm">煤炭开采</span><span class="down mono">−0.61%</span><span class="down mono net">−7.8 亿</span></div>
+          <div class="ov-flow-row"><span class="rk">5</span><span class="nm">航运港口</span><span class="down mono">−0.40%</span><span class="down mono net">−5.6 亿</span></div>
+          <div class="ov-flow-row"><span class="rk">6</span><span class="nm">白色家电</span><span class="down mono">−0.07%</span><span class="down mono net">−4.1 亿</span></div>
+        </div>
+      </div>
+    </section>
+
+    </div><!-- /#market-funds -->
+
+    </div><!-- /#pane-overview -->
+
+    <!-- ===== 资讯（风格对齐总览 FROZEN ds-* + Research 资讯雷达） ===== -->
+    </div><!-- /.page-body -->
+
+    </div><!-- /.content-with-agent -->
+  </main>
+</div>
+
+<script src="market/shell.js?v=13"></script>
+<script src="market/agent.js"></script>
+<script src="nav-collapse.js?v=10"></script>
+<script>
+// ─── 总览 Dashboard：数据块独立，标题/说明/刷新状态由 MarketComponents 统一提供 ───
+const DASHBOARD_UPDATED_AT = '2026-07-29 14:32';
+const dashboardIcon = path => `<svg class="ds-ico" viewBox="0 0 24 24" aria-hidden="true">${path}</svg>`;
+const INDEX_GROUPS = [
+  { items: [
+    { name: '上证指数', price: '3,809.66', change: -0.59, changeLabel: '−0.59%' },
+    { name: '深证成指', price: '13,448.29', change: -0.96, changeLabel: '−0.96%' },
+    { name: '创业板指', price: '3,302.55', change: -1.24, changeLabel: '−1.24%' },
+  ] },
+  { items: [
+    { name: '科创50', price: '1,552.89', change: -5.08, changeLabel: '−5.08%' },
+    { name: '上证50', price: '2,887.05', change: -1.23, changeLabel: '−1.23%' },
+    { name: '沪深300', price: '4,543.18', change: -0.98, changeLabel: '−0.98%' },
+    { name: '北证50', price: '1,076.07', change: -0.66, changeLabel: '−0.66%' },
+  ] },
+  { items: [
+    { name: '恒生指数', price: '26,009.40', change: 0.48, changeLabel: '+0.48%' },
+    { name: '国企指数', price: '8,652.15', change: 0.46, changeLabel: '+0.46%' },
+    { name: '恒生科技指数', price: '4,875.61', change: 0.96, changeLabel: '+0.96%' },
+  ] },
+];
+const DASHBOARDS = [
+  {
+    mount: 'dashboard-index-quotes', id: 'index-quotes', title: '大盘指数', summary: 'A 股、港股主要宽基',
+    updatedAt: DASHBOARD_UPDATED_AT,
+    icon: dashboardIcon('<path d="M3 3v18h18"/><path d="m7 15 4-4 3 2 4-6"/>'),
+  },
+  {
+    mount: 'dashboard-index-valuation', id: 'index-valuation', title: '指数市盈率', summary: '历史分位',
+    updatedAt: DASHBOARD_UPDATED_AT,
+    icon: dashboardIcon('<path d="M5 19V9"/><path d="M10 19V5"/><path d="M15 19v-7"/><path d="M20 19V3"/>'),
+  },
+  {
+    mount: 'dashboard-heatmap', id: 'heatmap', title: '市场热力图', summary: '行业 / 个股涨跌分布',
+    updatedAt: DASHBOARD_UPDATED_AT,
+    icon: dashboardIcon('<rect x="4" y="4" width="6" height="6" rx="1"/><rect x="14" y="4" width="6" height="6" rx="1"/><rect x="4" y="14" width="6" height="6" rx="1"/><rect x="14" y="14" width="6" height="6" rx="1"/>'),
+  },
+  {
+    mount: 'dashboard-market-breadth', id: 'market-breadth', title: '市场情绪', summary: '涨跌家数 / 宽度 / 题材温度',
+    updatedAt: DASHBOARD_UPDATED_AT,
+    icon: dashboardIcon('<path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3"/><path d="M9 19.4a1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1A1.7 1.7 0 0 0 4.7 15"/><path d="M4.7 9a1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1A1.7 1.7 0 0 0 9 4.7"/><path d="M15 4.7a1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8"/><path d="M19.3 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3"/>'),
+  },
+  {
+    mount: 'dashboard-short-term', id: 'short-term', title: '短线情绪', summary: '连板与打板表现',
+    updatedAt: DASHBOARD_UPDATED_AT,
+    icon: dashboardIcon('<path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.07-2.14-.3-3.7.5-4.5.5.83.5 2 0 3-.5 1-1 2-1 3a2.5 2.5 0 0 0 2.5 2.5c1 0 1.5-.5 2-1.5.5 1 .5 2.5-.5 3.5-1.2 1.2-3 1-4.5 0z"/><path d="M14.5 9.5c.5-1 1.5-1.5 2.5-1.5 1.5 0 2.5 1 2.5 2.5S18 13 16.5 13c-1 0-1.5-.5-2-1"/>'),
+  },
+  {
+    mount: 'dashboard-turnover-top', id: 'turnover-top', title: '全市场成交额 TOP20', summary: '客观公开榜单',
+    updatedAt: DASHBOARD_UPDATED_AT,
+    icon: dashboardIcon('<path d="M3 3v18h18"/><path d="M7 16V9"/><path d="M12 16V5"/><path d="M17 16v-7"/>'),
+  },
+  {
+    mount: 'dashboard-rotation', id: 'rotation', title: '资金轮动', summary: '板块级净流入 / 流出',
+    updatedAt: DASHBOARD_UPDATED_AT,
+    icon: dashboardIcon('<path d="M7 16V4"/><path d="M17 8v12"/><path d="M3 12h4l3-4 4 8 3-4h4"/>'),
+  },
+];
+
+document.getElementById('index-quotes-body').innerHTML = MarketComponents.renderIndexGroups(INDEX_GROUPS);
+DASHBOARDS.forEach(dashboard => {
+  document.getElementById(dashboard.mount).innerHTML = MarketComponents.renderDashboardHeader(dashboard);
+});
+
+function setDashboardUpdated(id) {
+  document.querySelectorAll(`[data-dashboard-updated="${id}"]`).forEach(node => {
+    node.textContent = '刚刚更新';
+  });
+}
+
+function refreshDashboard(id, source) {
+  return new Promise(resolve => {
+  // 原型阶段只展示通用刷新状态；接真实数据后，每个 id 在此绑定自己的 fetch / error state。
+  window.setTimeout(() => {
+    if (id === 'heatmap') renderAll();
+    if (source === 'realtime') setDashboardUpdated(id);
+    resolve();
+  }, 360);
+  });
+}
+
+MarketComponents.bindDashboardControls(document, id => refreshDashboard(id, 'manual'));
+
+window.addEventListener('mkt:realtime-refresh', () => {
+  Promise.all(DASHBOARDS.map(dashboard => refreshDashboard(dashboard.id, 'realtime')));
+});
+
+// ─── 检索：对象识别 × 动作识别 → 确认卡 ───
+const CORP_DICT = [
+  { name: '贵州茅台', code: '600519', industry: '白酒', inResearch: false },
+  { name: '宁德时代', code: '300750', industry: '电池', inResearch: false },
+  { name: '五粮液', code: '000858', industry: '白酒', inResearch: false },
+  { name: '招商银行', code: '600036', industry: '银行', inResearch: false },
+  { name: '中国平安', code: '601318', industry: '保险', inResearch: false },
+  { name: '中远海控', code: '601919', industry: '航运港口', inResearch: true, researchAt: '7 月 28 日' },
+  { name: '牧原股份', code: '002714', industry: '生猪养殖', inResearch: false },
+  { name: '温氏股份', code: '300498', industry: '生猪养殖', inResearch: false },
+];
+const IND_DICT = [
+  { name: '白酒', count: 20, label: '东财二级行业' },
+  { name: '银行', count: 42, label: '东财二级行业' },
+  { name: '半导体', count: 86, label: '东财二级行业' },
+  { name: '电池', count: 48, label: '东财二级行业' },
+  { name: '生猪养殖', count: 16, label: '东财二级行业' },
+  { name: '航运港口', count: 28, label: '东财二级行业' },
+  { name: '光伏设备', count: 36, label: '东财二级行业' },
+  { name: '通信设备', count: 52, label: '东财二级行业' },
+  { name: '软件开发', count: 64, label: '东财二级行业' },
+];
+const TOPIC_DICT = [
+  {
+    name: '猪周期',
+    aliases: ['猪肉周期', '猪周期分析', '猪肉'],
+    mapTo: '生猪养殖',
+    links: '生猪养殖行业、猪肉价格、能繁母猪存栏、饲料成本，以及牧原股份、温氏股份等公司',
+    stocks: ['牧原股份', '温氏股份'],
+    candidates: null,
+  },
+  {
+    name: '半导体设备',
+    aliases: ['半导体设备分析', '设备国产替代'],
+    mapTo: '半导体',
+    links: '关联中微公司、北方华创等；关注设备订单与国产替代进度',
+    stocks: ['中微公司', '北方华创'],
+    candidates: null,
+  },
+  {
+    name: 'AI 算力',
+    aliases: ['算力', 'ai算力', 'AI算力'],
+    mapTo: null,
+    links: '关联中际旭创、新易盛等光模块与算力相关标的',
+    stocks: ['中际旭创', '新易盛'],
+    candidates: [
+      { name: '通信设备', why: '光模块与算力基建相关' },
+      { name: '半导体', why: '推理芯片与先进封装' },
+      { name: '软件开发', why: '云与调度软件' },
+    ],
+  },
+  {
+    name: '光伏出海',
+    aliases: ['光伏', '组件出海'],
+    mapTo: '光伏设备',
+    links: '关联隆基绿能、晶科能源等；关注欧洲库存与组件出口报价',
+    stocks: ['隆基绿能', '晶科能源'],
+    candidates: null,
+  },
+  {
+    name: '航运运价',
+    aliases: ['运价', 'SCFI', '集运'],
+    mapTo: '航运港口',
+    links: '关联中远海控、中远海特等；关注 SCFI 与欧线运价',
+    stocks: ['中远海控', '中远海特'],
+    candidates: null,
+  },
+  {
+    name: '白酒旺季',
+    aliases: ['白酒旺季分析', '白酒动销'],
+    mapTo: '白酒',
+    links: '关联贵州茅台、五粮液等；关注批价、渠道库存与旺季动销',
+    stocks: ['贵州茅台', '五粮液'],
+    candidates: null,
+  },
+];
+const HOT_THEMES = ['半导体设备', 'AI 算力', '光伏出海', '航运运价', '白酒旺季'];
+
+const researched = new Set(
+  JSON.parse(sessionStorage.getItem('wd-researched') || '[]')
+);
+function isInResearch(name) {
+  const c = CORP_DICT.find(x => x.name === name);
+  return researched.has(name) || !!(c && c.inResearch);
+}
+function markResearched(name) {
+  researched.add(name);
+  sessionStorage.setItem('wd-researched', JSON.stringify([...researched]));
+}
+
+// 研究页对象 id（与 02-research.html 侧栏 data-id 对齐）
+const RESEARCH_STK = { '中远海控': 'cosco', '贵州茅台': 'moutai', '宁德时代': 'catl' };
+const RESEARCH_IND = {
+  '航运': 'shipping', '航运港口': 'shipping', '推理芯片': 'chip',
+  '白酒': 'baijiu', '半导体设备': 'semi', '半导体': 'semi',
+};
+function researchHref(kind, name, id) {
+  const q = new URLSearchParams();
+  if (kind) q.set('kind', kind);
+  if (id) q.set('id', id);
+  if (name) q.set('name', name);
+  return '02-research.html?' + q.toString();
+}
+function openResearch(kind, name, id) {
+  location.href = researchHref(kind, name, id);
+}
+
+function detectIntent(raw) {
+  const q = raw.trim();
+  if (!q) return null;
+  let intent = 'view';
+  if (/分析|研究|深度|研报/.test(q)) intent = 'research';
+  else if (/股价|行情|涨跌|市值|估值|PE|PB|市盈率/.test(q)) intent = 'quote';
+
+  let core = q
+    .replace(/(的)?(深度)?(分析|研究|研报)/g, '')
+    .replace(/(股价|行情|涨跌幅?|市值|估值)/g, '')
+    .replace(/行业$/, '')
+    .trim();
+
+  // 话题
+  for (const t of TOPIC_DICT) {
+    if (t.aliases.some(a => q.includes(a)) || q.includes(t.name) || core === t.name) {
+      return { kind: 'topic', intent: intent === 'view' ? 'research' : intent, topic: t, query: q };
+    }
+  }
+
+  // 行业（含「…行业」）
+  const indHit = IND_DICT.find(i =>
+    q.includes(i.name + '行业') || q === i.name + '行业' || core === i.name || q === i.name
+  );
+  // 公司优先：若同时像公司
+  const corpHit = CORP_DICT.find(c =>
+    q.includes(c.name) || q.includes(c.code) || core === c.name
+  );
+
+  if (corpHit && (!indHit || q.includes(corpHit.name) || q.includes(corpHit.code))) {
+    // 「白酒」单独更像行业；「贵州茅台」是公司
+    if (indHit && !q.includes(corpHit.name) && core === indHit.name) {
+      return { kind: 'industry', intent, industry: indHit, query: q };
+    }
+    return { kind: 'company', intent, company: corpHit, query: q };
+  }
+  if (indHit) {
+    return { kind: 'industry', intent, industry: indHit, query: q };
+  }
+
+  return { kind: 'unknown', intent, query: q, core };
+}
+
+function stockUrl(name, hash) {
+  return '05-stock.html?name=' + encodeURIComponent(name) + (hash || '');
+}
+function industryUrl(name) {
+  return '04-industry.html?name=' + encodeURIComponent(name);
+}
+
+const input = document.getElementById('command-input');
+const suggestEl = document.getElementById('command-suggest');
+const cardEl = document.getElementById('intent-card');
+
+function hideSuggest() {
+  suggestEl.classList.remove('show');
+  suggestEl.innerHTML = '';
+}
+function hideCard() {
+  cardEl.classList.remove('show');
+  cardEl.innerHTML = '';
+}
+
+function renderSuggest(q) {
+  const t = q.trim();
+  if (!t) { hideSuggest(); return; }
+  const items = [];
+  CORP_DICT.forEach(c => {
+    if (c.name.includes(t) || c.code.includes(t)) {
+      items.push({ kind: '公司', name: c.name, meta: c.code, go: () => location.href = stockUrl(c.name) });
+    }
+  });
+  IND_DICT.forEach(i => {
+    if (i.name.includes(t)) {
+      items.push({ kind: '行业', name: i.name, meta: i.count + ' 家', go: () => location.href = industryUrl(i.name) });
+    }
+  });
+  TOPIC_DICT.forEach(tp => {
+    if (tp.name.includes(t) || tp.aliases.some(a => a.includes(t))) {
+      items.push({
+        kind: '话题', name: tp.name, meta: tp.mapTo || '多候选',
+        go: () => { input.value = tp.name + '分析'; submitQuery(); },
+      });
+    }
+  });
+  if (!items.length) { hideSuggest(); return; }
+  suggestEl.classList.add('show');
+  suggestEl.innerHTML = items.slice(0, 6).map((it, idx) =>
+    `<button type="button" data-i="${idx}"><span class="kind">${it.kind}</span><span class="nm">${it.name}</span><span class="meta">${it.meta}</span></button>`
+  ).join('');
+  suggestEl.querySelectorAll('button').forEach((btn, idx) => {
+    btn.addEventListener('click', () => {
+      hideSuggest();
+      hideCard();
+      items[idx].go();
+    });
+  });
+}
+
+function renderCard(hit) {
+  hideSuggest();
+  cardEl.classList.add('show');
+
+  if (hit.kind === 'company') {
+    const c = hit.company;
+    const joined = isInResearch(c.name);
+    const kindLabel = hit.intent === 'research' ? '公司研究' : hit.intent === 'quote' ? '公司行情' : '公司';
+    const desc = hit.intent === 'research'
+      ? (joined
+        ? `该公司已在研究中，最近更新于 ${c.researchAt || '近日'}。`
+        : `已识别为${c.industry}行业公司。当前尚未加入研究，可先查看公司基本信息，或加入研究后进入商业模式、利润生成、现金留存、价值评估和跟踪证伪。`)
+      : hit.intent === 'quote'
+        ? `已识别为${c.industry}行业公司。将打开个股基本页并定位到行情摘要。`
+        : `已识别为${c.industry}行业公司。可查看公司基本信息。`;
+    const stkId = RESEARCH_STK[c.name] || '';
+    const primary = joined
+      ? `<a class="primary" href="${researchHref('stk', c.name, stkId)}">打开研究</a>`
+      : `<button type="button" class="primary" id="act-join">加入研究并打开</button>`;
+    cardEl.innerHTML = `
+      <div class="kind">${kindLabel}</div>
+      <div class="title" id="act-view-title">${c.name}<span class="code">${c.code}</span></div>
+      <div class="desc">${desc}</div>
+      <div class="acts">
+        <a href="${stockUrl(c.name, hit.intent === 'quote' ? '#quote' : '')}">查看公司</a>
+        ${hit.intent === 'research' || hit.intent === 'view' ? primary : ''}
+      </div>`;
+    document.getElementById('act-view-title')?.addEventListener('click', () => {
+      location.href = stockUrl(c.name, hit.intent === 'quote' ? '#quote' : '');
+    });
+    document.getElementById('act-join')?.addEventListener('click', () => {
+      markResearched(c.name);
+      openResearch('stk', c.name, stkId);
+    });
+    return;
+  }
+
+  if (hit.kind === 'industry') {
+    const i = hit.industry;
+    const kindLabel = hit.intent === 'research' ? '行业研究' : '行业';
+    const desc = hit.intent === 'research'
+      ? `当前包含 ${i.count} 家上市公司。已识别为行业深度分析请求。行业基本页使用实时数据，加入研究只保存研究对象关系。`
+      : `当前包含 ${i.count} 家上市公司（${i.label}）。可查看行业与成分股。`;
+    cardEl.innerHTML = `
+      <div class="kind">${kindLabel}</div>
+      <div class="title" id="act-view-title">${i.name} · ${i.label}</div>
+      <div class="desc">${desc}</div>
+      <div class="acts">
+        <a href="${industryUrl(i.name)}"${hit.intent !== 'research' ? ' class="primary"' : ''}>查看行业及成分股</a>
+        ${hit.intent === 'research' ? `<button type="button" class="primary" id="act-join">加入行业研究</button>` : ''}
+      </div>`;
+    document.getElementById('act-view-title')?.addEventListener('click', () => {
+      location.href = industryUrl(i.name);
+    });
+    document.getElementById('act-join')?.addEventListener('click', () => {
+      markResearched('行业:' + i.name);
+      openResearch('ind', i.name, RESEARCH_IND[i.name] || '');
+    });
+    return;
+  }
+
+  if (hit.kind === 'topic') {
+    const t = hit.topic;
+    if (t.candidates && !t.mapTo) {
+      let selected = 0;
+      cardEl.innerHTML = `
+        <div class="kind">热点剖析</div>
+        <div class="title">${t.name}</div>
+        <div class="desc">关联 ${(t.stocks || []).join('、') || '多只相关标的'}。无法唯一映射到单一行业，请选择候选后再查看或加入研究。</div>
+        <div class="cands" id="topic-cands">
+          ${t.candidates.map((c, i) =>
+            `<button type="button" class="cand${i === 0 ? ' on' : ''}" data-i="${i}"><strong>${c.name}</strong> · ${c.why}</button>`
+          ).join('')}
+        </div>
+        <div class="acts">
+          <button type="button" id="act-view-ind">查看候选行业</button>
+          <button type="button" class="primary" id="act-join">加入行业研究</button>
+        </div>`;
+      const cands = cardEl.querySelectorAll('.cand');
+      cands.forEach(btn => btn.addEventListener('click', () => {
+        selected = +btn.dataset.i;
+        cands.forEach(x => x.classList.toggle('on', x === btn));
+      }));
+      document.getElementById('act-view-ind').addEventListener('click', () => {
+        location.href = industryUrl(t.candidates[selected].name);
+      });
+      document.getElementById('act-join').addEventListener('click', () => {
+        const nm = t.candidates[selected].name;
+        markResearched('行业:' + nm);
+        openResearch('ind', nm, RESEARCH_IND[nm] || '');
+      });
+      return;
+    }
+    cardEl.innerHTML = `
+      <div class="kind">热点剖析</div>
+      <div class="title">${t.name}</div>
+      <div class="desc">${t.links}。建议以「${t.mapTo}」作为行业研究对象。</div>
+      <div class="acts">
+        <a href="${industryUrl(t.mapTo)}">查看${t.mapTo}行业</a>
+        <button type="button" class="primary" id="act-join">加入行业研究</button>
+      </div>`;
+    document.getElementById('act-join').addEventListener('click', () => {
+      markResearched('行业:' + t.mapTo);
+      openResearch('ind', t.mapTo, RESEARCH_IND[t.mapTo] || '');
+    });
+    return;
+  }
+
+  cardEl.innerHTML = `
+    <div class="kind">未能识别</div>
+    <div class="title">${hit.query}</div>
+    <div class="desc">未匹配到公司、行业或已知话题。可改用补全建议，或输入如「贵州茅台分析」「白酒行业」「猪肉周期分析」。</div>
+    <div class="acts"><button type="button" id="act-clear">关闭</button></div>`;
+  document.getElementById('act-clear').addEventListener('click', hideCard);
+}
+
+function submitQuery() {
+  const q = input.value.trim();
+  if (!q) return;
+  const hit = detectIntent(q);
+  renderCard(hit);
+}
+
+input.addEventListener('input', () => {
+  hideCard();
+  renderSuggest(input.value);
+});
+input.addEventListener('keydown', e => {
+  if (e.key === 'Enter') {
+    e.preventDefault();
+    submitQuery();
+  } else if (e.key === 'Escape') {
+    hideSuggest();
+    hideCard();
+  }
+});
+document.getElementById('btn-corp').addEventListener('click', () => {
+  if (!input.value.trim()) input.value = '贵州茅台分析';
+  else if (!/分析|研究/.test(input.value)) input.value = input.value.trim() + '分析';
+  submitQuery();
+});
+document.getElementById('btn-ind').addEventListener('click', () => {
+  if (!input.value.trim()) input.value = '白酒行业分析';
+  else if (!/行业/.test(input.value)) input.value = input.value.trim().replace(/分析$/, '') + '行业分析';
+  else if (!/分析|研究/.test(input.value)) input.value = input.value.trim() + '分析';
+  submitQuery();
+});
+function openTopicByName(name) {
+  input.value = name + '分析';
+  submitQuery();
+  document.getElementById('command-box')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+function renderHotThemePicker() {
+  hideSuggest();
+  cardEl.classList.add('show');
+  cardEl.innerHTML = `
+    <div class="kind">热点剖析</div>
+    <div class="title">选择热门主题</div>
+    <div class="desc">从下方热门主题中选择一项，确认后再查看行业或加入研究。</div>
+    <div class="cands" id="theme-cands">
+      ${HOT_THEMES.map((n, i) => {
+        const t = TOPIC_DICT.find(x => x.name === n);
+        const meta = (t?.stocks || []).slice(0, 2).join('、') || (t?.mapTo || '多候选');
+        return `<button type="button" class="cand${i === 0 ? ' on' : ''}" data-name="${n}"><strong>${n}</strong> · ${meta}</button>`;
+      }).join('')}
+    </div>
+    <div class="acts">
+      <button type="button" id="act-scroll-themes">查看热门主题列表</button>
+      <button type="button" class="primary" id="act-pick-theme">剖析所选主题</button>
+    </div>`;
+  let selected = HOT_THEMES[0];
+  const cands = cardEl.querySelectorAll('.cand');
+  cands.forEach(btn => btn.addEventListener('click', () => {
+    selected = btn.dataset.name;
+    cands.forEach(x => x.classList.toggle('on', x === btn));
+  }));
+  document.getElementById('act-scroll-themes')?.addEventListener('click', () => {
+    // 主题列表在资讯页（资讯雷达）
+    location.href = 'market/intel.html';
+  });
+  document.getElementById('act-pick-theme').addEventListener('click', () => openTopicByName(selected));
+}
+document.getElementById('btn-topic').addEventListener('click', () => {
+  const q = input.value.trim();
+  if (!q) {
+    renderHotThemePicker();
+    return;
+  }
+  if (!/分析|研究|剖析/.test(q)) input.value = q + '分析';
+  submitQuery();
+});
+document.querySelectorAll('.theme-card[data-theme]').forEach(card => {
+  card.addEventListener('click', () => openTopicByName(card.dataset.theme));
+});
+
+// ─── 热力图：有序二分 treemap ───
+const INDUSTRIES = [
+  ['银行',-2.13,10],['半导体',7.29,10],['电池',1.86,6],['证券',0.03,6],
+  ['电力',0.60,5],['消费电子',4.39,5],['通信设备',5.15,5],['白酒',-0.25,5],
+  ['保险',-1.06,4],['煤炭开采',-0.61,4],['炼化及贸易',0.57,4],['元件',7.08,4],
+  ['通用设备',3.87,4],['通信服务',3.55,4],['工业金属',2.12,4],['乘用车',-0.45,3],
+  ['计算机',3.94,3],['光学光电子',4.50,3],['光伏设备',1.93,3],['化学制品',1.59,3],
+  ['IT服务',4.68,3],['汽车零部件',2.00,3],['电网设备',1.59,3],['自动化设备',5.02,3],
+  ['医疗器械',1.54,3],['化学制药',1.17,3],['软件开发',4.48,3],['油气开采',-1.08,3],
+  ['专用设备',2.51,2],['白色家电',-0.07,2],['航运港口',-0.40,2],['军工电子',3.28,2],
+  ['房地产',0.75,2],['航空装备',1.24,2],['小金属',3.80,2],['中药',0.60,2],
+];
+const STOCKS = [
+  ['贵州茅台',-1.83,9],['宁德时代',-0.76,8],['中国平安',-2.24,6],['招商银行',-2.91,6],
+  ['长鑫科技',9.89,5],['五粮液',-0.34,5],['山西汾酒',-1.61,5],['雅克科技',3.54,5],
+  ['华电国际',-0.83,5],['分众传媒',-1.25,5],['中国联通',-1.12,5],['长江电力',-2.85,5],
+  ['紫金矿业',1.16,5],['中际旭创',8.51,4],['中国神华',-2.67,4],['中国海油',-1.32,4],
+  ['泸州老窖',0.00,4],['双汇发展',-2.94,4],['中国铝业',0.84,4],['东鹏饮料',-2.83,4],
+  ['唐山港',-2.65,3],['中远海特',3.19,3],['亿联网络',-0.08,3],['华润新能源',2.07,3],
+  ['伊利股份',-2.20,3],['中粮糖业',2.70,3],['中国船舶',0.58,3],['三一重工',-1.44,3],
+  ['华能国际',0.00,3],['德业股份',0.66,3],
+];
+
+function levelClass(chg) {
+  const a = Math.abs(chg);
+  if (a < 0.2) return 'hm-flat';
+  const l = a >= 5 ? 4 : a >= 2.5 ? 3 : a >= 1 ? 2 : 1;
+  return (chg > 0 ? 'hm-up-' : 'hm-down-') + l;
+}
+function fmtChg(c) {
+  if (c === 0) return '0.00%';
+  return (c > 0 ? '+' : '−') + Math.abs(c).toFixed(2) + '%';
+}
+
+function renderTreemap(el, data) {
+  const W = el.clientWidth, H = el.clientHeight;
+  // 外沿内缩 + 格缝：圆角保留，偏密（缝刚好露出底）
+  const PAD = 2, GAP = 1.5;
+  const items = data.map(([name, chg, w]) => ({ name, chg, w }))
+                    .sort((a, b) => b.w - a.w);
+  el.innerHTML = '';
+
+  function place(list, x, y, w, h) {
+    if (!list.length) return;
+    if (list.length === 1) return draw(list[0], x, y, w, h);
+    const total = list.reduce((s, d) => s + d.w, 0);
+    let acc = 0, i = 0;
+    while (i < list.length - 1 && acc < total / 2) acc += list[i++].w;
+    const a = list.slice(0, i), b = list.slice(i);
+    const ratio = a.reduce((s, d) => s + d.w, 0) / total;
+    if (w >= h) {
+      place(a, x, y, w * ratio, h);
+      place(b, x + w * ratio, y, w * (1 - ratio), h);
+    } else {
+      place(a, x, y, w, h * ratio);
+      place(b, x, y + h * ratio, w, h * (1 - ratio));
+    }
+  }
+
+  function draw(d, x, y, w, h) {
+    const c = document.createElement('div');
+    c.className = 'hm-cell ' + levelClass(d.chg);
+    const tip = el.id === 'hm-industry' ? ' · 点击查看行业'
+      : el.id === 'hm-stock' ? ' · 点击查看个股' : '';
+    c.title = d.name + ' ' + fmtChg(d.chg) + tip;
+    c.style.cssText = `left:${x + GAP / 2}px;top:${y + GAP / 2}px;width:${Math.max(w - GAP, 0)}px;height:${Math.max(h - GAP, 0)}px;`;
+    if (w >= 56 && h >= 32) {
+      c.innerHTML = `<div class="v">${fmtChg(d.chg)}</div><div class="t">${d.name}</div>`;
+    } else if (w >= 40 && h >= 22) {
+      c.innerHTML = `<div class="t">${d.name}</div>`;
+    }
+    if (el.id === 'hm-industry') {
+      c.style.cursor = 'pointer';
+      c.addEventListener('click', () => {
+        // 行业热力点击 → 行业页
+        location.href = '04-industry.html?name=' + encodeURIComponent(d.name);
+      });
+    } else if (el.id === 'hm-stock') {
+      c.style.cursor = 'pointer';
+      c.addEventListener('click', () => {
+        location.href = '05-stock.html?name=' + encodeURIComponent(d.name);
+      });
+    }
+    el.appendChild(c);
+  }
+
+  place(items, PAD, PAD, Math.max(W - PAD * 2, 0), Math.max(H - PAD * 2, 0));
+}
+
+const hmI = document.getElementById('hm-industry');
+const hmS = document.getElementById('hm-stock');
+function renderAll() {
+  if (!hmI || !hmS || !hmI.clientWidth) return;
+  renderTreemap(hmI, INDUSTRIES);
+  renderTreemap(hmS, STOCKS);
+}
+renderAll();
+window.addEventListener('resize', renderAll);
+
+// ─── 行情壳：左栏 总览 / 板块 / 资讯 ───
+(function () {
+
+  const shell = document.getElementById('shell');
+
+  window.MKT_AGENT_CTX = {
+    title: '今日市场 · 复盘',
+    sub: '左栏 · 总览',
+    body: '会带上这些客观数据：指数涨跌、行业/个股热力头部、热门主题、7×24 要点。分析由你的模型完成，产品只提供客观数据。',
+    ph: '追问今日行情…',
+  };
+  document.getElementById('ai-overview')?.addEventListener('click', () => window.MKT_AGENT.open(true));
+  window.addEventListener('mkt:agent-layout', () => renderAll());
+
+  // 热门主题卡：也可进板块镜头
+  document.querySelectorAll('.theme-card[data-theme]').forEach(card => {
+    // 保留原 openTopicByName；长按/次要路径不改
+  });
+})();
+</script>
+</body>
+</html>

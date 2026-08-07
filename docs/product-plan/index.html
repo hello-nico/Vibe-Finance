@@ -489,17 +489,7 @@
       padding: 20px;
     }
 
-    .trust .t-mark {
-      width: 30px; height: 30px;
-      border-radius: 9px;
-      background: var(--accent-soft);
-      color: var(--accent-deep);
-      display: grid; place-items: center;
-      font-size: 14px; font-weight: 800;
-      margin-bottom: 12px;
-    }
-
-    .trust h3 { font-size: 14.5px; }
+    .trust h3 { font-size: 14.5px; margin-bottom: 6px; }
     .trust p { font-size: 12.5px; color: var(--muted); }
 
     .trust-note {
@@ -769,6 +759,7 @@
 
     /* ---------- cases ---------- */
     .cases { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .cases.three { grid-template-columns: repeat(3, 1fr); }
 
     .case {
       background: var(--paper);
@@ -788,6 +779,11 @@
 
     .case.cyc .c-tag { background: var(--accent-soft); color: var(--accent-deep); }
     .case.gro .c-tag { background: var(--green-soft); color: var(--green); }
+    .case.mkt .c-tag { background: var(--accent-soft); color: var(--accent-deep); }
+    .case.res .c-tag { background: var(--amber-soft); color: var(--amber); }
+    .case.dat .c-tag { background: var(--green-soft); color: var(--green); }
+    .case.ind .c-tag { background: var(--gray-soft); color: var(--muted); }
+    .case.stk .c-tag { background: var(--gray-soft); color: var(--muted); }
 
     .case h3 { font-size: 15.5px; }
     .case p { font-size: 13px; color: var(--muted); }
@@ -865,7 +861,7 @@
     @media (max-width: 960px) {
       .hero, .skeleton, .val-grid, .snapshot-body { grid-template-columns: 1fr; }
       .trust-grid, .guardrails { grid-template-columns: 1fr 1fr; }
-      .pages-grid, .cases { grid-template-columns: 1fr; }
+      .pages-grid, .cases, .cases.three { grid-template-columns: 1fr; }
       .archive-flow { flex-direction: column; }
       .af-node + .af-node { border-left: 0; border-top: 1px dashed var(--line); }
       .snapshot-col + .snapshot-col { border-left: 0; border-top: 1px solid var(--line-soft); }
@@ -1113,32 +1109,26 @@
 
       <div class="trust-grid">
         <article class="trust">
-          <div class="t-mark">档</div>
           <h3>自动建好研究档案</h3>
           <p>加入一个行业或公司，档案就建好了：是干什么的、属于哪个行业、适合怎么分析、已经知道什么、还缺什么；公司自动关联所属行业，双向都能查。</p>
         </article>
         <article class="trust">
-          <div class="t-mark">源</div>
           <h3>出处和时间一直在</h3>
           <p>原始资料只加不改：出处、日期、原文位置都留着；要更正就加一条新记录，旧的不会被偷偷改掉。</p>
         </article>
         <article class="trust">
-          <div class="t-mark">整</div>
           <h3>自动整理，矛盾不掩盖</h3>
           <p>新消息自动整理进对应档案；两份资料打架时两边都摆出来、标上"存疑"，等有新证据再定论，不会偷偷盖掉一边。</p>
         </article>
         <article class="trust">
-          <div class="t-mark">级</div>
           <h3>事实和猜测分开标</h3>
           <p>哪些是事实、哪些是别人说的、哪些是推测，分开标清楚；你自己的想法在找到证据前会标成"待验证"，不会被当成事实。</p>
         </article>
         <article class="trust">
-          <div class="t-mark">控</div>
           <h3>你的资料你说了算</h3>
           <p>上传的文件、链接和文本集中管理；改或删之前，先告诉你会影响哪些结论，你点头才动；纠错也会留下原话和原因。</p>
         </article>
         <article class="trust">
-          <div class="t-mark">忆</div>
           <h3>记得住你的思路</h3>
           <p>你的假设、修正和待验证的问题会被长期记住，下次分析直接用；不会每次问答都从零开始。</p>
         </article>
@@ -1351,6 +1341,51 @@
           <h3>推理芯片</h3>
           <p>验证重点：收入结构和订单质量、产业链位置和竞争格局、高增长但利润还不稳定时怎么估值。</p>
           <a class="case-link" href="./inference-silicon-cn/index.html">打开交互案例 →</a>
+        </article>
+      </div>
+    </section>
+
+    <section aria-labelledby="proto-title">
+      <div class="section-heading">
+        <div>
+          <p class="section-kicker">设计原型</p>
+          <h2 id="proto-title">先看界面长什么样，再确认交互对不对</h2>
+        </div>
+        <p class="section-intro">
+          用模拟数据演示行情发现、研究阅读、资料管理；不是最终产品，用来对齐交互方向。
+        </p>
+      </div>
+
+      <div class="cases three">
+        <article class="case mkt">
+          <span class="c-tag">行情</span>
+          <h3>行情总览</h3>
+          <p>广度发现入口：指数、热力、行业与资讯；从这里发现方向并加入研究。</p>
+          <a class="case-link" href="./prototype/01-market.html">打开原型设计 →</a>
+        </article>
+        <article class="case res">
+          <span class="c-tag">研究</span>
+          <h3>关注与对象页</h3>
+          <p>关注列表、最近更新、健康评估、当前报告与研究依据；持续看懂一只股或一个行业。</p>
+          <a class="case-link" href="./prototype/02-research.html">打开原型设计 →</a>
+        </article>
+        <article class="case dat">
+          <span class="c-tag">数据</span>
+          <h3>数据源与研究资料</h3>
+          <p>数据通道、你上传的资料、配置与变更记录；管来源、改删前先确认。</p>
+          <a class="case-link" href="./prototype/03-data.html">打开原型设计 →</a>
+        </article>
+        <article class="case ind">
+          <span class="c-tag">详情</span>
+          <h3>行业详情</h3>
+          <p>行业数据看板与加入研究；无自动生成结论，助手仍可分析当前页。</p>
+          <a class="case-link" href="./prototype/04-industry.html">打开原型设计 →</a>
+        </article>
+        <article class="case stk">
+          <span class="c-tag">详情</span>
+          <h3>个股详情</h3>
+          <p>个股数据看板、基本面速览入口与加入研究；先看清这家公司再决定深挖。</p>
+          <a class="case-link" href="./prototype/05-stock.html">打开原型设计 →</a>
         </article>
       </div>
     </section>

@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>投研助手 · 行情 · 资讯雷达</title>
+<link rel="stylesheet" href="../shared.css?v=10">
+<script src="../theme.js?v=3"></script>
+<script src="data.js?v=2"></script>
+<style>body > main.main-area { display: none; }</style>
+</head>
+<body>
+<div id="shell-root" data-view="intel"></div>
+
+<main class="main-area">
+  <div class="content-with-agent">
+    <div class="page-body">
+
+      <div class="ov-head">
+        <div>
+          <h1>资讯雷达</h1>
+          <p class="sub">多来源资讯中心：AI 帮你跨源捞资讯、提炼要点</p>
+        </div>
+      </div>
+
+      <!-- 左侧“今日资讯”承担来源切换；主区只呈现当前资讯 Dashboard。 -->
+      <div id="intel-body"></div>
+
+    </div>
+  </div>
+</main>
+
+<script src="shell.js?v=13"></script>
+<script src="agent.js"></script>
+<script src="../nav-collapse.js?v=10"></script>
+<script src="components.js?v=2"></script>
+<script>
+(function () {
+  var D = window.MKT_DATA;
+  var C = window.MarketComponents;
+  var params = new URLSearchParams(location.search);
+  var tab = params.get('tab') || 'investment-news';
+  var trackId = params.get('track') || 'llm';
+  var bodyEl = document.getElementById('intel-body');
+
+  function setCtx() {
+    if (tab === 'investment-news') {
+      var t = D.tracks.find(function (x) { return x.id === trackId; }) || D.tracks[0];
+      window.MKT_AGENT_CTX = {
+        title: '资讯 · ' + (t ? t.name : 'Investment News'),
+        sub: '资讯雷达 · Investment News',
+        body: '会带上 ' + (t ? t.name : '当前赛道') + ' 近 7 日公开源标题与摘要，输出「今日要点」条目。客观陈述，不推荐标的。',
+        ph: '追问本赛道…',
+      };
+    } else if (tab === 'filings') {
+      window.MKT_AGENT_CTX = {
+        title: '资讯 · A股公告',
+        sub: '资讯雷达 · A股公告',
+        body: '会带上关注列表近期公告标题，提炼可核对要点。公开披露，不构成建议。',
+        ph: '追问公告…',
+      };
+    } else if (tab === 'news') {
+      window.MKT_AGENT_CTX = {
+        title: '资讯 · 公开新闻',
+        sub: '资讯雷达 · 公开新闻',
+        body: '会带上关注列表近期公开新闻标题，提炼今日要点。',
+        ph: '追问新闻…',
+      };
+    }
+  }
+
+  function render() {
+    bodyEl.innerHTML = C.renderIntelBody(tab, D, trackId);
+    setCtx();
+    bind();
+  }
+
+  function bind() {
+    bodyEl.querySelectorAll('.news-chip[data-track]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        trackId = btn.getAttribute('data-track');
+        history.replaceState(null, '', '?tab=investment-news&track=' + trackId);
+        render();
+      });
+    });
+
+    bodyEl.querySelectorAll('[data-ai]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        setCtx();
+        window.MKT_AGENT.open(true);
+      });
+    });
+  }
+
+  // 校验 tab
+  if (!(D.intelTabs || []).some(function (t) { return t.key === tab; })) tab = 'investment-news';
+  render();
+})();
+</script>
+</body>
+</html>
